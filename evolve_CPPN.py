@@ -36,21 +36,32 @@ class MinecraftBreeder(object):
         # Don't try any multithreading yet
         self.num_workers = 1
 
-    def make_image_from_data(self, image_data, width, height):
-        # For mono and grayscale, we need a palette because the evaluation function
-        # only returns a single integer instead of an (R, G, B) tuple.
-        if self.scheme == 'color':
-            image = pygame.Surface((width, height))
-        else:
-            image = pygame.Surface((width, height), depth=8)
-            palette = tuple([(i, i, i) for i in range(256)])
-            image.set_palette(palette)
-
-        for r, row in enumerate(image_data):
-            for c, color in enumerate(row):
-                image.set_at((r, c), color)
-
-        return image
+    def query_cppn_for_shape(genome, config, xrange, yrange, zrange):
+        """
+            Query CPPN at all voxel coordinates to generate the list of
+            blocks that will eventually be rendered in the Minecraft server.
+        """
+        net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
+        shape = []
+        for xi in range(xrange):
+            x = scale_and_center(xi,xrange)
+            row = []
+            for yi in range(yrange):
+                y = scale_and_center(yi,yrange)
+                for zi in range(zrange):
+                    z = scale_and_center(zi,zrange)
+                
+                    output = net.activate([x, y, z, distance((x,y,z),(0,0,0))])
+                    red = int(round((output[0] + 1.0) * 255 / 2.0))
+                    green = int(round((output[1] + 1.0) * 255 / 2.0))
+                    blue = int(round((output[2] + 1.0) * 255 / 2.0))
+                    red = max(0, min(255, red))
+                    green = max(0, min(255, green))
+                    blue = max(0, min(255, blue))
+                    row.append((red, green, blue))
+                shape.append(row)
+        
+        return shape
 
     def eval_fitness(self, genomes, config):
         """
@@ -76,6 +87,25 @@ class MinecraftBreeder(object):
             else:
                 genome.fitness = 0.0
 
+def distance(v, u):
+    """
+    Euclidean distance between two vectors of the same length.
+    :param u: a vectors
+    :param v: other vector
+    """
+    d = 0;
+    for i in range(len(u)):
+        d += (u[i] - v[i])**2
+    return math.sqrt(d)
+
+def scale_and_center(index, top):
+    """
+    This scales the block index to the range [-1,1]
+    
+    :param index: index of block along a given dimension
+    :param top: number of blocks along the given dimension
+    """
+    return -1.0 + 2.0 * index / (top - 1)
 
 def run():
     mc = MinecraftBreeder(10,10,10)
