@@ -6,8 +6,10 @@ fitness_threshold     = 1.01
 pop_size              = 0
 reset_on_extinction   = False
 
+# Genome will have x, y, z, r, and bias inputs.
+# Outputs starting very simply (improve later): Just presence (Air vs Something) and two block types (one chosen if not Air)
 [DefaultGenome]
-num_inputs              = 2
+num_inputs              = 5
 num_hidden              = 3
 num_outputs             = 3
 initial_connection      = partial_direct 0.25
@@ -55,6 +57,7 @@ compatibility_threshold = 5.0
 [InteractiveStagnation]
 max_stagnation       = 5
 
+# TODO: Add some elitism once I'm sure I know how the setting works
 [DefaultReproduction]
 elitism            = 0
 survival_threshold = 0.5
