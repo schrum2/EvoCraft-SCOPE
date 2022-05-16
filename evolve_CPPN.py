@@ -63,6 +63,11 @@ class MinecraftBreeder(object):
         :param zrange: range of y-coordinate values rendered
         :param xrange: range of z-coordinate values rendered
         """
+        
+        self.startx = 0
+        self.starty = 0
+        self.startx = 0
+        
         self.generation = 0
         self.xrange = xrange
         self.yrange = yrange
@@ -87,66 +92,17 @@ class MinecraftBreeder(object):
 
         return image
 
-    def make_thumbnails(self, genomes, config):
-        img_func = eval_mono_image
-        if self.scheme == 'gray':
-            img_func = eval_gray_image
-        elif self.scheme == 'color':
-            img_func = eval_color_image
-
-        with Pool(self.num_workers) as pool:
-            jobs = []
-            for genome_id, genome in genomes:
-                jobs.append(pool.apply_async(img_func, (genome, config, self.thumb_width, self.thumb_height)))
-
-            thumbnails = []
-            for j in jobs:
-                # TODO: This code currently generates the image data using the multiprocessing
-                # pool, and then does the actual image construction here because pygame complained
-                # about not being initialized if the pool workers tried to construct an image.
-                # Presumably there is some way to fix this, but for now this seems fast enough
-                # for the purposes of a demo.
-                image_data = j.get()
-
-                thumbnails.append(self.make_image_from_data(image_data, self.thumb_width, self.thumb_height))
-
-        return thumbnails
-
-    def make_high_resolution(self, genome, config):
-        genome_id, genome = genome
-
-        # Make sure the output directory exists.
-        if not os.path.isdir('rendered'):
-            os.mkdir('rendered')
-
-        if self.scheme == 'gray':
-            image_data = eval_gray_image(genome, config, self.full_width, self.full_height)
-        elif self.scheme == 'color':
-            image_data = eval_color_image(genome, config, self.full_width, self.full_height)
-        else:
-            image_data = eval_mono_image(genome, config, self.full_width, self.full_height)
-
-        image = self.make_image_from_data(image_data, self.full_width, self.full_height)
-        pygame.image.save(image, "rendered/rendered-{}-{}.png".format(os.getpid(), genome_id))
-
-        with open("rendered/genome-{}-{}.bin".format(os.getpid(), genome_id), "wb") as f:
-            pickle.dump(genome, f, 2)
-
     def eval_fitness(self, genomes, config):
+        """
+            This function is expected by the NEAT-Python framework.
+            It takes a population of genomes and configuration information
+        """
         selected = []
-        rects = []
+        placements = []
         for n, (genome_id, genome) in enumerate(genomes):
             selected.append(False)
-            row, col = divmod(n, self.num_cols)
-            rects.append(pygame.Rect(4 + (self.thumb_width + 4) * col,
-                                     4 + (self.thumb_height + 4) * row,
-                                     self.thumb_width, self.thumb_height))
-
-        pygame.init()
-        screen = pygame.display.set_mode((self.window_width, self.window_height))
-        pygame.display.set_caption("Interactive NEAT-python generation {0}".format(self.generation))
-
-        buttons = self.make_thumbnails(genomes, config)
+            # These are the 3D regions where each evolved shape will be placed
+            placements.append( (self.startx + n*self.xrange, self.starty, self.startz) )
 
         running = True
         while running:
