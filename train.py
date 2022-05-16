@@ -5,6 +5,7 @@ import torch
 from os.path import join, exists
 from os import mkdir
 import numpy as np
+import neat
 
 from evolution_strategy_static import EvolutionStrategyStatic
 from policies import RNN, MLP, SymMLP
@@ -21,7 +22,7 @@ def main(argv):
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--generator', type=str, default='MLP',
-                        metavar='', help='Generator/policy type: MLP, RNN, SymMLP')
+                        metavar='', help='Generator/policy type: MLP, RNN, SymMLP, CPPN')
     parser.add_argument('--restricted', type=int, default=1, metavar='',
                         help='0 or 1. Tells if want to use only a restricted list of blocks (1), else 0.')
     parser.add_argument('--dimension', type=int, default=3, metavar='',
@@ -154,6 +155,41 @@ def main(argv):
         }
         p = RNN(generator_init_params['output_dim'], generator_init_params['embedding_dim'],
                 generator_init_params['hidden_dim_RNN'], generator_init_params['n_layers_RNN'], generator_init_params['if_embedding'])
+    elif args.generator == 'CPPN':
+        if args.restricted == 1:
+            output_dim = int(len(RESTRICTED_BLOCKS) + 6*args.oriented+1)
+        else:
+            output_dim = int(254-len(REMOVED_INDICES)+6*args.oriented)
+        generator_init_params = {
+            'output_dim': output_dim,
+            'embedding_dim': 50,
+            'dimension': args.dimension+1,
+            'restricted_encoding': args.restricted,
+            # Bounds within which will query the network to build a structure. If 2D, the 3rd dimension will be ignored.
+            'bounds': [6, 10, 10],
+            # If query blocks only within a radial bound.
+            'radial_bound': True,
+            # If radial_bound=true, will inquire only blocks within a certain radius. Has to be between 0 and 1. Radius computed then depending on above bounds.
+            'max_radius': 0.9,
+            'top_k': args.top_k,
+            'min_size': 3,  # Minimum number of block for a structure to proposed under the human rating
+            'position': args.position,
+            'choice_batch': args.choice_batch,
+            'n_layers': 3,  # Number layers of the MLP. May be 2 or 3.
+            'population_size': args.population_size,
+            'oriented': bool(args.oriented),
+            # Enable to have some control over the density of the structure.
+            'density_threshold': 0.75,
+            # May filter the input through 'sin' or 'abs' to enforce certain symmetry or regularities.
+            'input_symmetry': 'abs',
+            # If True, will symmetrise structure on the X axis.
+            'symmetrise': False
+        }
+        #p = MLP(generator_init_params['output_dim'], generator_init_params['embedding_dim'],
+        #        generator_init_params['dimension'], generator_init_params['n_layers'])
+
+        print("Don't know how to initialize the CPPN yet!")
+        raise NotImplementedError
 
     else:
         raise NotImplementedError
