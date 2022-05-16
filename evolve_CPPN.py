@@ -56,36 +56,20 @@ class InteractiveStagnation(object):
         return result
 
 
-class PictureBreeder(object):
-    def __init__(self, thumb_width, thumb_height, full_width, full_height,
-                 window_width, window_height, scheme, num_workers):
+class MinecraftBreeder(object):
+    def __init__(self, xrange, yrange, zrange):
         """
-        :param thumb_width: Width of preview image
-        :param thumb_height: Height of preview image
-        :param full_width: Width of full rendered image
-        :param full_height: Height of full rendered image
-        :param window_width: Width of the view window
-        :param window_height: Height of the view window
-        :param scheme: Image type to generate: mono, gray, or color
+        :param xrange: range of x-coordinate values rendered
+        :param zrange: range of y-coordinate values rendered
+        :param xrange: range of z-coordinate values rendered
         """
         self.generation = 0
-        self.thumb_width = thumb_width
-        self.thumb_height = thumb_height
-        self.full_width = full_width
-        self.full_height = full_height
-
-        self.window_width = window_width
-        self.window_height = window_height
-
-        assert scheme in ('mono', 'gray', 'color')
-        self.scheme = scheme
-
-        # Compute the number of thumbnails we can show in the viewer window, while
-        # leaving one row to handle minor variations in the population size.
-        self.num_cols = int(math.floor((window_width - 16) / (thumb_width + 4)))
-        self.num_rows = int(math.floor((window_height - 16) / (thumb_height + 4)))
-
-        self.num_workers = num_workers
+        self.xrange = xrange
+        self.yrange = yrange
+        self.zrange = zrange
+        
+        # Don't try any multithreading yet
+        self.num_workers = 1
 
     def make_image_from_data(self, image_data, width, height):
         # For mono and grayscale, we need a palette because the evaluation function
@@ -203,8 +187,7 @@ class PictureBreeder(object):
 
 
 def run():
-    # 128x128 thumbnails, 1500x1500 rendered images, 1100x810 viewer, grayscale images, 4 worker processes.
-    pb = PictureBreeder(128, 128, 1500, 1500, 1100, 810, 'color', 4)
+    mc = MinecraftBreeder(10,10,10)
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
@@ -215,7 +198,7 @@ def run():
                          neat.DefaultSpeciesSet, InteractiveStagnation,
                          config_path)
 
-    config.pop_size = pb.num_cols * pb.num_rows
+    config.pop_size = 10
     pop = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
@@ -224,8 +207,8 @@ def run():
     pop.add_reporter(stats)
 
     while 1:
-        pb.generation = pop.generation + 1
-        pop.run(pb.eval_fitness, 1)
+        mc.generation = pop.generation + 1
+        pop.run(mc.eval_fitness, 1)
 
 
 if __name__ == '__main__':
