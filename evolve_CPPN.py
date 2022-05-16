@@ -16,46 +16,6 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-class InteractiveStagnation(object):
-    """
-    This class is used as a drop-in replacement for the default species stagnation scheme.
-
-    A species is only marked as stagnant if the user has not selected one of its output images
-    within the last `max_stagnation` generations.
-    """
-
-    def __init__(self, config, reporters):
-        self.max_stagnation = int(config.get('max_stagnation'))
-        self.reporters = reporters
-
-    @classmethod
-    def parse_config(cls, param_dict):
-        config = {'max_stagnation': 15}
-        config.update(param_dict)
-
-        return config
-
-    @classmethod
-    def write_config(cls, f, config):
-        f.write('max_stagnation       = {}\n'.format(config['max_stagnation']))
-
-    def update(self, species_set, generation):
-        result = []
-        for s in species_set.species.values():
-            # If any member of the species is selected (i.e., has a fitness above zero),
-            # mark the species as improved.
-            for m in s.members.values():
-                if m.fitness > 0:
-                    s.last_improved = generation
-                    break
-
-            stagnant_time = generation - s.last_improved
-            is_stagnant = stagnant_time >= self.max_stagnation
-            result.append((s.key, s, is_stagnant))
-
-        return result
-
-
 class MinecraftBreeder(object):
     def __init__(self, xrange, yrange, zrange):
         """
@@ -95,7 +55,9 @@ class MinecraftBreeder(object):
     def eval_fitness(self, genomes, config):
         """
             This function is expected by the NEAT-Python framework.
-            It takes a population of genomes and configuration information
+            It takes a population of genomes and configuration information,
+            and assigns fitness values to each of the genome objects in
+            the population.
         """
         selected = []
         placements = []
@@ -104,40 +66,13 @@ class MinecraftBreeder(object):
             # These are the 3D regions where each evolved shape will be placed
             placements.append( (self.startx + n*self.xrange, self.starty, self.startz) )
 
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    running = False
-                    break
+        # TODO: Loop through and render all shapes in Minecraft server
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    clicked_button = -1
-                    for n, button in enumerate(buttons):
-                        if rects[n].collidepoint(pygame.mouse.get_pos()):
-                            clicked_button = n
-                            break
-
-                    if event.button == 1:
-                        selected[clicked_button] = not selected[clicked_button]
-                    else:
-                        self.make_high_resolution(genomes[clicked_button], config)
-
-            if running:
-                screen.fill((128, 128, 192))
-                for n, button in enumerate(buttons):
-                    screen.blit(button, rects[n])
-                    if selected[n]:
-                        pygame.draw.rect(screen, (255, 0, 0), rects[n], 3)
-                pygame.display.flip()
+        # TODO: Figure out how to specify which items are or are not selected (ideally via in-game interaction)
 
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
                 genome.fitness = 1.0
-                pygame.image.save(buttons[n], "image-{}.{}.png".format(os.getpid(), genome_id))
-                with open("genome-{}-{}.bin".format(os.getpid(), genome_id), "wb") as f:
-                    pickle.dump(genome, f, 2)
             else:
                 genome.fitness = 0.0
 
