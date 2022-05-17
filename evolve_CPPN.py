@@ -94,7 +94,7 @@ class MinecraftBreeder(object):
                 for zi in range(zrange):
                     z = scale_and_center(zi,zrange)
                     # math.sqrt(2) is the usual scaling for radial distances in CPPNs
-                    output = net.activate([x, y, z, distance((x,y,z),(0,0,0)) * math.sqrt(2)])
+                    output = net.activate([x, y, z, distance((x,y,z),(0,0,0)) * math.sqrt(2), 1.0])
                     
                     # First output determines whether there is a block at all.
                     # The next two outputs favor one block or the other: redstone or quartz.
