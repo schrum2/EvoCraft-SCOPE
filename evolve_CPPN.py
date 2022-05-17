@@ -110,6 +110,24 @@ class MinecraftBreeder(object):
         
         return shape
 
+    def place_fences(self, pop_size):
+        fence = []
+        # Make the first row because this is a fence post problem
+        for first in range(self.zrange+2):
+            fence.append(Block(position=Point(x=self.startx-1, y=self.starty,z=self.startz-1 + first), type=DARK_OAK_FENCE, orientation=NORTH))
+
+        # Make nested for loops that will make the fence going in the 
+        # top and bottom and other column that divides each structure
+        for i in range(pop_size): # should it be pop_size for them all?
+            # do the top
+            for j in range(pop_size):
+                # do the bottom
+                for k in range(pop_size):
+                    #do the one that divides the structures
+                    x = 5
+
+        self.client.spawnBlocks(Blocks(blocks=fence))
+
     def eval_fitness(self, genomes, config):
         """
             This function is expected by the NEAT-Python framework.
@@ -117,6 +135,8 @@ class MinecraftBreeder(object):
             and assigns fitness values to each of the genome objects in
             the population.
         """
+        self.place_fences(config.pop_size)
+
         selected = []
         placements = []
         shapes = []
