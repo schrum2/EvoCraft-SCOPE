@@ -65,7 +65,7 @@ class MinecraftBreeder(object):
         """
         
         self.startx = 0
-        self.starty = 0
+        self.starty = 5
         self.startz = 0
         
         self.generation = 0
