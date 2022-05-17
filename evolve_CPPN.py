@@ -36,7 +36,11 @@ class MinecraftBreeder(object):
         # Don't try any multithreading yet
         self.num_workers = 1
 
-    def query_cppn_for_shape(genome, config, xrange, yrange, zrange):
+        # Connect to Minecraft server
+        channel = grpc.insecure_channel('localhost:5001')
+        self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
+
+    def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
         """
             Query CPPN at all voxel coordinates to generate the list of
             blocks that will eventually be rendered in the Minecraft server.
@@ -45,21 +49,24 @@ class MinecraftBreeder(object):
         shape = []
         for xi in range(xrange):
             x = scale_and_center(xi,xrange)
-            row = []
             for yi in range(yrange):
                 y = scale_and_center(yi,yrange)
                 for zi in range(zrange):
                     z = scale_and_center(zi,zrange)
-                
-                    output = net.activate([x, y, z, distance((x,y,z),(0,0,0))])
-                    red = int(round((output[0] + 1.0) * 255 / 2.0))
-                    green = int(round((output[1] + 1.0) * 255 / 2.0))
-                    blue = int(round((output[2] + 1.0) * 255 / 2.0))
-                    red = max(0, min(255, red))
-                    green = max(0, min(255, green))
-                    blue = max(0, min(255, blue))
-                    row.append((red, green, blue))
-                shape.append(row)
+                    # math.sqrt(2) is the usual scaling for radial distances in CPPNs
+                    output = net.activate([x, y, z, distance((x,y,z),(0,0,0)) * math.sqrt(2)])
+                    
+                    # First output determines whether there is a block at all.
+                    # The next two outputs favor one block or the other: redstone or quartz.
+                    # Only if a block is present, then the max of the two available choices is used.
+                    if output[0] < 0.5: 
+                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
+                    elif output[1] > output[2]:
+                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=REDSTONE_BLOCK, orientation=NORTH)
+                    else:
+                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=QUARTZ_BLOCK, orientation=NORTH)
+                        
+                    shape.append(block)
         
         return shape
 
@@ -72,14 +79,33 @@ class MinecraftBreeder(object):
         """
         selected = []
         placements = []
+        shapes = []
+        
+        # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             selected.append(False)
             # These are the 3D regions where each evolved shape will be placed
-            placements.append( (self.startx + n*self.xrange, self.starty, self.startz) )
+            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
+            placements.append( corner )
+            # See how CPPN fills out the shape
+            shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
 
-        # TODO: Loop through and render all shapes in Minecraft server
+        # Render shapes in Minecraft world
+        for i in range(len(placements)):
+            space = placements[i]
+            # Clear a space for the shape
+            self.client.fillCube(FillCubeRequest(  
+                cube=Cube(
+                    min=Point(x=space[0], y=space[1], z=space[2]),
+                    max=Point(x=space[0]+self.xrange, y=space[1]+self.yrange, z=space[2]+self.zrange)
+                ),
+                type=AIR
+            ))
+            # fill the empty space with the evolved shape
+            self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
         # TODO: Figure out how to specify which items are or are not selected (ideally via in-game interaction)
+        input() # For now, just pause the algorithm to get user input
 
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
