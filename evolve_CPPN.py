@@ -16,6 +16,9 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
+from vectors_to_blocks import RESTRICTED_BLOCKS, REMOVED_INDICES
+
+
 class InteractiveStagnation(object):
     """
     This class is used as a drop-in replacement for the default species stagnation scheme.
@@ -145,7 +148,34 @@ class MinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
         # TODO: Figure out how to specify which items are or are not selected (ideally via in-game interaction)
-        input() # For now, just pause the algorithm to get user input
+        vals = input("Select the ones you like:") # For now, just pause the algorithm to get user input
+        splitVals = vals.split(' ')
+        mapVals = list(map(int,splitVals))
+
+        selected = []
+        
+        list1 = []
+        k = 0
+        print(config.pop_size)
+        print(selected)
+        while(k<config.pop_size):
+            valIndex = 0
+            placed = False
+            while(valIndex<len(mapVals) and not placed):
+                if(k==mapVals[valIndex]):
+                    placed = True
+                    selected.append(True)
+                valIndex = valIndex + 1
+            if(placed==False):
+                selected.append(False)
+            k = k + 1
+        
+        print(selected)
+
+
+
+
+
 
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
