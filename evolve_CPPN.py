@@ -10,6 +10,7 @@ import pickle
 
 # For CPPNs and NEAT
 import neat
+import custom_genomes as cg
 
 # for Minecraft
 import grpc
@@ -401,7 +402,7 @@ def run():
     config_path = os.path.join(local_dir, 'cppn_minecraft_config')
 
     # Note that we provide the custom stagnation class to the Config constructor.
-    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+    config = neat.Config(cg.CustomBlocksGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, InteractiveStagnation,
                          config_path)
 
