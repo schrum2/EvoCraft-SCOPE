@@ -16,7 +16,6 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-from vectors_to_blocks import RESTRICTED_BLOCKS, REMOVED_INDICES
 
 
 class InteractiveStagnation(object):
@@ -60,13 +59,14 @@ class InteractiveStagnation(object):
 
 
 class MinecraftBreeder(object):
-    def __init__(self, xrange, yrange, zrange):
+    def __init__(self, xrange, yrange, zrange, block_list):
         """
         :param xrange: range of x-coordinate values rendered
         :param zrange: range of y-coordinate values rendered
         :param xrange: range of z-coordinate values rendered
         """
-        
+        self.block_list = block_list
+
         self.startx = 0
         self.starty = 5
         self.startz = 0
@@ -103,14 +103,12 @@ class MinecraftBreeder(object):
                     # The next two outputs favor one block or the other: redstone or quartz.
                     # Only if a block is present, then the max of the two available choices is used.
 
-                    # TODO: Create a list that contains these blocks and then get this working with the list
                     if output[0] < 0.5: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
-                    elif output[1] > output[2]:
-                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=REDSTONE_BLOCK, orientation=NORTH)
                     else:
-                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=QUARTZ_BLOCK, orientation=NORTH)
-                        
+                        output_val = argmax(output[1:])
+                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=self.block_list[output_val-1], orientation=NORTH)
+
                     shape.append(block)
         
         return shape
@@ -151,8 +149,8 @@ class MinecraftBreeder(object):
 
         # Creates a string that is the user's input, and the converts it to a list
         vals = input("Select the ones you like:")
-        splitVals = vals.split(' ')
-        mapVals = list(map(int,splitVals))
+        split_vals = vals.split(' ')
+        selected_vals = list(map(int,split_vals))
 
         selected = []
         list1 = []
@@ -165,23 +163,18 @@ class MinecraftBreeder(object):
         # While loop goes through all values 0 to population size. Any value that the selected is added to
         # selected as true. Anyhting that isn't selected is added as false
         while(k<config.pop_size):
-            valIndex = 0
+            val_index = 0
             placed = False
-            while(valIndex<len(mapVals) and not placed):
-                if(k==mapVals[valIndex]):
+            while(val_index<len(selected_vals) and not placed):
+                if(k==selected_vals[val_index]):
                     placed = True
                     selected.append(True)
-                valIndex = valIndex + 1
+                val_index = val_index + 1
             if(placed==False):
                 selected.append(False)
             k = k + 1
         
         # print(selected)
-
-
-
-
-
 
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
@@ -189,11 +182,24 @@ class MinecraftBreeder(object):
             else:
                 genome.fitness = 0.0
 
+    # End of MinecraftBreeder
+
+# Various functions
+
+def argmax(l):
+    """
+    :param l a list of numeric elements
+    :return index of first maximal element
+    """
+    f = lambda i: l[i]
+    return max(range(len(l)), key=f)
+
 def distance(v, u):
     """
     Euclidean distance between two vectors of the same length.
-    :param u: a vectors
-    :param v: other vector
+    :param u a vectors
+    :param v other vector
+    :return distance between vectors
     """
     d = 0;
     for i in range(len(u)):
@@ -210,7 +216,10 @@ def scale_and_center(index, top):
     return -1.0 + 2.0 * index / (top - 1)
 
 def run():
-    mc = MinecraftBreeder(10,10,10)
+
+    block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,DIAMOND_BLOCK,GOLD_BLOCK,REDSTONE_LAMP]
+
+    mc = MinecraftBreeder(10,10,10,block_list)
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
@@ -222,7 +231,10 @@ def run():
                          config_path)
 
     config.pop_size = 10
-    #config.DefaultGenome.num_outputs = ???
+    # Changing the number of CPPN outputs after initialization. Could cause problems.
+    config.genome_config.num_outputs = len(block_list)
+    config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
+
     pop = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
