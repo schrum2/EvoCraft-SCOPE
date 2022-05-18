@@ -5,7 +5,6 @@ import random
 
 # For CPPNs and NEAT
 import neat
-import CustomBlocksGenome
 
 # for Minecraft
 import grpc
@@ -16,23 +15,35 @@ LENGTH_OF_BLOCKLIST = 5
 MUTATE_CONSTANT = .2
 
 class CustomBlocksGenome(neat.DefaultGenome):
+    # Initializes the block list
     def __init__(self, key):
         super().__init__(key)
         self.block_list = []
 
+    # Fills the block list with random block types
     def configure_new(self, config):
         super().configure_new(config)
         self.block_list = random.sample(list(BlockType), LENGTH_OF_BLOCKLIST) #<--
 
+    # Randomly selects one block list from the two genomes (multi-point crossover)
     def configure_crossover(self, genome1, genome2, config):
         super().configure_crossover(genome1, genome2, config)
-        self.block_list = random.choice(genome1.block_list,genome2.block_list)
 
+        index =0
+        while(index<len(self.block_list)):
+            rand_choice = random.uniform(0.0,1.0)
+            if(rand_choice<.5):
+                self.block_list.append(genome1.block_list)
+            else:
+                self.block_list.append(genome2.block_list)
+               
+
+    # Based on MUTATE_CONSTANT, selects a random index and replaces it with a new random block
     def mutate(self, config):
         super().mutate(config)
         r = random()
         if(r<MUTATE_CONSTANT):
-            random_int = random.randInt(0,len(self.block_list)-1) #<--
+            random_int = random.randInt(0,len(self.block_list)) #<--
             self.block_list[random_int] = random.choice(list(BlockType))#<--
     
     # Arbitrary value for the difference calculated by inceasing the distance for each difference 
