@@ -59,8 +59,6 @@ class InteractiveStagnation(object):
 
 def place_number(client,x,y,z,num):
     
-    
-    
     if num == 0:
         number = [
             Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
@@ -295,6 +293,26 @@ class MinecraftBreeder(object):
 
         self.client.spawnBlocks(Blocks(blocks=fence))
 
+    def clear_area(self,pop_size):
+        """
+        This function clears a large area by using the population
+        size to create a large cube that will encompass more than enough area.
+        The value 11 is used because it is the value that will clear everything
+        in terms of the y direction. Any larger value will clear the number labels.
+        The value 7 is used for the x and z direction because the most something will
+        spread is 7 blocks in either the x or z direction.
+
+        :param pop_size Number of shapes being generated
+        """
+        # clear out a big area rather than individual cubes
+        self.client.fillCube(FillCubeRequest(  
+                cube=Cube(
+                    min=Point(x=self.startx-7, y=self.starty-1, z=self.startz-7),
+                    max=Point(x=self.startx-1 + pop_size*(self.xrange+1)+7, y=self.starty+11, z=self.zrange+7)
+                ),
+                type=AIR
+            ))
+
     def eval_fitness(self, genomes, config):
         """
             This function is expected by the NEAT-Python framework.
@@ -302,9 +320,12 @@ class MinecraftBreeder(object):
             and assigns fitness values to each of the genome objects in
             the population.
         """
+
+        self.clear_area(config.pop_size)
         self.place_fences(config.pop_size)
 
         selected = []
+        # using placement is superfluous now since a singular big cube is being cleared rather than several little cubes
         placements = []
         shapes = []
         
@@ -392,7 +413,8 @@ def scale_and_center(index, top):
 
 def run():
     # Contains all possible blocks that could be placed
-    block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
+    # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
+    block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
 
     mc = MinecraftBreeder(10,10,10,block_list)
 
