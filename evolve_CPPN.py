@@ -116,6 +116,39 @@ class MinecraftBreeder(object):
         
         return shape
 
+    def place_fences(self, pop_size):
+
+        # clear out previous fences
+        self.client.fillCube(FillCubeRequest(  
+                cube=Cube(
+                    min=Point(x=self.startx-1, y=self.starty-1, z=self.startz-1),
+                    max=Point(x=self.startx-1 + pop_size*(self.xrange+1)+1, y=self.starty-1, z=self.zrange+2)
+                ),
+                type=AIR
+            ))
+
+        fence = []
+        # Make the first row because this is a fence post problem
+        # 0 5 0 to 0 5 11
+        for first in range(self.zrange+2):
+            fence.append(Block(position=Point(x=self.startx-1, y=self.starty-1,z=self.startz-1 + first), type=DARK_OAK_FENCE, orientation=NORTH))
+
+        # Make nested for loops that will make the fence going in the 
+        # top and bottom and other column that divides each structure
+        for m in range(pop_size): # still don't know how to get it to repeat itself
+            for i in range(self.xrange+2): 
+                # do the fence in front of player going in the x direction (when facing south)
+                fence.append(Block(position=Point(x=self.startx-1 + m*(self.xrange + 1) + i, y=self.starty-1,z=self.startz-1), type=DARK_OAK_FENCE, orientation=NORTH))
+            for j in range(self.xrange+2):
+                # do the fence in back of the structure going in the x direction (when facing south)
+                fence.append(Block(position=Point(x=self.startx-1 + m*(self.xrange + 1) + j, y=self.starty-1,z=self.startz+self.zrange), type=DARK_OAK_FENCE, orientation=NORTH))
+            for k in range(self.zrange+2):
+                # do the one that divides the structures z changes
+                # there is problem with where the divisions are being placed. Each division isn't the same size
+                fence.append(Block(position=Point(x=self.startx-1 + (m+1)*(self.xrange + 1), y=self.starty-1,z=self.startz-1 + k), type=DARK_OAK_FENCE, orientation=NORTH)) 
+
+        self.client.spawnBlocks(Blocks(blocks=fence))
+
     def eval_fitness(self, genomes, config):
         """
             This function is expected by the NEAT-Python framework.
@@ -123,6 +156,8 @@ class MinecraftBreeder(object):
             and assigns fitness values to each of the genome objects in
             the population.
         """
+        self.place_fences(config.pop_size)
+
         selected = []
         placements = []
         shapes = []
