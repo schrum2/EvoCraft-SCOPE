@@ -191,7 +191,6 @@ class MinecraftBreeder(object):
         selected_vals = list(map(int,split_vals))
 
         selected = []
-        list1 = []
         k = 0
 
         # Print statements used for troubleshooting the loop below
@@ -219,6 +218,11 @@ class MinecraftBreeder(object):
                 genome.fitness = 1.0
             else:
                 genome.fitness = 0.0
+
+        # To assure that all selected individuals survive, the elitism setting is changed
+        elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
+        print("{} elite survivors".format(elite_count))
+        config.reproduction_config.elitism = elite_count
 
     # End of MinecraftBreeder
 
