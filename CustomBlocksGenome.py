@@ -5,6 +5,7 @@ import random
 
 # For CPPNs and NEAT
 import neat
+from configparser import ConfigParser
 
 # for Minecraft
 import grpc
@@ -58,4 +59,6 @@ class CustomBlocksGenome(neat.DefaultGenome):
             index = index+1
         return block_list_dist
 
+    def __str__(self):
+        return f"Blocks: {self.block_list}\n{super().__str__()}"
 
