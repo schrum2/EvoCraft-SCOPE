@@ -155,7 +155,7 @@ def fitness_MLP_alltogether(evolved_parameters: np.array, generator_init_params:
 
             while True:
                 try:
-                    index = int(getch())
+                    index = int(input())
                     if index not in np.arange(len(batch_indices))+1:
                         print('Entry not valid, try again. Press 0 to EXIT')
                     else:
