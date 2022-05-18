@@ -190,28 +190,13 @@ class MinecraftBreeder(object):
         split_vals = vals.split(' ')
         selected_vals = list(map(int,split_vals))
 
-        selected = []
-        k = 0
-
-        # Print statements used for troubleshooting the loop below
-        # print(config.pop_size)
-        # print(selected)
-
-        # While loop goes through all values 0 to population size. Any value that the selected is added to
-        # selected as true. Anyhting that isn't selected is added as false
-        while(k<config.pop_size):
-            val_index = 0
-            placed = False
-            while(val_index<len(selected_vals) and not placed):
-                if(k==selected_vals[val_index]):
-                    placed = True
-                    selected.append(True)
-                val_index = val_index + 1
-            if(placed==False):
-                selected.append(False)
-            k = k + 1
+        # Initialize to all False
+        selected = [False for i in range(config.pop_size)]
+        # Then set to True for the items that are selected
+        for ind in selected_vals:
+            selected[ind] = True
         
-        # print(selected)
+        print("Selected: {}".format(selected))
 
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
@@ -244,7 +229,7 @@ def distance(v, u):
     :param v other vector
     :return distance between vectors
     """
-    d = 0;
+    d = 0
     for i in range(len(u)):
         d += (u[i] - v[i])**2
     return math.sqrt(d)
