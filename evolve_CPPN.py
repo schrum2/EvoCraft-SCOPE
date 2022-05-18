@@ -100,14 +100,17 @@ class MinecraftBreeder(object):
                     output = net.activate([x, y, z, distance((x,y,z),(0,0,0)) * math.sqrt(2), 1.0])
                     
                     # First output determines whether there is a block at all.
-                    # The next two outputs favor one block or the other: redstone or quartz.
-                    # Only if a block is present, then the max of the two available choices is used.
+                    # If there is a block, argmax determines the max value and places the specified block 
+                    # from the list of possible blocks
 
-                    if output[0] < 0.5: 
+                    #print(output)
+                        
+                    if output[0] < 0: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = argmax(output[1:])
-                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=self.block_list[output_val-1], orientation=NORTH)
+                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=self.block_list[output_val], orientation=NORTH)
+                        
 
                     shape.append(block)
         
@@ -156,7 +159,7 @@ class MinecraftBreeder(object):
         list1 = []
         k = 0
 
-        # Print statements used for troubleshooting
+        # Print statements used for troubleshooting the loop below
         # print(config.pop_size)
         # print(selected)
 
@@ -188,6 +191,7 @@ class MinecraftBreeder(object):
 
 def argmax(l):
     """
+    Finds the maximum value in a list of values
     :param l a list of numeric elements
     :return index of first maximal element
     """
@@ -216,8 +220,8 @@ def scale_and_center(index, top):
     return -1.0 + 2.0 * index / (top - 1)
 
 def run():
-
-    block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,DIAMOND_BLOCK,GOLD_BLOCK,REDSTONE_LAMP]
+    # Contains all possible blocks that could be placed
+    block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
 
     mc = MinecraftBreeder(10,10,10,block_list)
 
@@ -232,7 +236,7 @@ def run():
 
     config.pop_size = 10
     # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = len(block_list)
+    config.genome_config.num_outputs = len(block_list)+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     pop = neat.Population(config)
