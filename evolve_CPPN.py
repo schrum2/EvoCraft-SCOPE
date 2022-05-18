@@ -16,6 +16,9 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
+from vectors_to_blocks import RESTRICTED_BLOCKS, REMOVED_INDICES
+
+
 class InteractiveStagnation(object):
     """
     This class is used as a drop-in replacement for the default species stagnation scheme.
@@ -99,6 +102,8 @@ class MinecraftBreeder(object):
                     # First output determines whether there is a block at all.
                     # The next two outputs favor one block or the other: redstone or quartz.
                     # Only if a block is present, then the max of the two available choices is used.
+
+                    # TODO: Create a list that contains these blocks and then get this working with the list
                     if output[0] < 0.5: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     elif output[1] > output[2]:
@@ -144,8 +149,39 @@ class MinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
-        # TODO: Figure out how to specify which items are or are not selected (ideally via in-game interaction)
-        input() # For now, just pause the algorithm to get user input
+        # Creates a string that is the user's input, and the converts it to a list
+        vals = input("Select the ones you like:")
+        splitVals = vals.split(' ')
+        mapVals = list(map(int,splitVals))
+
+        selected = []
+        list1 = []
+        k = 0
+
+        # Print statements used for troubleshooting
+        # print(config.pop_size)
+        # print(selected)
+
+        # While loop goes through all values 0 to population size. Any value that the selected is added to
+        # selected as true. Anyhting that isn't selected is added as false
+        while(k<config.pop_size):
+            valIndex = 0
+            placed = False
+            while(valIndex<len(mapVals) and not placed):
+                if(k==mapVals[valIndex]):
+                    placed = True
+                    selected.append(True)
+                valIndex = valIndex + 1
+            if(placed==False):
+                selected.append(False)
+            k = k + 1
+        
+        # print(selected)
+
+
+
+
+
 
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
@@ -186,6 +222,7 @@ def run():
                          config_path)
 
     config.pop_size = 10
+    #config.DefaultGenome.num_outputs = ???
     pop = neat.Population(config)
 
     # Add a stdout reporter to show progress in the terminal.
