@@ -16,7 +16,7 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-
+USE_ELITISM = False
 
 class InteractiveStagnation(object):
     """
@@ -204,10 +204,11 @@ class MinecraftBreeder(object):
             else:
                 genome.fitness = 0.0
 
-        # To assure that all selected individuals survive, the elitism setting is changed
-        elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
-        print("{} elite survivors".format(elite_count))
-        config.reproduction_config.elitism = elite_count
+        if USE_ELITISM:
+            # To assure that all selected individuals survive, the elitism setting is changed
+            elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
+            print("{} elite survivors".format(elite_count))
+            config.reproduction_config.elitism = elite_count
 
     # End of MinecraftBreeder
 
