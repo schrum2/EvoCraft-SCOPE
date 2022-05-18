@@ -325,7 +325,6 @@ class MinecraftBreeder(object):
         self.place_fences(config.pop_size)
 
         selected = []
-        # using placement is superfluous now since a singular big cube is being cleared rather than several little cubes
         placements = []
         shapes = []
         
@@ -340,15 +339,6 @@ class MinecraftBreeder(object):
 
         # Render shapes in Minecraft world
         for i in range(len(placements)):
-            space = placements[i]
-            # Clear a space for the shape
-            self.client.fillCube(FillCubeRequest(  
-                cube=Cube(
-                    min=Point(x=space[0], y=space[1], z=space[2]),
-                    max=Point(x=space[0]+self.xrange, y=space[1]+self.yrange, z=space[2]+self.zrange)
-                ),
-                type=AIR
-            ))
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
