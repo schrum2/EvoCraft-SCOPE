@@ -149,6 +149,40 @@ class MinecraftBreeder(object):
 
         self.client.spawnBlocks(Blocks(blocks=fence))
 
+    def player_selection_switches(self, pop_size):
+        switch = []
+
+        #clear out the section for the redstone part of the swtich
+        for n in range(pop_size):
+            self.client.fillCube(FillCubeRequest(  
+                    cube=Cube(
+                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-4), # subject to change
+                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=self.startz-2)  # subject to change (y = 4 is ground level)
+                    ),
+                    type=AIR
+                ))
+
+        # spawn in everything for the redstone mechanism
+
+        # spawn in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust
+        for p in range(pop_size):
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=self.startz-4), type=STICKY_PISTON, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-4), type=SLIME, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=2, z=self.startz-4), type=REDSTONE_BLOCK, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=self.startz-4), type=REDSTONE_LAMP, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=self.startz-5), type=LEVER, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-3), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-4), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=self.startz-4), type=REDSTONE_WIRE, orientation=NORTH))
+            
+        
+        self.client.spawnBlocks(Blocks(blocks=switch))
+
+        # then implement so that it knows what was chosen
+
     def eval_fitness(self, genomes, config):
         """
             This function is expected by the NEAT-Python framework.
@@ -157,7 +191,8 @@ class MinecraftBreeder(object):
             the population.
         """
         self.place_fences(config.pop_size)
-
+        self.player_selection_switches(config.pop_size)
+        
         selected = []
         placements = []
         shapes = []
