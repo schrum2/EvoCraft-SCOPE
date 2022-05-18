@@ -55,6 +55,148 @@ class InteractiveStagnation(object):
 
         return result
 
+def place_number(client,x,y,z,num):
+    
+    
+    
+    if num == 0:
+        number = [
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    elif num == 1:
+        number = [
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    elif num == 2:
+        number = [ 
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH)]
+           
+    elif num == 3:
+        number = [
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    elif num == 4:
+        number = [
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    elif num == 5:
+        number = [
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    elif num == 6:
+        number = [
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    elif num == 7:
+        number = [
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y,    z=z), type=GLOWSTONE, orientation=NORTH)]
+    elif num == 8:
+        number = [
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    else:
+        # number is 9 at this point
+        number = [
+            Block(position=Point(x=x,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH)]
+
+    client.spawnBlocks(Blocks(blocks=number))
 
 class MinecraftBreeder(object):
     def __init__(self, xrange, yrange, zrange):
@@ -80,139 +222,9 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        number1 = [Block(position=Point(x=xrange, y=yrange+5, z=zrange), type=REDSTONE_BLOCK, orientation=NORTH),
-        Block(position=Point(x=xrange, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH)]
-        self.client.spawnBlocks(Blocks(blocks=number1))
-
-        number2 = [Block(position=Point(x=xrange*2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*2, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH)]
-        self.client.spawnBlocks(Blocks(blocks=number2))
-
-        number3 = [Block(position=Point(x=xrange*3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*3, y=yrange-4, z=zrange))]
-        self.client.spawnBlocks(Blocks(blocks=number3))
-
-        number4 = [Block(position=Point(x=xrange*4, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*4, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH)]
-        self.client.spawnBlocks(Blocks(blocks=number4))
-
-        number5 = [Block(position=Point(x=xrange*5, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*5+1, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*5+2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*5+3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*5, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*5)+1, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*5)+2, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*5)+3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*5), y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*5)+1, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*5)+2, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*5)+3, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH)]
-        self.client.spawnBlocks(Blocks(blocks=number5))
-       
-
-        number6 = [Block(position=Point(x=xrange*6, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*6, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*6, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*6, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*6, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*6)+1, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*6)+2, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*6)+3, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*6)+1, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*6)+2, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*6)+3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*6)+3, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),]
-        self.client.spawnBlocks(Blocks(blocks=number6))
-       
-        number7 = [Block(position=Point(x=xrange*7, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*7+1, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*7+2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*7+3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*7+3, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*7)+2, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*7)+1, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*7)+1, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH)]
-        self.client.spawnBlocks(Blocks(blocks=number7))
-       
-        number8 = [Block(position=Point(x=xrange*8, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+1, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+3, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*8, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*8, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*8, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*8, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+1, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+2, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+3, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+1, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+2, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*8)+3, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),]
-        self.client.spawnBlocks(Blocks(blocks=number8))
-
-        number9 = [Block(position=Point(x=xrange*9, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+1, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+3, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*9, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*9+3, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*9, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+1, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+2, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+3, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+3, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+3, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*9)+3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),]
-        self.client.spawnBlocks(Blocks(blocks=number9))
-
-        number10 = [Block(position=Point(x=xrange*8, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+1, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+2, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+3, y=yrange, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+3, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*10, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*10+3, y=yrange-1, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=xrange*10, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+1, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+2, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+3, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+3, y=yrange-2, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+3, y=yrange-3, z=zrange), type=GLOWSTONE, orientation=NORTH),
-        Block(position=Point(x=(xrange*10)+3, y=yrange-4, z=zrange), type=GLOWSTONE, orientation=NORTH),]
-        self.client.spawnBlocks(Blocks(blocks=number10))
-
-
+        # Place numbers 0-9, use yrange + 2
+        for i in range(10):
+            place_number(self.client,self.startx+(i*(self.xrange+1))+int(self.xrange/2),self.starty+self.yrange+2,self.startz,i)
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
         """
