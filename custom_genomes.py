@@ -1,15 +1,9 @@
-import math
-import os
-import pickle
 import random
 
 # For CPPNs and NEAT
 import neat
-from configparser import ConfigParser
 
 # for Minecraft
-import grpc
-import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 LENGTH_OF_BLOCKLIST = 5
