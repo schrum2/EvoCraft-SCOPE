@@ -230,8 +230,19 @@ class MinecraftBreeder(object):
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
         """
-            Query CPPN at all voxel coordinates to generate the list of
-            blocks that will eventually be rendered in the Minecraft server.
+        Query CPPN at all voxel coordinates to generate the list of
+        blocks that will eventually be rendered in the Minecraft server.
+
+        Parameters:
+        genome (DefaultGenome): A CPPN or some class that extends CPPNs
+        config (Config): NEAT configurations
+        corner (int,int,int): three-tuple of initial x,y,z coordinates
+        xrange (int): number of voxel blocks for each shape along x-dimension
+        yrange (int): number of voxel blocks for each shape along y-dimension
+        zrange (int): number of voxel blocks for each shape along z-dimension
+
+        Returns:
+        [Block]:List of Blocks to generate in Minecraft
         """
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
