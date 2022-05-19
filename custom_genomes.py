@@ -4,7 +4,7 @@ import random
 import neat
 
 # for Minecraft
-from minecraft_pb2 import *
+import minecraft_pb2 as mc
 
 LENGTH_OF_BLOCKLIST = 5
 MUTATE_CONSTANT = .2
@@ -18,28 +18,31 @@ class CustomBlocksGenome(neat.DefaultGenome):
     # Fills the block list with random block types
     def configure_new(self, config):
         super().configure_new(config)
-        self.block_list = random.sample(list(BlockType), LENGTH_OF_BLOCKLIST) #<--
-
+        self.block_list = random.sample(list(mc.BlockType.keys()), LENGTH_OF_BLOCKLIST)
+        
     # Randomly selects one block list from the two genomes (multi-point crossover)
     def configure_crossover(self, genome1, genome2, config):
         super().configure_crossover(genome1, genome2, config)
 
-        index =0
-        while(index<len(self.block_list)):
+        index = 0
+        while(index<len(genome1.block_list)):
             rand_choice = random.uniform(0.0,1.0)
             if(rand_choice<.5):
-                self.block_list.append(genome1.block_list)
+                self.block_list.append(genome1.block_list[index])
             else:
-                self.block_list.append(genome2.block_list)
+                self.block_list.append(genome2.block_list[index])
+            index = index + 1
                
 
     # Based on MUTATE_CONSTANT, selects a random index and replaces it with a new random block
     def mutate(self, config):
         super().mutate(config)
-        r = random()
+        print(self.block_list)
+        r = random.uniform(0.0,1.0) 
         if(r<MUTATE_CONSTANT):
-            random_int = random.randInt(0,len(self.block_list)) #<--
-            self.block_list[random_int] = random.choice(list(BlockType))#<--
+            print(len(self.block_list))
+            random_int = random.randint(0,len(self.block_list)) 
+            self.block_list[random_int] = random.choice(list(mc.BlockType.keys()))#<--
     
     # Arbitrary value for the difference calculated by inceasing the distance for each difference 
     # in the two lists, will likley change later
