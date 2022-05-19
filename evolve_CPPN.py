@@ -86,6 +86,8 @@ class MinecraftBreeder(object):
         else:
             block_options = genome.block_list
 
+        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
+
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
         for xi in range(xrange):
@@ -239,7 +241,7 @@ def run():
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
     if not BLOCK_LIST_EVOLVES:
         # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
-        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
+        block_list = [REDSTONE_BLOCK,PISTON,WATER,LAVA]
         genome_type = neat.DefaultGenome
         config_file = 'cppn_minecraft_config'
     else:
