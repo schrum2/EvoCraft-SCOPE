@@ -17,7 +17,7 @@ import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 USE_ELITISM = False
-IN_GAME_CONTROL = True
+IN_GAME_CONTROL = False
 
 class InteractiveStagnation(object):
     """
