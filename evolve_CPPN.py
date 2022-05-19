@@ -28,7 +28,7 @@ import neat_stagnation
 import main
 
 class MinecraftBreeder(object):
-    def __init__(self, args, xrange, yrange, zrange, block_list):
+    def __init__(self, args, block_list):
         """
 
         UPDATE THIS!
@@ -45,9 +45,9 @@ class MinecraftBreeder(object):
         self.startz = 0
         
         self.generation = 0
-        self.xrange = xrange
-        self.yrange = yrange
-        self.zrange = zrange
+        self.xrange = self.args.XRANGE
+        self.yrange = self.args.YRANGE
+        self.zrange = self.args.ZRANGE
         
         # Don't try any multithreading yet
         self.num_workers = 1
@@ -92,7 +92,7 @@ class MinecraftBreeder(object):
                     # from the list of possible blocks
 
                     #print(output)
-                                                #TODO
+                                                
                     if output[0] < self.args.PRESENCE_THRESHOLD: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
@@ -156,7 +156,7 @@ class MinecraftBreeder(object):
             It takes a population of genomes and configuration information,
             and assigns fitness values to each of the genome objects in
             the population.
-        """                                                                                                                           #TODO
+        """                                                                                                                           
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
@@ -178,7 +178,6 @@ class MinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
-            #TODO
         if self.args.IN_GAME_CONTROL:
             # TODO
               # if the player can switch the lever to pick a structure
@@ -231,7 +230,7 @@ def run(args):
     # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
     block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
 
-    mc = MinecraftBreeder(args,10,10,10,block_list)
+    mc = MinecraftBreeder(args,block_list)
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)

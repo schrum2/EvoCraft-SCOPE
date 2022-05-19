@@ -16,6 +16,12 @@ def main(argv):
                         help='The activation value determining if a block is present or not.')
     parser.add_argument('--POPULATION_SIZE', type=int, default=10, metavar='',
                         help='Number of the population size.')
+    parser.add_argument('--XRANGE', type=int, default=10, metavar='',
+                        help='The range of x coordinate values.')
+    parser.add_argument('--YRANGE', type=int, default=10, metavar='',
+                        help='The range of y coordinate values.')
+    parser.add_argument('--ZRANGE', type=int, default=10, metavar='',
+                        help='The range of z coordinate values.')
 
     args = parser.parse_args()
 
