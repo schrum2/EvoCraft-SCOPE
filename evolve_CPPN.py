@@ -262,6 +262,14 @@ class MinecraftBreeder(object):
         return shape
 
     def place_fences(self, pop_size):
+        """
+        Places a fenced in area around each of the shapes from the population
+        that will be rendered in Minecraft. The size of the fenced in areas
+        is based off of instance variables, as is the location.
+
+        Parameters:
+        pop_size (int): Fenced in areas to generate in a row
+        """
 
         # clear out previous fences
         self.client.fillCube(FillCubeRequest(  
@@ -303,7 +311,8 @@ class MinecraftBreeder(object):
         The value 7 is used for the x and z direction because the most something will
         spread is 7 blocks in either the x or z direction.
 
-        :param pop_size Number of shapes being generated
+        Parameters:
+        pop_size (int): Number of shapes being generated
         """
         # clear out a big area rather than individual cubes
         self.client.fillCube(FillCubeRequest(  
