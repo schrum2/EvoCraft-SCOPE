@@ -310,7 +310,6 @@ class MinecraftBreeder(object):
                 fence.append(Block(position=Point(x=self.startx-1 + m*(self.xrange + 1) + j, y=self.starty-1,z=self.startz+self.zrange), type=DARK_OAK_FENCE, orientation=NORTH))
             for k in range(self.zrange+2):
                 # do the one that divides the structures z changes
-                # there is problem with where the divisions are being placed. Each division isn't the same size
                 fence.append(Block(position=Point(x=self.startx-1 + (m+1)*(self.xrange + 1), y=self.starty-1,z=self.startz-1 + k), type=DARK_OAK_FENCE, orientation=NORTH)) 
 
         self.client.spawnBlocks(Blocks(blocks=fence))
@@ -337,6 +336,21 @@ class MinecraftBreeder(object):
             ))
 
     def player_selection_switches(self, pop_size):
+        """
+        Spawns the switches the a player can use to select their preferred
+        structures along with the switch that is used to indicate that they are
+        done selected. Then it returns the position of all the points
+        right below the redstone lamps for both the selection switches and
+        the next generation switch
+
+        Parameters:
+        pop_size (int): Number of selection switches being selected
+
+        Returns:
+        ((int,int,int),[(int,int,int)]): The position of the space below the redstone lamp for the 
+                next generation switch and the list of positions right under each of the redstone lamps for
+                the selection switches
+        """
         switch = []
         # z coordinate needs to back away from the shapes if they generate water or lava
         zplacement = self.startz - 10
@@ -354,8 +368,8 @@ class MinecraftBreeder(object):
         # clear out the section for the done/next switch
         self.client.fillCube(FillCubeRequest(  
                     cube=Cube(
-                            min=Point(x=self.startx - 6, y=1, z=zplacement-4), # subject to change
-                            max=Point(x=self.startx - 4, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
+                            min=Point(x=self.startx - 6, y=1, z=zplacement-4), 
+                            max=Point(x=self.startx - 4, y=3, z=zplacement-2)  
                     ),
                     type=AIR
                 ))
@@ -373,7 +387,7 @@ class MinecraftBreeder(object):
             switch.append(Block(position=Point(x=self.startx - 5, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
             switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
 
-        switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) # this adds two dirt blocks which don't belong
+        switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) 
         switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-5), type=LEVER, orientation=UP))
         switch.append(Block(position=Point(x=self.startx - 6, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
         switch.append(Block(position=Point(x=self.startx - 6, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
@@ -397,10 +411,10 @@ class MinecraftBreeder(object):
             # this is the position of each redstone block when the lever is switched on
             on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, zplacement-4)
             switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
-            # stores the position from above
+            # stores the positions from above
             on_block_positions.append(on_block_position)
 
-            #slabs to put around the mechanism
+            # slabs to put around the mechanism
             for slab in range(0,3):
                 switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 3, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
                 switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 2, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
@@ -408,6 +422,7 @@ class MinecraftBreeder(object):
                 switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
                 switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
 
+            # spawn in the rest of the blocks needed
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) # this adds two dirt blocks which don't belong
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
@@ -451,10 +466,8 @@ class MinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
 
-        if IN_GAME_CONTROL:
-            # TODO
-              # if the player can switch the lever to pick a structure
-
+        if IN_GAME_CONTROL: # if the player can switch the lever to pick a structure
+            
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
 
@@ -477,9 +490,9 @@ class MinecraftBreeder(object):
                     max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
                 ))
                 player_select_done = done.blocks[0].type == REDSTONE_BLOCK
-                print("Next gen? : {}".format(player_select_done))
+                #print("Next gen? : {}".format(player_select_done))
                     
-                print(selected)
+                #print(selected)
 
         else:
             # Controlled externally by keyboard
