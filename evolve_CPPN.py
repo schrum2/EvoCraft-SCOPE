@@ -325,20 +325,18 @@ class MinecraftBreeder(object):
         self.place_fences(config.pop_size)
 
         selected = []
-        placements = []
         shapes = []
         
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
+            # Initially, none are selected
             selected.append(False)
-            # These are the 3D regions where each evolved shape will be placed
-            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
-            placements.append( corner )
             # See how CPPN fills out the shape
+            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
 
         # Render shapes in Minecraft world
-        for i in range(len(placements)):
+        for i in range(len(shapes)):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
@@ -347,9 +345,7 @@ class MinecraftBreeder(object):
         split_vals = vals.split(' ')
         selected_vals = list(map(int,split_vals))
 
-        # Initialize to all False
-        selected = [False for i in range(config.pop_size)]
-        # Then set to True for the items that are selected
+        # Set to True for the items that are selected
         for ind in selected_vals:
             selected[ind] = True
         
