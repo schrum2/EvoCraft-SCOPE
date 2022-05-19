@@ -104,27 +104,6 @@ class MinecraftBreeder(object):
         
         return shape
 
-    def clear_area(self,pop_size):
-        """
-        This function clears a large area by using the population
-        size to create a large cube that will encompass more than enough area.
-        The value 11 is used because it is the value that will clear everything
-        in terms of the y direction. Any larger value will clear the number labels.
-        The value 7 is used for the x and z direction because the most something will
-        spread is 7 blocks in either the x or z direction.
-
-        Parameters:
-        pop_size (int): Number of shapes being generated
-        """
-        # clear out a big area rather than individual cubes
-        self.client.fillCube(FillCubeRequest(  
-                cube=Cube(
-                    min=Point(x=self.startx-7, y=self.starty-1, z=self.startz-7),
-                    max=Point(x=self.startx-1 + pop_size*(self.xrange+1)+7, y=self.starty+11, z=self.zrange+7)
-                ),
-                type=AIR
-            ))
-
     def player_selection_switches(self, pop_size):
         switch = []
         # z coordinate needs to back away from the shapes if they generate water or lava
