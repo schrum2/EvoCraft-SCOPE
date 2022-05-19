@@ -25,19 +25,19 @@ import minecraft_structures
 # For InteractiveStagnation class
 import neat_stagnation
 
-USE_ELITISM = False
-IN_GAME_CONTROL = False
-PRESENCE_THRESHOLD = 0.5
-POPULATION_SIZE = 10
-
+import main
 
 class MinecraftBreeder(object):
-    def __init__(self, xrange, yrange, zrange, block_list):
+    def __init__(self, args, xrange, yrange, zrange, block_list):
         """
+
+        UPDATE THIS!
+
         :param xrange: range of x-coordinate values rendered
         :param zrange: range of y-coordinate values rendered
         :param xrange: range of z-coordinate values rendered
         """
+        self.args = args
         self.block_list = block_list
 
         self.startx = 0
@@ -57,7 +57,7 @@ class MinecraftBreeder(object):
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
         # Place numbers 0-9, use yrange + 2
-        for i in range(10):
+        for i in range(10): # Problems if pop_size is not 10!
             minecraft_structures.place_number(self.client,self.startx+(i*(self.xrange+1))+int(self.xrange/2),self.starty+self.yrange+2,self.startz,i)
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
@@ -92,8 +92,8 @@ class MinecraftBreeder(object):
                     # from the list of possible blocks
 
                     #print(output)
-                        
-                    if output[0] < PRESENCE_THRESHOLD: 
+                                                #TODO
+                    if output[0] < self.args.PRESENCE_THRESHOLD: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = util.argmax(output[1:])
@@ -156,10 +156,9 @@ class MinecraftBreeder(object):
             It takes a population of genomes and configuration information,
             and assigns fitness values to each of the genome objects in
             the population.
-        """
-
-        minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
-        minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
+        """                                                                                                                           #TODO
+        minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
+        minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
         on_block_positions = self.player_selection_switches(config.pop_size)
         
@@ -179,8 +178,8 @@ class MinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
-
-        if IN_GAME_CONTROL:
+            #TODO
+        if self.args.IN_GAME_CONTROL:
             # TODO
               # if the player can switch the lever to pick a structure
 
@@ -217,7 +216,7 @@ class MinecraftBreeder(object):
             else:
                 genome.fitness = 0.0
 
-        if USE_ELITISM:
+        if self.args.USE_ELITISM:
             # To assure that all selected individuals survive, the elitism setting is changed
             elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
             print("{} elite survivors".format(elite_count))
@@ -227,12 +226,12 @@ class MinecraftBreeder(object):
 
 # Various functions
 
-def run():
+def run(args):
     # Contains all possible blocks that could be placed
     # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
     block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
 
-    mc = MinecraftBreeder(10,10,10,block_list)
+    mc = MinecraftBreeder(args,10,10,10,block_list)
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
@@ -243,7 +242,7 @@ def run():
                          neat.DefaultSpeciesSet, neat_stagnation.InteractiveStagnation,
                          config_path)
 
-    config.pop_size = POPULATION_SIZE
+    config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
     config.genome_config.num_outputs = len(block_list)+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
@@ -261,4 +260,4 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    print("Do not launch this file directly. Launch main.py instead.")
