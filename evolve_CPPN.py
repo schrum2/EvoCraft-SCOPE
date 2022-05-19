@@ -17,6 +17,7 @@ import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 USE_ELITISM = False
+IN_GAME_CONTROL = True
 
 class InteractiveStagnation(object):
     """
@@ -313,6 +314,50 @@ class MinecraftBreeder(object):
                 type=AIR
             ))
 
+    def player_selection_switches(self, pop_size):
+        switch = []
+
+        #clear out the section for the redstone part of the swtich
+        for n in range(pop_size):
+            self.client.fillCube(FillCubeRequest(  
+                    cube=Cube(
+                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-4), # subject to change
+                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=self.startz-2)  # subject to change (y = 4 is ground level)
+                    ),
+                    type=AIR
+                ))
+
+        # spawn in everything for the redstone mechanism
+
+        # list that stores the position of the redstone block 
+        # that is moved when the player flicks the switch
+        on_block_positions = []
+
+        # spawn in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust
+        for p in range(pop_size):
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=self.startz-4), type=STICKY_PISTON, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-4), type=SLIME, orientation=NORTH))
+
+            # this is the position of each redstone block when the lever is switched on
+            on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, self.startz-4)
+            switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+            # stores the position from above
+            on_block_positions.append(on_block_position)
+
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=self.startz-4), type=REDSTONE_LAMP, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=self.startz-5), type=LEVER, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-3), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-4), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=self.startz-4), type=REDSTONE_WIRE, orientation=NORTH))
+            
+        
+        self.client.spawnBlocks(Blocks(blocks=switch))
+
+        return on_block_positions
+
     def eval_fitness(self, genomes, config):
         """
             This function is expected by the NEAT-Python framework.
@@ -323,7 +368,8 @@ class MinecraftBreeder(object):
 
         self.clear_area(config.pop_size)
         self.place_fences(config.pop_size)
-
+        on_block_positions = self.player_selection_switches(config.pop_size)
+        
         selected = []
         shapes = []
         
@@ -340,12 +386,33 @@ class MinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
-        # Creates a string that is the user's input, and the converts it to a list
-        vals = input("Select the ones you like:")
-        split_vals = vals.split(' ')
-        selected_vals = list(map(int,split_vals))
 
-        # Set to True for the items that are selected
+        if IN_GAME_CONTROL:
+            # TODO
+              # if the player can switch the lever to pick a structure
+
+            while True:
+                # constantly reads the position right below the redstone lamp
+                # to see if the player has switched on a lever
+                first = on_block_positions[0]
+                blocks = self.client.readCube(Cube(
+                    min=Point(x=first[0], y=first[1], z=first[2]),
+                    max=Point(x=first[0], y=first[1], z=first[2])
+                ))
+
+                print(blocks)
+
+        else:
+            # Controlled externally by keyboard
+
+            # Creates a string that is the user's input, and the converts it to a list
+            vals = input("Select the ones you like:")
+            split_vals = vals.split(' ')
+            selected_vals = list(map(int,split_vals))
+
+        # Initialize to all False
+        selected = [False for i in range(config.pop_size)]
+        # Then set to True for the items that are selected
         for ind in selected_vals:
             selected[ind] = True
         
