@@ -8,7 +8,7 @@ reset_on_extinction   = False
 
 # Genome will have x, y, z, r, and bias inputs.
 # Outputs starting very simply (improve later): Just presence (Air vs Something) and two block types (one chosen if not Air)
-[DefaultGenome]
+[CustomBlocksGenome]
 num_inputs              = 5
 num_hidden              = 3
 # This is initially set larger than the amount likely to be used in the code (which resets this to a smaller value)
