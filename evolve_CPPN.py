@@ -19,6 +19,8 @@ from minecraft_pb2 import *
 
 USE_ELITISM = False
 IN_GAME_CONTROL = False
+PRESENCE_THRESHOLD = 0.5
+POPULATION_SIZE = 10
 
 class InteractiveStagnation(object):
     """
@@ -262,7 +264,7 @@ class MinecraftBreeder(object):
 
                     #print(output)
                         
-                    if output[0] < 0: 
+                    if output[0] < PRESENCE_THRESHOLD: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = argmax(output[1:])
@@ -503,7 +505,7 @@ def run():
                          neat.DefaultSpeciesSet, InteractiveStagnation,
                          config_path)
 
-    config.pop_size = 10
+    config.pop_size = POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
     config.genome_config.num_outputs = len(block_list)+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
