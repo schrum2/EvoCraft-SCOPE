@@ -17,6 +17,7 @@ import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 USE_ELITISM = False
+IN_GAME_CONTROL = False
 
 class InteractiveStagnation(object):
     """
@@ -229,8 +230,19 @@ class MinecraftBreeder(object):
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
         """
-            Query CPPN at all voxel coordinates to generate the list of
-            blocks that will eventually be rendered in the Minecraft server.
+        Query CPPN at all voxel coordinates to generate the list of
+        blocks that will eventually be rendered in the Minecraft server.
+
+        Parameters:
+        genome (DefaultGenome): A CPPN or some class that extends CPPNs
+        config (Config): NEAT configurations
+        corner (int,int,int): three-tuple of initial x,y,z coordinates
+        xrange (int): number of voxel blocks for each shape along x-dimension
+        yrange (int): number of voxel blocks for each shape along y-dimension
+        zrange (int): number of voxel blocks for each shape along z-dimension
+
+        Returns:
+        [Block]:List of Blocks to generate in Minecraft
         """
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
@@ -261,6 +273,14 @@ class MinecraftBreeder(object):
         return shape
 
     def place_fences(self, pop_size):
+        """
+        Places a fenced in area around each of the shapes from the population
+        that will be rendered in Minecraft. The size of the fenced in areas
+        is based off of instance variables, as is the location.
+
+        Parameters:
+        pop_size (int): Fenced in areas to generate in a row
+        """
 
         # clear out previous fences
         self.client.fillCube(FillCubeRequest(  
@@ -302,7 +322,8 @@ class MinecraftBreeder(object):
         The value 7 is used for the x and z direction because the most something will
         spread is 7 blocks in either the x or z direction.
 
-        :param pop_size Number of shapes being generated
+        Parameters:
+        pop_size (int): Number of shapes being generated
         """
         # clear out a big area rather than individual cubes
         self.client.fillCube(FillCubeRequest(  
@@ -312,6 +333,52 @@ class MinecraftBreeder(object):
                 ),
                 type=AIR
             ))
+
+    def player_selection_switches(self, pop_size):
+        switch = []
+        # z coordinate needs to back away from the shapes if they generate water or lava
+        zplacement = self.startz - 10
+
+        #clear out the section for the redstone part of the swtich
+        for n in range(pop_size):
+            self.client.fillCube(FillCubeRequest(  
+                    cube=Cube(
+                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-4), # subject to change
+                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
+                    ),
+                    type=AIR
+                ))
+
+        # spawn in everything for the redstone mechanism
+
+        # list that stores the position of the redstone block 
+        # that is moved when the player flicks the switch
+        on_block_positions = []
+
+        # spawn in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust
+        for p in range(pop_size):
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-4), type=SLIME, orientation=NORTH))
+
+            # this is the position of each redstone block when the lever is switched on
+            on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, zplacement-4)
+            switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+            # stores the position from above
+            on_block_positions.append(on_block_position)
+
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+            
+        
+        self.client.spawnBlocks(Blocks(blocks=switch))
+
+        return on_block_positions
 
     def eval_fitness(self, genomes, config):
         """
@@ -323,29 +390,47 @@ class MinecraftBreeder(object):
 
         self.clear_area(config.pop_size)
         self.place_fences(config.pop_size)
-
+        on_block_positions = self.player_selection_switches(config.pop_size)
+        
         selected = []
-        placements = []
         shapes = []
         
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
+            # Initially, none are selected
             selected.append(False)
-            # These are the 3D regions where each evolved shape will be placed
-            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
-            placements.append( corner )
             # See how CPPN fills out the shape
+            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
 
         # Render shapes in Minecraft world
-        for i in range(len(placements)):
+        for i in range(len(shapes)):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
-        # Creates a string that is the user's input, and the converts it to a list
-        vals = input("Select the ones you like:")
-        split_vals = vals.split(' ')
-        selected_vals = list(map(int,split_vals))
+
+        if IN_GAME_CONTROL:
+            # TODO
+              # if the player can switch the lever to pick a structure
+
+            while True:
+                # constantly reads the position right below the redstone lamp
+                # to see if the player has switched on a lever
+                first = on_block_positions[0]
+                blocks = self.client.readCube(Cube(
+                    min=Point(x=first[0], y=first[1], z=first[2]),
+                    max=Point(x=first[0], y=first[1], z=first[2])
+                ))
+
+                print(blocks)
+
+        else:
+            # Controlled externally by keyboard
+
+            # Creates a string that is the user's input, and the converts it to a list
+            vals = input("Select the ones you like:")
+            split_vals = vals.split(' ')
+            selected_vals = list(map(int,split_vals))
 
         # Initialize to all False
         selected = [False for i in range(config.pop_size)]
