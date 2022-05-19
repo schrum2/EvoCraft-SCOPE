@@ -341,7 +341,7 @@ class MinecraftBreeder(object):
         # z coordinate needs to back away from the shapes if they generate water or lava
         zplacement = self.startz - 10
 
-        #clear out the section for the redstone part of the swtich
+        # clear out the section for the redstone part of the swtich
         for n in range(pop_size):
             self.client.fillCube(FillCubeRequest(  
                     cube=Cube(
@@ -351,7 +351,39 @@ class MinecraftBreeder(object):
                     type=AIR
                 ))
 
-        # spawn in everything for the redstone mechanism
+        # clear out the section for the done/next switch
+        self.client.fillCube(FillCubeRequest(  
+                    cube=Cube(
+                            min=Point(x=self.startx - 6, y=1, z=zplacement-4), # subject to change
+                            max=Point(x=self.startx - 4, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
+                    ),
+                    type=AIR
+                ))
+        
+        # add in all the things for this switch
+        switch.append(Block(position=Point(x=self.startx - 4, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+        switch.append(Block(position=Point(x=self.startx - 4, y=1, z=zplacement-4), type=SLIME, orientation=UP))
+        done_block_position = (self.startx - 4, 3, zplacement-4)
+        switch.append(Block(position=Point(x=done_block_position[0], y=done_block_position[1] - 1, z=done_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+
+        for slab in range(0,3):
+            switch.append(Block(position=Point(x=self.startx - 2, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 3, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 5, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+
+        switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) # this adds two dirt blocks which don't belong
+        switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-5), type=LEVER, orientation=UP))
+        switch.append(Block(position=Point(x=self.startx - 6, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 6, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 4, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 5, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 6, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 6, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+        
+
+        # Now spawn in everything for the redstone mechanism
 
         # list that stores the position of the redstone block 
         # that is moved when the player flicks the switch
@@ -368,6 +400,14 @@ class MinecraftBreeder(object):
             # stores the position from above
             on_block_positions.append(on_block_position)
 
+            #slabs to put around the mechanism
+            for slab in range(0,3):
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 3, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 2, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) # this adds two dirt blocks which don't belong
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
@@ -376,11 +416,11 @@ class MinecraftBreeder(object):
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
-            
+   
         
         self.client.spawnBlocks(Blocks(blocks=switch))
 
-        return on_block_positions
+        return (done_block_position, on_block_positions)
 
     def eval_fitness(self, genomes, config):
         """
@@ -392,7 +432,7 @@ class MinecraftBreeder(object):
 
         self.clear_area(config.pop_size)
         self.place_fences(config.pop_size)
-        on_block_positions = self.player_selection_switches(config.pop_size)
+        (done_block_position, on_block_positions) = self.player_selection_switches(config.pop_size)
         
         selected = []
         shapes = []
@@ -416,8 +456,10 @@ class MinecraftBreeder(object):
               # if the player can switch the lever to pick a structure
 
             selected = [False for chosen in range(config.pop_size)]
+            player_select_done = False
 
-            while True: #player is still selecting: meaning that a switch hasn't been turned to go to next generation
+            while not player_select_done: #player is still selecting
+               
                 # constantly reads the position right below the redstone lamp
                 # to see if the player has switched on a lever
                 for i in range(config.pop_size):
@@ -427,6 +469,15 @@ class MinecraftBreeder(object):
                         max=Point(x=first[0], y=first[1], z=first[2])
                     ))
                     selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
+
+                # if the player has clicked the switch for next, then 
+                # exit while 
+                done = self.client.readCube(Cube(
+                    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
+                    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
+                ))
+                player_select_done = done.blocks[0].type == REDSTONE_BLOCK
+                print("Next gen? : {}".format(player_select_done))
                     
                 print(selected)
 
@@ -438,11 +489,11 @@ class MinecraftBreeder(object):
             split_vals = vals.split(' ')
             selected_vals = list(map(int,split_vals))
 
-        # Initialize to all False
-        selected = [False for i in range(config.pop_size)]
-        # Then set to True for the items that are selected
-        for ind in selected_vals:
-            selected[ind] = True
+            # Initialize to all False
+            selected = [False for i in range(config.pop_size)]
+            # Then set to True for the items that are selected
+            for ind in selected_vals:
+                selected[ind] = True
         
         print("Selected: {}".format(selected))
 
