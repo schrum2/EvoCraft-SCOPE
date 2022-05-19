@@ -58,17 +58,18 @@ def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_siz
 
 def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
         """
-        TODO Make sure to explain why using 11 and 7
+        This function clears a large area by creating one
+        large cube and filling it with air blocks.
 
         Parameters:
-        client (TODO): TODO
-        startx (int): TODO
-        starty (int): TODO
-        startz (int): TODO
-        xrange (int): TODO
-        yrange   (int): Range for y coordinate values
-        zrange (int): TODO
-        pop_size (int): TODO
+        client (MinecraftServiceStub): TODO: put appropriate description here
+        startx (int): Starting value for x coordinate.
+        starty (int): Starting value for y coordinate.
+        startz (int): Starting value for z coordinate.
+        xrange (int): Range for x coordinate values.
+        yrange   (int): Range for y coordinate values.
+        zrange (int): Range for z coordinate values.
+        pop_size (int): The size of the population.
         """
         # clear out a big area rather than individual cubes
         client.fillCube(FillCubeRequest(  
