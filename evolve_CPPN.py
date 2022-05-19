@@ -27,9 +27,6 @@ import minecraft_structures
 # For InteractiveStagnation class
 import neat_stagnation
 
-BLOCK_LIST_EVOLVES = True
-BLOCK_LIST_SIZE = 5
-
 class MinecraftBreeder(object):
     def __init__(self, args, block_list):
         """
@@ -79,7 +76,7 @@ class MinecraftBreeder(object):
         Returns:
         [Block]:List of Blocks to generate in Minecraft
         """
-        if not BLOCK_LIST_EVOLVES:
+        if not self.args.BLOCK_LIST_EVOLVES:
             block_options = self.block_list
         else:
             block_options = genome.block_list
@@ -105,6 +102,7 @@ class MinecraftBreeder(object):
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = util.argmax(output[1:])
+                        assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
                         
 
@@ -302,7 +300,7 @@ class MinecraftBreeder(object):
 # Various functions
 
 def run(args):
-    if not BLOCK_LIST_EVOLVES:
+    if not args.BLOCK_LIST_EVOLVES:
         # Contains all possible blocks that could be placed
         # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
         block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
@@ -326,7 +324,7 @@ def run(args):
 
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = BLOCK_LIST_SIZE+1
+    config.genome_config.num_outputs = args.BLOCK_LIST_SIZE+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     pop = neat.Population(config)

@@ -4,7 +4,6 @@ import evolve_CPPN
 from os.path import exists
 from os import mkdir
 
-
 def main(argv):
     parser = argparse.ArgumentParser()
 
@@ -22,6 +21,10 @@ def main(argv):
                         help='The range of y coordinate values. This value must be at least 1.')
     parser.add_argument('--ZRANGE', type=int, default=10, metavar='',
                         help='The range of z coordinate values. This value must be at least 1.')
+    parser.add_argument('--BLOCK_LIST_EVOLVES', type=bool, default=True, metavar='',
+                        help='When true, blocks from the block list will be used to evolve.')
+    parser.add_argument('--BLOCK_LIST_SIZE', type=int, default=5, metavar='',
+                        help='The size of the block list.')
 
     args = parser.parse_args()
     if args.XRANGE < 1:
@@ -41,6 +44,9 @@ def main(argv):
     
     if args.POPULATION_SIZE < 2:
         raise ValueError("Population size must at least two.")
+
+    if args.BLOCK_LIST_SIZE < 2:
+        raise ValueError("Block list size must at least two.")
 
     evolve_CPPN.run(args)
 
