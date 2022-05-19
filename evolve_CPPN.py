@@ -4,12 +4,14 @@ that comes with NEAT-Python. Just wanted a starting point for evolving CPPNs.
 Modifying the code to apply to Minecraft.
 """
 # Are these still needed?
+from http import client
 import math
 import os
 import pickle
 
 # For CPPNs and NEAT
 import neat
+import custom_genomes as cg
 
 # for Minecraft
 import grpc
@@ -25,7 +27,8 @@ import minecraft_structures
 # For InteractiveStagnation class
 import neat_stagnation
 
-import main
+BLOCK_LIST_EVOLVES = True
+BLOCK_LIST_SIZE = 5
 
 class MinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -76,6 +79,11 @@ class MinecraftBreeder(object):
         Returns:
         [Block]:List of Blocks to generate in Minecraft
         """
+        if not BLOCK_LIST_EVOLVES:
+            block_options = self.block_list
+        else:
+            block_options = genome.block_list
+
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
         for xi in range(xrange):
@@ -97,7 +105,7 @@ class MinecraftBreeder(object):
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = util.argmax(output[1:])
-                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=self.block_list[output_val], orientation=NORTH)
+                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
                         
 
                     shape.append(block)
@@ -105,11 +113,26 @@ class MinecraftBreeder(object):
         return shape
 
     def player_selection_switches(self, pop_size):
+        """
+        Spawns the switches the a player can use to select their preferred
+        structures along with the switch that is used to indicate that they are
+        done selected. Then it returns the position of all the points
+        right below the redstone lamps for both the selection switches and
+        the next generation switch
+
+        Parameters:
+        pop_size (int): Number of selection switches being selected
+
+        Returns:
+        ((int,int,int),[(int,int,int)]): The position of the space below the redstone lamp for the 
+                next generation switch and the list of positions right under each of the redstone lamps for
+                the selection switches
+        """
         switch = []
         # z coordinate needs to back away from the shapes if they generate water or lava
         zplacement = self.startz - 10
 
-        #clear out the section for the redstone part of the swtich
+        # clear out the section for the redstone part of the swtich
         for n in range(pop_size):
             self.client.fillCube(FillCubeRequest(  
                     cube=Cube(
@@ -119,7 +142,39 @@ class MinecraftBreeder(object):
                     type=AIR
                 ))
 
-        # spawn in everything for the redstone mechanism
+        # clear out the section for the done/next switch
+        self.client.fillCube(FillCubeRequest(  
+                    cube=Cube(
+                            min=Point(x=self.startx - 6, y=1, z=zplacement-4), 
+                            max=Point(x=self.startx - 4, y=3, z=zplacement-2)  
+                    ),
+                    type=AIR
+                ))
+        
+        # add in all the things for this switch
+        switch.append(Block(position=Point(x=self.startx - 4, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+        switch.append(Block(position=Point(x=self.startx - 4, y=1, z=zplacement-4), type=SLIME, orientation=UP))
+        done_block_position = (self.startx - 4, 3, zplacement-4)
+        switch.append(Block(position=Point(x=done_block_position[0], y=done_block_position[1] - 1, z=done_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+
+        for slab in range(0,3):
+            switch.append(Block(position=Point(x=self.startx - 2, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 3, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 5, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+
+        switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) 
+        switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-5), type=LEVER, orientation=UP))
+        switch.append(Block(position=Point(x=self.startx - 6, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 6, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 4, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 5, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 6, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=self.startx - 6, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+        
+
+        # Now spawn in everything for the redstone mechanism
 
         # list that stores the position of the redstone block 
         # that is moved when the player flicks the switch
@@ -133,10 +188,19 @@ class MinecraftBreeder(object):
             # this is the position of each redstone block when the lever is switched on
             on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, zplacement-4)
             switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
-            # stores the position from above
+            # stores the positions from above
             on_block_positions.append(on_block_position)
 
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH))
+            # slabs to put around the mechanism
+            for slab in range(0,3):
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 3, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 2, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+
+            # spawn in the rest of the blocks needed
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) # this adds two dirt blocks which don't belong
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
@@ -144,11 +208,11 @@ class MinecraftBreeder(object):
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
-            
+   
         
         self.client.spawnBlocks(Blocks(blocks=switch))
 
-        return on_block_positions
+        return (done_block_position, on_block_positions)
 
     def eval_fitness(self, genomes, config):
         """
@@ -160,7 +224,7 @@ class MinecraftBreeder(object):
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
-        on_block_positions = self.player_selection_switches(config.pop_size)
+        (done_block_position, on_block_positions) = self.player_selection_switches(self.args.POPULATION_SIZE)
         
         selected = []
         shapes = []
@@ -179,19 +243,31 @@ class MinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
         if self.args.IN_GAME_CONTROL:
-            # TODO
-              # if the player can switch the lever to pick a structure
+            selected = [False for chosen in range(config.pop_size)]
+            player_select_done = False
 
-            while True:
+            while not player_select_done: #player is still selecting
+               
                 # constantly reads the position right below the redstone lamp
                 # to see if the player has switched on a lever
-                first = on_block_positions[0]
-                blocks = self.client.readCube(Cube(
-                    min=Point(x=first[0], y=first[1], z=first[2]),
-                    max=Point(x=first[0], y=first[1], z=first[2])
-                ))
+                for i in range(config.pop_size):
+                    first = on_block_positions[i]
+                    blocks = self.client.readCube(Cube(
+                        min=Point(x=first[0], y=first[1], z=first[2]),
+                        max=Point(x=first[0], y=first[1], z=first[2])
+                    ))
+                    selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
 
-                print(blocks)
+                # if the player has clicked the switch for next, then 
+                # exit while 
+                done = self.client.readCube(Cube(
+                    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
+                    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
+                ))
+                player_select_done = done.blocks[0].type == REDSTONE_BLOCK
+                #print("Next gen? : {}".format(player_select_done))
+                    
+                #print(selected)
 
         else:
             # Controlled externally by keyboard
@@ -201,11 +277,11 @@ class MinecraftBreeder(object):
             split_vals = vals.split(' ')
             selected_vals = list(map(int,split_vals))
 
-        # Initialize to all False
-        selected = [False for i in range(config.pop_size)]
-        # Then set to True for the items that are selected
-        for ind in selected_vals:
-            selected[ind] = True
+            # Initialize to all False
+            selected = [False for i in range(config.pop_size)]
+            # Then set to True for the items that are selected
+            for ind in selected_vals:
+                selected[ind] = True
         
         print("Selected: {}".format(selected))
 
@@ -226,27 +302,36 @@ class MinecraftBreeder(object):
 # Various functions
 
 def run(args):
-    # Contains all possible blocks that could be placed
-    # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
-    block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
+    if not BLOCK_LIST_EVOLVES:
+        # Contains all possible blocks that could be placed
+        # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
+        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
+        genome_type = neat.DefaultGenome
+        config_file = 'cppn_minecraft_config'
+    else:
+        block_list = [] # Won't be used, but parameter is still needed
+        genome_type = cg.CustomBlocksGenome
+        config_file = 'cppn_minecraft_custom_blocks_config'
 
     mc = MinecraftBreeder(args,block_list)
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'cppn_minecraft_config')
+    config_path = os.path.join(local_dir, config_file)
 
     # Note that we provide the custom stagnation class to the Config constructor.
-    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+    config = neat.Config(genome_type, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat_stagnation.InteractiveStagnation,
                          config_path)
 
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = len(block_list)+1
+    config.genome_config.num_outputs = BLOCK_LIST_SIZE+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     pop = neat.Population(config)
+
+
 
     # Add a stdout reporter to show progress in the terminal.
     pop.add_reporter(neat.StdOutReporter(True))
