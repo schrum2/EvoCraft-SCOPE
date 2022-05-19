@@ -179,9 +179,9 @@ class MinecraftBreeder(object):
             the population.
         """
 
-        self.clear_area(POPULATION_SIZE)
+        minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
-        
+
         on_block_positions = self.player_selection_switches(config.pop_size)
         
         selected = []
