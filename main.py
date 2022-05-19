@@ -17,13 +17,27 @@ def main(argv):
     parser.add_argument('--POPULATION_SIZE', type=int, default=10, metavar='',
                         help='Number of the population size.')
     parser.add_argument('--XRANGE', type=int, default=10, metavar='',
-                        help='The range of x coordinate values.')
+                        help='The range of x coordinate values. This value must be at least 1.')
     parser.add_argument('--YRANGE', type=int, default=10, metavar='',
-                        help='The range of y coordinate values.')
+                        help='The range of y coordinate values. This value must be at least 1.')
     parser.add_argument('--ZRANGE', type=int, default=10, metavar='',
-                        help='The range of z coordinate values.')
+                        help='The range of z coordinate values. This value must be at least 1.')
 
     args = parser.parse_args()
+    if args.XRANGE < 1:
+        raise ValueError("XRANGE value must be at least one.")
+    elif args.XRANGE >= 25:
+        print("XRANGE values larger than 25 may cause the server to slow down or crash.")   
+
+    if args.YRANGE < 1:
+        raise ValueError("YRANGE value must be at least one.")
+    elif args.YRANGE >= 25:
+        print("YRANGE values larger than 25 may cause the server to slow down or crash.")   
+
+    if args.ZRANGE < 1:
+        raise ValueError("ZRANGE value must be at least one.")
+    elif args.ZRANGE >= 25:
+        print("ZRANGE values larger than 25 may cause the server to slow down or crash.")   
 
     evolve_CPPN.run(args)
 
