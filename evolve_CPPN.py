@@ -60,8 +60,6 @@ class InteractiveStagnation(object):
 
 def place_number(client,x,y,z,num):
     
-    
-    
     if num == 0:
         number = [
             Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
@@ -232,8 +230,19 @@ class MinecraftBreeder(object):
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
         """
-            Query CPPN at all voxel coordinates to generate the list of
-            blocks that will eventually be rendered in the Minecraft server.
+        Query CPPN at all voxel coordinates to generate the list of
+        blocks that will eventually be rendered in the Minecraft server.
+
+        Parameters:
+        genome (DefaultGenome): A CPPN or some class that extends CPPNs
+        config (Config): NEAT configurations
+        corner (int,int,int): three-tuple of initial x,y,z coordinates
+        xrange (int): number of voxel blocks for each shape along x-dimension
+        yrange (int): number of voxel blocks for each shape along y-dimension
+        zrange (int): number of voxel blocks for each shape along z-dimension
+
+        Returns:
+        [Block]:List of Blocks to generate in Minecraft
         """
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
@@ -264,6 +273,14 @@ class MinecraftBreeder(object):
         return shape
 
     def place_fences(self, pop_size):
+        """
+        Places a fenced in area around each of the shapes from the population
+        that will be rendered in Minecraft. The size of the fenced in areas
+        is based off of instance variables, as is the location.
+
+        Parameters:
+        pop_size (int): Fenced in areas to generate in a row
+        """
 
         # clear out previous fences
         self.client.fillCube(FillCubeRequest(  
@@ -296,15 +313,38 @@ class MinecraftBreeder(object):
 
         self.client.spawnBlocks(Blocks(blocks=fence))
 
+    def clear_area(self,pop_size):
+        """
+        This function clears a large area by using the population
+        size to create a large cube that will encompass more than enough area.
+        The value 11 is used because it is the value that will clear everything
+        in terms of the y direction. Any larger value will clear the number labels.
+        The value 7 is used for the x and z direction because the most something will
+        spread is 7 blocks in either the x or z direction.
+
+        Parameters:
+        pop_size (int): Number of shapes being generated
+        """
+        # clear out a big area rather than individual cubes
+        self.client.fillCube(FillCubeRequest(  
+                cube=Cube(
+                    min=Point(x=self.startx-7, y=self.starty-1, z=self.startz-7),
+                    max=Point(x=self.startx-1 + pop_size*(self.xrange+1)+7, y=self.starty+11, z=self.zrange+7)
+                ),
+                type=AIR
+            ))
+
     def player_selection_switches(self, pop_size):
         switch = []
+        # z coordinate needs to back away from the shapes if they generate water or lava
+        zplacement = self.startz - 10
 
         #clear out the section for the redstone part of the swtich
         for n in range(pop_size):
             self.client.fillCube(FillCubeRequest(  
                     cube=Cube(
-                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-4), # subject to change
-                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=self.startz-2)  # subject to change (y = 4 is ground level)
+                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-4), # subject to change
+                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
                     ),
                     type=AIR
                 ))
@@ -317,23 +357,23 @@ class MinecraftBreeder(object):
 
         # spawn in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust
         for p in range(pop_size):
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=self.startz-4), type=STICKY_PISTON, orientation=UP))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-4), type=SLIME, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-4), type=SLIME, orientation=NORTH))
 
             # this is the position of each redstone block when the lever is switched on
-            on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, self.startz-4)
+            on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, zplacement-4)
             switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
             # stores the position from above
             on_block_positions.append(on_block_position)
 
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=self.startz-4), type=REDSTONE_LAMP, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=self.startz-5), type=LEVER, orientation=UP))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-3), type=COBBLESTONE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-4), type=COBBLESTONE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=self.startz-4), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
             
         
         self.client.spawnBlocks(Blocks(blocks=switch))
@@ -347,33 +387,24 @@ class MinecraftBreeder(object):
             and assigns fitness values to each of the genome objects in
             the population.
         """
+
+        self.clear_area(config.pop_size)
         self.place_fences(config.pop_size)
         on_block_positions = self.player_selection_switches(config.pop_size)
         
         selected = []
-        placements = []
         shapes = []
         
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
+            # Initially, none are selected
             selected.append(False)
-            # These are the 3D regions where each evolved shape will be placed
-            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
-            placements.append( corner )
             # See how CPPN fills out the shape
+            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
 
         # Render shapes in Minecraft world
-        for i in range(len(placements)):
-            space = placements[i]
-            # Clear a space for the shape
-            self.client.fillCube(FillCubeRequest(  
-                cube=Cube(
-                    min=Point(x=space[0], y=space[1], z=space[2]),
-                    max=Point(x=space[0]+self.xrange, y=space[1]+self.yrange, z=space[2]+self.zrange)
-                ),
-                type=AIR
-            ))
+        for i in range(len(shapes)):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
@@ -457,7 +488,8 @@ def scale_and_center(index, top):
 
 def run():
     # Contains all possible blocks that could be placed
-    block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
+    # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
+    block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
 
     mc = MinecraftBreeder(10,10,10,block_list)
 
