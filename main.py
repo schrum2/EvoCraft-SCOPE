@@ -38,6 +38,9 @@ def main(argv):
         raise ValueError("ZRANGE value must be at least one.")
     elif args.ZRANGE >= 25:
         print("ZRANGE values larger than 25 may cause the server to slow down or crash.")   
+    
+    if args.POPULATION_SIZE < 2:
+        raise ValueError("Population size must at least two.")
 
     evolve_CPPN.run(args)
 
