@@ -31,4 +31,4 @@ def scale_and_center(index, top):
     :param index: index of block along a given dimension
     :param top: number of blocks along the given dimension
     """
-    return -1.0 + 2.0 * index / (top - 1)
+    return 0.0 if top == 1 else -1.0 + 2.0 * index / (top - 1)

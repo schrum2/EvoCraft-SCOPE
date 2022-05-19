@@ -27,21 +27,19 @@ import minecraft_structures
 # For InteractiveStagnation class
 import neat_stagnation
 
-USE_ELITISM = False
-IN_GAME_CONTROL = True
-PRESENCE_THRESHOLD = 0.5
-POPULATION_SIZE = 10
-BLOCK_LIST_EVOLVES = True
-BLOCK_LIST_SIZE=5
-
+import main
 
 class MinecraftBreeder(object):
-    def __init__(self, xrange, yrange, zrange, block_list):
+    def __init__(self, args, block_list):
         """
+
+        UPDATE THIS!
+
         :param xrange: range of x-coordinate values rendered
         :param zrange: range of y-coordinate values rendered
         :param xrange: range of z-coordinate values rendered
         """
+        self.args = args
         self.block_list = block_list
 
         self.startx = 0
@@ -49,9 +47,9 @@ class MinecraftBreeder(object):
         self.startz = 0
         
         self.generation = 0
-        self.xrange = xrange
-        self.yrange = yrange
-        self.zrange = zrange
+        self.xrange = self.args.XRANGE
+        self.yrange = self.args.YRANGE
+        self.zrange = self.args.ZRANGE
         
         # Don't try any multithreading yet
         self.num_workers = 1
@@ -61,7 +59,7 @@ class MinecraftBreeder(object):
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
         # Place numbers 0-9, use yrange + 2
-        for i in range(10):
+        for i in range(10): # Problems if pop_size is not 10!
             minecraft_structures.place_number(self.client,self.startx+(i*(self.xrange+1))+int(self.xrange/2),self.starty+self.yrange+2,self.startz,i)
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
@@ -101,8 +99,8 @@ class MinecraftBreeder(object):
                     # from the list of possible blocks
 
                     #print(output)
-                        
-                    if output[0] < PRESENCE_THRESHOLD: 
+                                                
+                    if output[0] < self.args.PRESENCE_THRESHOLD: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = util.argmax(output[1:])
@@ -221,11 +219,11 @@ class MinecraftBreeder(object):
             It takes a population of genomes and configuration information,
             and assigns fitness values to each of the genome objects in
             the population.
-        """
+        """                                                                                                                           
+        minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
+        minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
-        minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
-        minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
-        (done_block_position, on_block_positions) = self.player_selection_switches(config.pop_size)
+        (done_block_position, on_block_positions) = self.player_selection_switches(self.args.POPULATION_SIZE)
         
         selected = []
         shapes = []
@@ -243,9 +241,7 @@ class MinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
-
-        if IN_GAME_CONTROL: # if the player can switch the lever to pick a structure
-            
+        if self.args.IN_GAME_CONTROL:
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
 
@@ -294,7 +290,7 @@ class MinecraftBreeder(object):
             else:
                 genome.fitness = 0.0
 
-        if USE_ELITISM:
+        if self.args.USE_ELITISM:
             # To assure that all selected individuals survive, the elitism setting is changed
             elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
             print("{} elite survivors".format(elite_count))
@@ -304,7 +300,7 @@ class MinecraftBreeder(object):
 
 # Various functions
 
-def run():
+def run(args):
     if not BLOCK_LIST_EVOLVES:
         # Contains all possible blocks that could be placed
         # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
@@ -316,7 +312,7 @@ def run():
         genome_type = cg.CustomBlocksGenome
         config_file = 'cppn_minecraft_custom_blocks_config'
 
-    mc = MinecraftBreeder(10,10,10,block_list)
+    mc = MinecraftBreeder(args,block_list)
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
@@ -327,7 +323,7 @@ def run():
                          neat.DefaultSpeciesSet, neat_stagnation.InteractiveStagnation,
                          config_path)
 
-    config.pop_size = POPULATION_SIZE
+    config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
     config.genome_config.num_outputs = BLOCK_LIST_SIZE+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
@@ -347,4 +343,4 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    print("Do not launch this file directly. Launch main.py instead.")
