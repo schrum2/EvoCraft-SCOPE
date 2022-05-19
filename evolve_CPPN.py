@@ -242,15 +242,17 @@ def run():
         # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
         block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
         genome_type = neat.DefaultGenome
+        config_file = 'cppn_minecraft_config'
     else:
         block_list = [] # Won't be used, but parameter is still needed
         genome_type = cg.CustomBlocksGenome
+        config_file = 'cppn_minecraft_custom_blocks_config'
 
     mc = MinecraftBreeder(10,10,10,block_list)
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'cppn_minecraft_config')
+    config_path = os.path.join(local_dir, config_file)
 
     # Note that we provide the custom stagnation class to the Config constructor.
     config = neat.Config(genome_type, neat.DefaultReproduction,
