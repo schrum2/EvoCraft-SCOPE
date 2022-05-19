@@ -336,13 +336,15 @@ class MinecraftBreeder(object):
 
     def player_selection_switches(self, pop_size):
         switch = []
+        # z coordinate needs to back away from the shapes if they generate water or lava
+        zplacement = self.startz - 10
 
         #clear out the section for the redstone part of the swtich
         for n in range(pop_size):
             self.client.fillCube(FillCubeRequest(  
                     cube=Cube(
-                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-4), # subject to change
-                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=self.startz-2)  # subject to change (y = 4 is ground level)
+                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-4), # subject to change
+                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
                     ),
                     type=AIR
                 ))
@@ -355,23 +357,23 @@ class MinecraftBreeder(object):
 
         # spawn in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust
         for p in range(pop_size):
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=self.startz-4), type=STICKY_PISTON, orientation=UP))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-4), type=SLIME, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-4), type=SLIME, orientation=NORTH))
 
             # this is the position of each redstone block when the lever is switched on
-            on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, self.startz-4)
+            on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, zplacement-4)
             switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
             # stores the position from above
             on_block_positions.append(on_block_position)
 
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=self.startz-4), type=REDSTONE_LAMP, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=self.startz-5), type=LEVER, orientation=UP))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=self.startz-3), type=COBBLESTONE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-4), type=COBBLESTONE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=self.startz-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=self.startz-4), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
             
         
         self.client.spawnBlocks(Blocks(blocks=switch))
