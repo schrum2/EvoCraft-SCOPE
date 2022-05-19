@@ -27,7 +27,8 @@ import minecraft_structures
 # For InteractiveStagnation class
 import neat_stagnation
 
-import main
+BLOCK_LIST_EVOLVES = True
+BLOCK_LIST_SIZE = 5
 
 class MinecraftBreeder(object):
     def __init__(self, args, block_list):
