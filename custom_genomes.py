@@ -41,7 +41,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
         r = random.uniform(0.0,1.0) 
         if(r<MUTATE_CONSTANT):
             print(len(self.block_list))
-            random_int = random.randint(0,len(self.block_list)) 
+            random_int = random.randint(0,len(self.block_list)-1) 
             self.block_list[random_int] = random.choice(list(mc.BlockType.keys()))#<--
     
     # Arbitrary value for the difference calculated by inceasing the distance for each difference 
@@ -58,4 +58,6 @@ class CustomBlocksGenome(neat.DefaultGenome):
 
     def __str__(self):
         return f"Blocks: {self.block_list}\n{super().__str__()}"
+
+    
 
