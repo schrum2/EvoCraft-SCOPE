@@ -17,7 +17,7 @@ import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 USE_ELITISM = False
-IN_GAME_CONTROL = False
+IN_GAME_CONTROL = True
 PRESENCE_THRESHOLD = 0.5
 POPULATION_SIZE = 10
 
@@ -368,7 +368,7 @@ class MinecraftBreeder(object):
             # stores the position from above
             on_block_positions.append(on_block_position)
 
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH))
+            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) # this adds two dirt blocks which don't belong
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
             switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
@@ -415,16 +415,20 @@ class MinecraftBreeder(object):
             # TODO
               # if the player can switch the lever to pick a structure
 
-            while True:
+            selected = [False for chosen in range(config.pop_size)]
+
+            while True: #player is still selecting: meaning that a switch hasn't been turned to go to next generation
                 # constantly reads the position right below the redstone lamp
                 # to see if the player has switched on a lever
-                first = on_block_positions[0]
-                blocks = self.client.readCube(Cube(
-                    min=Point(x=first[0], y=first[1], z=first[2]),
-                    max=Point(x=first[0], y=first[1], z=first[2])
-                ))
-
-                print(blocks)
+                for i in range(config.pop_size):
+                    first = on_block_positions[i]
+                    blocks = self.client.readCube(Cube(
+                        min=Point(x=first[0], y=first[1], z=first[2]),
+                        max=Point(x=first[0], y=first[1], z=first[2])
+                    ))
+                    selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
+                    
+                print(selected)
 
         else:
             # Controlled externally by keyboard
