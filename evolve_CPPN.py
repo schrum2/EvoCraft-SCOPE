@@ -135,7 +135,7 @@ class MinecraftBreeder(object):
         for n, (genome_id, genome) in enumerate(genomes):
             # Initially, none are selected
             selected.append(False)
-            minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz,n)
+            minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+1), self.position_information["starty"], self.position_information["startz"])
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information))
