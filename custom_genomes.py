@@ -31,7 +31,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
         """
         super().configure_new(config)
         # The number of blocks in the list is one less than the number of outputs (since the first determines presence)
-        self.block_list = random.sample(list(mc.BlockType.keys()), config.num_outputs - 1)
+        self.block_list = random.sample(list(mc.BlockType.values()), config.num_outputs - 1)
         
     def configure_crossover(self, genome1, genome2, config):
         """
@@ -68,7 +68,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
         r = random.uniform(0.0,1.0) 
         if(r<BLOCK_CHANGE_PROBABILITY):
             random_int = random.randint(0,len(self.block_list)-1) 
-            self.block_list[random_int] = random.choice(list(mc.BlockType.keys()))#<--
+            self.block_list[random_int] = random.choice(list(mc.BlockType.values()))#<--
     
     # Arbitrary value for the difference calculated by inceasing the distance for each difference 
     # in the two lists, will likley change later

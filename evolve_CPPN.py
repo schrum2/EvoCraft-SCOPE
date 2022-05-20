@@ -270,6 +270,13 @@ class MinecraftBreeder(object):
                 #print("Next gen? : {}".format(player_select_done))
 
                 minecraft_structures.read_current_block_options(self.client,placements,self.starty,self.startz,self.xrange)
+                # for block_list in (read_current_blocks):
+                #     print(block_list)
+                #     print(genomes[1].block_list)
+                #     print("------------------------------------")
+
+                for n, (genome_id, genome) in enumerate(genomes):
+                    print(genome.block_list)
  
                 #print(selected)
 
