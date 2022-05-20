@@ -244,3 +244,146 @@ def place_blocks_in_block_list(block_list,client, startx, starty, startz, xrange
     blocks_in_list.append(Block(position=Point(x=startx+11*xrange, y=starty-1,z=startz-9), type=block_list[4], orientation=NORTH))
 
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
+    
+def player_selection_switches(pop_size, client, startx, startz, xrange):
+    """
+    Spawns the switches the a player can use to select their preferred
+    structures along with the switch that is used to indicate that they are
+    done selected. Then it returns the position of all the points
+    right below the redstone lamps for both the selection switches and
+    the next generation switch
+
+    Parameters:
+    pop_size (int): Number of selection switches being selected
+
+    Returns:
+    [(int,int,int)]:The position of the space below the redstone lamp for the
+                    list of positions right under each of the redstone lamps for
+                    the selection switches
+    """
+    switch = []
+    lamps = []
+
+    # z coordinate needs to back away from the shapes if they generate water or lava
+    zplacement = startz - 10
+
+    #add the lamp in first when there is still ground underneath it to avoid the spawning of the grass blocks
+    for p in range(pop_size):
+        lamps.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=UP))
+        lamps.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2), y=4, z=zplacement-4), type=AIR, orientation=UP))
+        lamps.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=4, z=zplacement-5), type=AIR, orientation=UP))
+    client.spawnBlocks(Blocks(blocks=lamps))
+
+    # clear out the section for the redstone part of the swtich
+    for n in range(pop_size):
+        client.fillCube(FillCubeRequest(  
+                cube=Cube(
+                        min=Point(x=startx + n*(xrange+1) + int(xrange/2) - 3, y=1, z=zplacement-4), # subject to change
+                        max=Point(x=startx + n*(xrange+1) + int(xrange/2) - 1, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
+                ),
+                type=AIR
+            ))
+        
+        
+    # Now spawn in everything for the selection switches
+
+    # list that stores the position of the redstone block 
+    # that is moved when the player flicks the switch
+    on_block_positions = []
+
+    # add in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust to switch
+    for p in range(pop_size):
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=1, z=zplacement-4), type=SLIME, orientation=NORTH))
+
+        # this is the position of each redstone block when the lever is switched on
+        on_block_position = (startx + p*(xrange+1) + int(xrange/2) - 1, 3, zplacement-4)
+        switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+        # stores the positions from above
+        on_block_positions.append(on_block_position)
+
+        # slabs to put around the mechanism
+        for slab in range(0,3):
+            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) + 1, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2), y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=4, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
+            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 2, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 2 + slab, y=4, z=zplacement- 1), type=STONEBRICK, orientation=NORTH)) # makes tail less noticeable
+
+        # add in the rest of the blocks needed 
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=4, z=zplacement-5), type=LEVER, orientation=UP))
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 2, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+   
+    # spawn in all the switches
+    client.spawnBlocks(Blocks(blocks=switch))
+
+    return on_block_positions
+
+def player_next_gen_switch(startx, startz, client):
+    """
+    Adds in all the blocks necessary to make a next generation
+    button that the player can use to indicate when they want to
+    move on to see the next generation of structures and returns the 
+    position under the redstone lamp that indicates whether the player
+    is done or not.
+
+    Returns:
+    (int, int, int): Position of the space underneath the redstone lamp that
+            is used to indicate if the player is ready to see the next generation
+            of structures 
+    """
+
+    next_gen_switch = []
+    lamp = []
+    
+    # z coordinate needs to back away from the shapes if they generate water or lava
+    zplacement = startz - 10
+
+    # add the lamp in first when there is still ground underneath it to avoid the spawning of the grass blocks
+    lamp.append(Block(position=Point(x=startx - 4, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=DOWN))
+    lamp.append(Block(position=Point(x=startx - 3, y=4, z=zplacement-4), type=AIR, orientation=UP))
+    lamp.append(Block(position=Point(x=startx - 4, y=4, z=zplacement-5), type=AIR, orientation=UP))
+    client.spawnBlocks(Blocks(blocks=lamp))
+
+    # clear out the section for the next gen switch
+    client.fillCube(FillCubeRequest(  
+            cube=Cube(
+                min=Point(x=startx - 6, y=1, z=zplacement-4), 
+                max=Point(x=startx - 4, y=3, z=zplacement-2)  
+            ),
+            type=AIR
+        ))
+        
+    # add in all the components for the next gen switch to switch
+    next_gen_switch.append(Block(position=Point(x=startx - 4, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+    next_gen_switch.append(Block(position=Point(x=startx - 4, y=1, z=zplacement-4), type=SLIME, orientation=UP))
+    done_block_position = (startx - 4, 3, zplacement-4)
+    next_gen_switch.append(Block(position=Point(x=done_block_position[0], y=done_block_position[1] - 1, z=done_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+
+    for slab in range(0,3):
+        next_gen_switch.append(Block(position=Point(x=startx - 2, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=startx - 3, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=startx - 4, y=4, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
+        next_gen_switch.append(Block(position=Point(x=startx - 5, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=startx - 6, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=startx - 5 + slab, y=4, z=zplacement- 1), type=EMERALD_BLOCK, orientation=NORTH)) # makes the tail less noticeable
+
+    
+    next_gen_switch.append(Block(position=Point(x=startx - 6, y=4, z=zplacement-5), type=LEVER, orientation=UP))
+    next_gen_switch.append(Block(position=Point(x=startx - 6, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=startx - 6, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=startx - 4, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=startx - 5, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=startx - 6, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=startx - 6, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+
+    # spawn in the switches
+    client.spawnBlocks(Blocks(blocks=next_gen_switch))
+
+    return done_block_position
