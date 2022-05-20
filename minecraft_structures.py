@@ -285,7 +285,7 @@ def read_current_block_options(client,placements,starty,startz,xrange):
         block_list = []
         index = 0
         while index < len(blocks.blocks):
-            block_list.append(blocks.blocks[index])
+            block_list.append(blocks.blocks[index].type)
             index += 2 # Skip over spaces between blocks 
         blocks_for_shape.append(block_list)
     return blocks_for_shape
