@@ -138,6 +138,7 @@ class MinecraftBreeder(object):
             minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+1), self.position_information["starty"], self.position_information["startz"])
+            placements.append(corner)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information))
 
         # Place numbers 0-9, use yrange + 2
@@ -184,7 +185,7 @@ class MinecraftBreeder(object):
                     j += 1
                     
                 # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
-                read_current_blocks=minecraft_structures.read_current_block_options(self.client,placements,self.starty,self.startz,self.xrange)
+                read_current_blocks=minecraft_structures.read_current_block_options(self.client,placements,self.position_information)
 
                 for n, (genome_id, genome) in enumerate(genomes):
                     if(not genome.block_list==read_current_blocks[n]):

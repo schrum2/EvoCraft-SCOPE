@@ -499,3 +499,30 @@ def next_gen_button(pop_size,position_information, client):
     client.spawnBlocks(Blocks(blocks=next_gen_button))
 
     return next_block_positions
+
+def read_current_block_options(client,placements,position_information):
+    """
+    Used when users can change the blocks in evolved shapes from within the game.
+    Checks the blocks on display in front of each evolved shape and collects them in a list,
+    where each such list is combined into a list of lists that is returned. The returned
+    list will indicate all block types currently specified (on display) for each shape.
+
+    Parameters:
+    client ():
+
+    """
+    blocks_for_shape = []
+    for corner in placements:
+        # Change these coordinates to be an appropriate offset based on start x/y/z and x/y/z range
+        blocks = client.readCube(Cube(
+                    min=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-9),
+                    max=Point(x=corner[0]+position_information["xrange"]-2, y=position_information["starty"]-1, z=position_information["startz"]-9)
+                 ))
+        
+        block_list = []
+        index = 0
+        while index < len(blocks.blocks):
+            block_list.append(blocks.blocks[index].type)
+            index += 2 # Skip over spaces between blocks 
+        blocks_for_shape.append(block_list)
+    return blocks_for_shape
