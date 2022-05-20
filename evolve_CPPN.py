@@ -40,14 +40,15 @@ class MinecraftBreeder(object):
         self.args = args
         self.block_list = block_list
 
-        self.startx = 0
-        self.starty = 5
-        self.startz = 0
-        
+        self.position_information = dict()
+        self.position_information["startx"] = 0
+        self.position_information["starty"] = 5
+        self.position_information["startz"] = 0
+        self.position_information["xrange"] = self.args.XRANGE
+        self.position_information["yrange"] = self.args.YRANGE
+        self.position_information["zrange"] = self.args.ZRANGE
+
         self.generation = 0
-        self.xrange = self.args.XRANGE
-        self.yrange = self.args.YRANGE
-        self.zrange = self.args.ZRANGE
         
         # Don't try any multithreading yet
         self.num_workers = 1
@@ -56,11 +57,8 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        # Place numbers 0-9, use yrange + 2
-        for i in range(10): # Problems if pop_size is not 10!
-            minecraft_structures.place_number(self.client,self.startx+(i*(self.xrange+1))+int(self.xrange/2),self.starty+self.yrange+2,self.startz,i)
 
-    def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
+    def query_cppn_for_shape(self, genome, config, corner, position_information):
         """
         Query CPPN at all voxel coordinates to generate the list of
         blocks that will eventually be rendered in the Minecraft server.
@@ -84,20 +82,24 @@ class MinecraftBreeder(object):
 
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
-        for xi in range(xrange):
-            x = util.scale_and_center(xi,xrange)
-            for yi in range(yrange):
-                y = util.scale_and_center(yi,yrange)
-                for zi in range(zrange):
-                    z = util.scale_and_center(zi,zrange)
+        for xi in range(self.position_information["xrange"]):
+            x = util.scale_and_center(xi,self.position_information["xrange"])
+            for yi in range(self.position_information["yrange"]):
+                y = util.scale_and_center(yi,self.position_information["yrange"])
+                for zi in range(self.position_information["zrange"]):
+                    z = util.scale_and_center(zi,self.position_information["zrange"])
                     # math.sqrt(2) is the usual scaling for radial distances in CPPNs
                     output = net.activate([x, y, z, util.distance((x,y,z),(0,0,0)) * math.sqrt(2), 1.0])
                     
                     # First output determines whether there is a block at all.
                     # If there is a block, argmax determines the max value and places the specified block 
                     # from the list of possible blocks
-                                                
-                    if output[0] < self.args.PRESENCE_THRESHOLD: 
+                    presence_threshold = self.args.PRESENCE_THRESHOLD 
+                    
+                    if self.args.DISTANCE_PRESENCE_THRESHOLD == True:
+                        presence_threshold = self.args.DISTANCE_PRESENCE_MULTIPLIER * util.distance((x,y,z),(0,0,0)) * math.sqrt(2)                            
+                    
+                    if output[0] < presence_threshold: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = util.argmax(output[1:])
@@ -109,120 +111,21 @@ class MinecraftBreeder(object):
         
         return shape
 
-    def player_selection_switches(self, pop_size):
-        """
-        Spawns the switches the a player can use to select their preferred
-        structures along with the switch that is used to indicate that they are
-        done selected. Then it returns the position of all the points
-        right below the redstone lamps for both the selection switches and
-        the next generation switch
-
-        Parameters:
-        pop_size (int): Number of selection switches being selected
-
-        Returns:
-        ((int,int,int),[(int,int,int)]): The position of the space below the redstone lamp for the 
-                next generation switch and the list of positions right under each of the redstone lamps for
-                the selection switches
-        """
-        switch = []
-        # z coordinate needs to back away from the shapes if they generate water or lava
-        zplacement = self.startz - 10
-
-        # clear out the section for the redstone part of the swtich
-        for n in range(pop_size):
-            self.client.fillCube(FillCubeRequest(  
-                    cube=Cube(
-                            min=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-4), # subject to change
-                            max=Point(x=self.startx + n*(self.xrange+1) + int(self.xrange/2) + 1, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
-                    ),
-                    type=AIR
-                ))
-
-        # clear out the section for the done/next switch
-        self.client.fillCube(FillCubeRequest(  
-                    cube=Cube(
-                            min=Point(x=self.startx - 6, y=1, z=zplacement-4), 
-                            max=Point(x=self.startx - 4, y=3, z=zplacement-2)  
-                    ),
-                    type=AIR
-                ))
-        
-        # add in all the things for this switch
-        switch.append(Block(position=Point(x=self.startx - 4, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
-        switch.append(Block(position=Point(x=self.startx - 4, y=1, z=zplacement-4), type=SLIME, orientation=UP))
-        done_block_position = (self.startx - 4, 3, zplacement-4)
-        switch.append(Block(position=Point(x=done_block_position[0], y=done_block_position[1] - 1, z=done_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
-
-        for slab in range(0,3):
-            switch.append(Block(position=Point(x=self.startx - 2, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx - 3, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx - 5, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
-
-        switch.append(Block(position=Point(x=self.startx - 4, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) 
-        switch.append(Block(position=Point(x=self.startx - 6, y=4, z=zplacement-5), type=LEVER, orientation=UP))
-        switch.append(Block(position=Point(x=self.startx - 6, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
-        switch.append(Block(position=Point(x=self.startx - 6, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
-        switch.append(Block(position=Point(x=self.startx - 4, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=self.startx - 5, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=self.startx - 6, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=self.startx - 6, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
-        
-
-        # Now spawn in everything for the redstone mechanism
-
-        # list that stores the position of the redstone block 
-        # that is moved when the player flicks the switch
-        on_block_positions = []
-
-        # spawn in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust
-        for p in range(pop_size):
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-4), type=SLIME, orientation=NORTH))
-
-            # this is the position of each redstone block when the lever is switched on
-            on_block_position = (self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, 3, zplacement-4)
-            switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
-            # stores the positions from above
-            on_block_positions.append(on_block_position)
-
-            # slabs to put around the mechanism
-            for slab in range(0,3):
-                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 3, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
-                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 2, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-                switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
-
-            # spawn in the rest of the blocks needed
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=NORTH)) # this adds two dirt blocks which don't belong
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=4, z=zplacement-5), type=LEVER, orientation=UP))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) + 1, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2), y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-            switch.append(Block(position=Point(x=self.startx + p*(self.xrange+1) + int(self.xrange/2) - 1, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
-   
-        
-        self.client.spawnBlocks(Blocks(blocks=switch))
-
-        return (done_block_position, on_block_positions)
-
-
     def eval_fitness(self, genomes, config):
         """
-            This function is expected by the NEAT-Python framework.
-            It takes a population of genomes and configuration information,
-            and assigns fitness values to each of the genome objects in
-            the population.
+        This function is expected by the NEAT-Python framework.
+        It takes a population of genomes and configuration information,
+        and assigns fitness values to each of the genome objects in
+        the population. Nothing is returned, since the genomes themselves
+        are modified.
+        
+        Parameters:
+        genomes ([DefaultGenome]): list of CPPN genomes
+        config  (Config): NEAT configurations
         """                                                                                                                           
-        minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
-        minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
-
-        (done_block_position, on_block_positions) = self.player_selection_switches(self.args.POPULATION_SIZE)
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE)
+        minecraft_structures.reset_area(self.client, self.position_information, self.args.POPULATION_SIZE)
+        minecraft_structures.place_fences(self.client, self.position_information, self.args.POPULATION_SIZE)
         
         selected = []
         shapes = []
@@ -234,17 +137,24 @@ class MinecraftBreeder(object):
             selected.append(False)
             minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz,n)
             # See how CPPN fills out the shape
-            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
-            placements.append(corner)
-            shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
-        
-        
+            corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+1), self.position_information["starty"], self.position_information["startz"])
+            shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information))
+
+        # Place numbers 0-9, use yrange + 2
+        for i in range(10): # Problems if pop_size is not 10!
+            minecraft_structures.place_number(self.client,self.position_information["startx"]+(i*(self.position_information["xrange"]+1))+int(self.position_information["xrange"]/2),self.position_information["starty"]+self.position_information["yrange"]+2,self.position_information["startz"],i)
+
         # Render shapes in Minecraft world
         for i in range(len(shapes)):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
         if self.args.IN_GAME_CONTROL:
+
+            # done_block_position = minecraft_structures.player_next_gen_switch(self.position_information, self.client) no longer needed?
+            on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.position_information)
+            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.position_information, self.client)
+
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
             
@@ -260,35 +170,28 @@ class MinecraftBreeder(object):
                     ))
                     selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
 
-                # if the player has clicked the switch for next, then 
-                # exit while 
-                done = self.client.readCube(Cube(
-                    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
-                    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
-                ))
-                player_select_done = done.blocks[0].type == REDSTONE_BLOCK
-                #print("Next gen? : {}".format(player_select_done))
-
+                player_select_done = False
+                j = 0
+                # Checks the hidden Piston Heads associated with each next generation switch. 
+                # If any one is sensed, then player selection is done 
+                while not player_select_done and j < config.pop_size:
+                    pressed = next_block_positions[j]
+                    done_button = self.client.readCube(Cube(
+                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
+                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
+                    ))
+                    player_select_done = done_button.blocks[0].type == PISTON_HEAD
+                    j += 1
+                    
+                # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
                 read_current_blocks=minecraft_structures.read_current_block_options(self.client,placements,self.starty,self.startz,self.xrange)
 
                 for n, (genome_id, genome) in enumerate(genomes):
                     if(not genome.block_list==read_current_blocks[n]):
                         for i in range(len(genome.block_list)):
                             if(not genome.block_list[i]==read_current_blocks[n][i]):
-                                # print("------------------------------------")
-                                # print(read_current_blocks[n])
-                                # print(genome.block_list)
                                 genome.block_list[i]=read_current_blocks[n][i]
-                                # print(genome.block_list)
 
-
-                        # #diff = list(set(genome.block_list)-set(read_current_blocks[n]))
-                        # print("------------------------------------")
-                        # #For debugging
-                        # print(genome.block_list)
-                        # print(read_current_blocks[n])
-                        # print(genome.block_list==read_current_blocks[n])
-                        # print("------------------------------------")
  
                 #print(selected)
 
