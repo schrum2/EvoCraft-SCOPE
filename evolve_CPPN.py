@@ -82,7 +82,7 @@ class MinecraftBreeder(object):
         else:
             block_options = genome.block_list
 
-        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, POPULATION_SIZE)
+        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
@@ -304,13 +304,17 @@ def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
     if not args.BLOCK_LIST_EVOLVES:
         # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
-        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
+        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA] # TODO: Make this a command line parameter somehow?
         genome_type = neat.DefaultGenome
         config_file = 'cppn_minecraft_config'
+        block_list_length = len(block_list)
     else:
         block_list = [] # Won't be used, but parameter is still needed
         genome_type = cg.CustomBlocksGenome
         config_file = 'cppn_minecraft_custom_blocks_config'
+        block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
+        cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
+        #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
     mc = MinecraftBreeder(args,block_list)
 
@@ -325,7 +329,7 @@ def run(args):
 
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = args.BLOCK_LIST_SIZE+1
+    config.genome_config.num_outputs = block_list_length+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     pop = neat.Population(config)

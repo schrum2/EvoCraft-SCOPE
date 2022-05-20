@@ -6,8 +6,8 @@ import neat
 # for Minecraft
 import minecraft_pb2 as mc
 
-LENGTH_OF_BLOCKLIST = 5
-MUTATE_CONSTANT = .2
+# Must be set in evolve_CPPN.py
+BLOCK_CHANGE_PROBABILITY = 0.0
 
 class CustomBlocksGenome(neat.DefaultGenome):
     def __init__(self, key):
@@ -30,7 +30,8 @@ class CustomBlocksGenome(neat.DefaultGenome):
 
         """
         super().configure_new(config)
-        self.block_list = random.sample(list(mc.BlockType.keys()), LENGTH_OF_BLOCKLIST)
+        # The number of blocks in the list is one less than the number of outputs (since the first determines presence)
+        self.block_list = random.sample(list(mc.BlockType.keys()), config.num_outputs - 1)
         
     def configure_crossover(self, genome1, genome2, config):
         """
@@ -55,15 +56,17 @@ class CustomBlocksGenome(neat.DefaultGenome):
                
     def mutate(self, config):
         """
-        Based on MUTATE_CONSTANT, if the random condition is satisfied, selects a random index 
+        Based on BLOCK_CHANGE_PROBABILITY, if the random condition is satisfied, selects a random index 
         and replaces it with a new random block. Also mutates the rest of the default genome
 
         Parameters:
         config (neat.genome.DefaultGenomeConfig): Configuration for the default genome
         """
         super().mutate(config)
+        global BLOCK_CHANGE_PROBABILITY
+        #print("BLOCK_CHANGE_PROBABILITY = {}".format(BLOCK_CHANGE_PROBABILITY))
         r = random.uniform(0.0,1.0) 
-        if(r<MUTATE_CONSTANT):
+        if(r<BLOCK_CHANGE_PROBABILITY):
             random_int = random.randint(0,len(self.block_list)-1) 
             self.block_list[random_int] = random.choice(list(mc.BlockType.keys()))#<--
     
@@ -92,7 +95,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
 
     def __str__(self):
         """
-        Prints defaukt genomes's infromation in a string, as well as the newly added block_list
+        Prints default genomes's infromation in a string, as well as the newly added block_list
         """
         return f"Blocks: {self.block_list}\n{super().__str__()}"
 
