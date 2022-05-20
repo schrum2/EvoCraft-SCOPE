@@ -136,7 +136,7 @@ class MinecraftBreeder(object):
 
         # Place numbers 0-9, use yrange + 2
         for i in range(10): # Problems if pop_size is not 10!
-            minecraft_structures.place_number(self.client,self.position_information["startx"]+(i*(self.position_information["xrange"]+1))+int(self.position_information["xrange"]/2),self.position_information["starty"]+self.position_information["yrange"]+2,self.position_information["startz"],i)
+            minecraft_structures.place_number(self.client,corner[0]+int(self.position_information["xrange"]/2),corner[1]+corner[1]+2,corner[2],i)
 
         # Render shapes in Minecraft world
         for i in range(len(shapes)):
