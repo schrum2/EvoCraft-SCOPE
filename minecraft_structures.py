@@ -58,17 +58,18 @@ def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_siz
 
 def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
         """
-        TODO Make sure to explain why using 11 and 7
+        This function clears a large area by creating one
+        large cube and filling it with air blocks.
 
         Parameters:
-        client (TODO): TODO
-        startx (int): TODO
-        starty (int): TODO
-        startz (int): TODO
-        xrange (int): TODO
-        yrange   (int): Range for y coordinate values
-        zrange (int): TODO
-        pop_size (int): TODO
+        client (MinecraftServiceStub): TODO: put appropriate description here
+        startx (int): Starting value for x coordinate.
+        starty (int): Starting value for y coordinate.
+        startz (int): Starting value for z coordinate.
+        xrange (int): Range for x coordinate values.
+        yrange   (int): Range for y coordinate values.
+        zrange (int): Range for z coordinate values.
+        pop_size (int): The size of the population.
         """
         # clear out a big area rather than individual cubes
         client.fillCube(FillCubeRequest(  
@@ -232,6 +233,18 @@ def place_number(client,x,y,z,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
+def place_blocks_in_block_list(block_list,client, startx, starty, startz, xrange, yrange, zrange, pop_size):
+    i =0
+    blocks_in_list =[]
+    print(xrange)
+    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+8, y=starty-1,z=startz-9), type=block_list[0], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+6, y=starty-1,z=startz-9), type=block_list[1], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+4, y=starty-1,z=startz-9), type=block_list[2], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+2, y=starty-1,z=startz-9), type=block_list[3], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*xrange, y=starty-1,z=startz-9), type=block_list[4], orientation=NORTH))
+
+    client.spawnBlocks(Blocks(blocks=blocks_in_list))
+    
 def player_selection_switches(pop_size):
         """
         Spawns the switches the a player can use to select their preferred
