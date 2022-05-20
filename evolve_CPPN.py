@@ -225,7 +225,8 @@ class MinecraftBreeder(object):
             the population.
         """                                                                                                                           
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
-        minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
+        for i in range(self.args.POPULATION_SIZE):
+            minecraft_structures.place_fences(self.client, self.startx+(i*(self.xrange+2+self.args.SPACE_BETWEEN)), self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
         (done_block_position, on_block_positions) = self.player_selection_switches(self.args.POPULATION_SIZE)
         
@@ -237,7 +238,7 @@ class MinecraftBreeder(object):
             # Initially, none are selected
             selected.append(False)
             # See how CPPN fills out the shape
-            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
+            corner = (self.startx + n*(self.xrange+2+self.args.SPACE_BETWEEN), self.starty, self.startz)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
 
         # Render shapes in Minecraft world

@@ -5,10 +5,11 @@ kept in this module.
 
 # for Minecraft
 #import grpc
+from re import S
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_size):
+def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_size, space_between):
         """
         Places a fenced in area around each of the shapes from the population
         that will be rendered in Minecraft. The size of the fenced in areas
@@ -35,24 +36,16 @@ def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_siz
             ))
 
         fence = []
-        # Make the first row because this is a fence post problem
-        # 0 5 0 to 0 5 11
-        for first in range(zrange+2):
-            fence.append(Block(position=Point(x=startx-1, y=starty-1,z=startz-1 + first), type=DARK_OAK_FENCE, orientation=NORTH))
+        
+        # fill both x sides
+        for xi in range(xrange+2):
+            fence.append(Block(position=Point(x=startx-1 + xi, y=starty-1,z=startz-1), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=startx-1 + xi, y=starty-1,z=startz+zrange), type=DARK_OAK_FENCE, orientation=NORTH))
 
-        # Make nested for loops that will make the fence going in the 
-        # top and bottom and other column that divides each structure
-        for m in range(pop_size): # still don't know how to get it to repeat itself
-            for i in range(xrange+2): 
-                # do the fence in front of player going in the x direction (when facing south)
-                fence.append(Block(position=Point(x=startx-1 + m*(xrange + 1) + i, y=starty-1,z=startz-1), type=DARK_OAK_FENCE, orientation=NORTH))
-            for j in range(xrange+2):
-                # do the fence in back of the structure going in the x direction (when facing south)
-                fence.append(Block(position=Point(x=startx-1 + m*(xrange + 1) + j, y=starty-1,z=startz+zrange), type=DARK_OAK_FENCE, orientation=NORTH))
-            for k in range(zrange+2):
-                # do the one that divides the structures z changes
-                # there is problem with where the divisions are being placed. Each division isn't the same size
-                fence.append(Block(position=Point(x=startx-1 + (m+1)*(xrange + 1), y=starty-1,z=startz-1 + k), type=DARK_OAK_FENCE, orientation=NORTH)) 
+        # fill both z sides
+        for zi in range(zrange+1):
+            fence.append(Block(position=Point(x=startx-1, y=starty-1,z=startz + zi), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=startx-1 + xrange+1, y=starty-1,z=startz+zi), type=DARK_OAK_FENCE, orientation=NORTH))
 
         client.spawnBlocks(Blocks(blocks=fence))
 

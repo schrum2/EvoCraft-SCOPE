@@ -34,6 +34,8 @@ def main(argv):
                         help='The multiplier used when DISTANC_PRESENCE_THRESHOLD is true.')
     parser.add_argument('--RANDOM_SEED', type=random.Random, default=random.randrange(0,100,1), metavar='',
                         help='Random seed of the shapes produced on the initial time.')
+    parser.add_argument('--SPACE_BETWEEN', type=int, default=1, metavar='',
+                        help='The space between the fences of each shape.')
 
     args = parser.parse_args()
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
