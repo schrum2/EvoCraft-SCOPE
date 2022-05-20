@@ -291,7 +291,7 @@ def player_selection_switches(pop_size, client, position_information):
 
     Parameters:
     pop_size (int): Number of selection switches being selected
-    client (MinecraftServiceStub) TODO
+    client (MinecraftServiceStub): Interface to Minecraft
     position_information["startx"] (int): Integer that indicates the start of the range in x direction
     startz (int): Integer that indicates the start of the range in z direction
     xrange (int): Range of the x coordinate values
