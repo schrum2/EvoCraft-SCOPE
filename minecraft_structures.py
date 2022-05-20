@@ -83,8 +83,20 @@ def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
                 type=AIR
             ))
 
-def reset_area(client, startx, starty, startz, xrange, yrange, zrange, pop_size):
+def reset_area(client, startx, starty, startz, xrange, zrange, pop_size):
+    """
+    Resets the a wide that could have been damaged by the structures or 
+    that may contain a selection switch. 
 
+    Parameters:
+    client (MinecraftServiceStub): TODO
+    startx (int): Integer that indicates the start of the range in x direction
+    starty (int): Integer that indicates the start of the range in y direction
+    startz (int): Integer that indicates the start of the range in z direction
+    xrange (int): Range for the x coordinates
+    zrange (int): Range for the z coordinates
+    pop_size (int): The size of the population
+    """    
     zplacement = startz - 10
 
     # fill the ground with dirt up until bedrock

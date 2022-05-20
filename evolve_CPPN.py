@@ -121,7 +121,7 @@ class MinecraftBreeder(object):
             the population.
         """                                                                                                                           
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
-        minecraft_structures.reset_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
+        minecraft_structures.reset_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.zrange, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
         
