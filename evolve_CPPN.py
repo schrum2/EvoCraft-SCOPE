@@ -123,7 +123,8 @@ class MinecraftBreeder(object):
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
-        (done_block_position, on_block_positions) = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE)
+        done_block_position = minecraft_structures.player_next_gen_switch(self.startx, self.startz, self.client)
+        on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.startx, self.startz, self.xrange)
         
         selected = []
         shapes = []
