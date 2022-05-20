@@ -269,7 +269,7 @@ def place_number(client,x,y,z,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client, startx, starty, startz,genome_id):
+def place_blocks_in_block_list(block_list,client,position_information,genome_id):
     blocks_in_list = []
     block_list_to_compare = []
     # for i  in range(pop_size):
@@ -279,18 +279,18 @@ def place_blocks_in_block_list(block_list,client, startx, starty, startz,genome_
 
     
     while(index<len(block_list)):
-        generated_block=(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z), type=block_list[index], orientation=NORTH))
+        generated_block=(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z), type=block_list[index], orientation=NORTH))
         blocks_in_list.append(generated_block)
-        blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-2,z=startz+z), type=EMERALD_BLOCK, orientation=NORTH))
+        blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-2,z=position_information["startz"]+z), type=EMERALD_BLOCK, orientation=NORTH))
         
         block_list_to_compare.append(generated_block)
 
         if(generated_block.type==LAVA or generated_block.type==WATER):
-            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x-1, y=starty-1,z=startz+z), type=STONE_BRICK_STAIRS, orientation=EAST))
-            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x+1, y=starty-1,z=startz+z), type=STONE_BRICK_STAIRS, orientation=WEST))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x-1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x+1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
 
-            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
-            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
 
         # TODO: Generalize and explain these magic numbers. Define in terms of other position values
         x=x+2
