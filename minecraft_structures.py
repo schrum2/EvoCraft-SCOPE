@@ -269,19 +269,19 @@ def place_number(client,x,y,z,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client, startx, starty, startz, xrange, yrange, zrange, pop_size):
+def place_blocks_in_block_list(block_list,client, position_information, pop_size):
     i =0
     blocks_in_list =[]
-    print(xrange)
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+8, y=starty-1,z=startz-9), type=block_list[0], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+6, y=starty-1,z=startz-9), type=block_list[1], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+4, y=starty-1,z=startz-9), type=block_list[2], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+2, y=starty-1,z=startz-9), type=block_list[3], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange, y=starty-1,z=startz-9), type=block_list[4], orientation=NORTH))
+    print(position_information["xrange"])
+    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+8, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[0], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+6, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[1], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+4, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[2], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+2, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[3], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"], y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[4], orientation=NORTH))
 
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
     
-def player_selection_switches(pop_size, client, startx, startz, xrange):
+def player_selection_switches(pop_size, client, position_information):
     """
     Spawns the switches the a player can use to select their preferred
     structures along with the switch that is used to indicate that they are
@@ -292,7 +292,7 @@ def player_selection_switches(pop_size, client, startx, startz, xrange):
     Parameters:
     pop_size (int): Number of selection switches being selected
     client (MinecraftServiceStub) TODO
-    startx (int): Integer that indicates the start of the range in x direction
+    position_information["startx"] (int): Integer that indicates the start of the range in x direction
     startz (int): Integer that indicates the start of the range in z direction
     xrange (int): Range of the x coordinate values
 
@@ -305,21 +305,21 @@ def player_selection_switches(pop_size, client, startx, startz, xrange):
     lamps = []
 
     # z coordinate needs to back away from the shapes if they generate water or lava
-    zplacement = startz - 10
+    zplacement = position_information["startz"] - 10
 
     #add the lamp in first when there is still ground underneath it to avoid the spawning of the grass blocks
     for p in range(pop_size):
-        lamps.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=UP))
-        lamps.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2), y=4, z=zplacement-4), type=AIR, orientation=UP))
-        lamps.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=4, z=zplacement-5), type=AIR, orientation=UP))
+        lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"]-1, z=zplacement-4), type=REDSTONE_LAMP, orientation=UP))
+        lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2), y=position_information["starty"]-1, z=zplacement-4), type=AIR, orientation=UP))
+        lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"]-1, z=zplacement-5), type=AIR, orientation=UP))
     client.spawnBlocks(Blocks(blocks=lamps))
 
     # clear out the section for the redstone part of the swtich
     for n in range(pop_size):
         client.fillCube(FillCubeRequest(  
                 cube=Cube(
-                        min=Point(x=startx + n*(xrange+1) + int(xrange/2) - 3, y=1, z=zplacement-4), # subject to change
-                        max=Point(x=startx + n*(xrange+1) + int(xrange/2) - 1, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
+                        min=Point(x=position_information["startx"] + n*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 3, y=1, z=zplacement-4), # subject to change
+                        max=Point(x=position_information["startx"] + n*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=3, z=zplacement-2)  # subject to change (y = 4 is ground level)
                 ),
                 type=AIR
             ))
@@ -333,32 +333,32 @@ def player_selection_switches(pop_size, client, startx, startz, xrange):
 
     # add in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust to switch
     for p in range(pop_size):
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=1, z=zplacement-4), type=SLIME, orientation=NORTH))
+        switch.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"]-5, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+        switch.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"]-4, z=zplacement-4), type=SLIME, orientation=NORTH))
 
         # this is the position of each redstone block when the lever is switched on
-        on_block_position = (startx + p*(xrange+1) + int(xrange/2) - 1, 3, zplacement-4)
+        on_block_position = (position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, position_information["starty"]-2, zplacement-4)
         switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
         # stores the positions from above
         on_block_positions.append(on_block_position)
 
         # slabs to put around the mechanism
         for slab in range(0,3):
-            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) + 1, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
-            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2), y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=4, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
-            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 2, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=4, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
-            switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 2 + slab, y=4, z=zplacement- 1), type=STONEBRICK, orientation=NORTH)) # makes tail less noticeable
+            switch.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"] +1) + int(position_information["xrange"]/2) + 1, y=position_information["starty"] - 1, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2), y=position_information["starty"] - 1, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"] - 1, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
+            switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 2, y=position_information["starty"] - 1, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 3, y=position_information["starty"] - 1, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 2 + slab, y=position_information["starty"] - 1, z=zplacement- 1), type=STONEBRICK, orientation=NORTH)) # makes tail less noticeable
 
         # add in the rest of the blocks needed 
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=4, z=zplacement-5), type=LEVER, orientation=UP))
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 1, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 2, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) - 3, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 3, y=position_information["starty"] - 1, z=zplacement-5), type=LEVER, orientation=UP))
+        switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 3, y=position_information["starty"] - 4, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 3, y=position_information["starty"] - 3, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+        switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"] - 4, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 2, y=position_information["starty"] - 4, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 3, y=position_information["starty"] - 3, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        switch.append(Block(position=Point(x=position_information["startx"]  + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 3, y=position_information["starty"] - 2, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
    
     # spawn in all the switches
     client.spawnBlocks(Blocks(blocks=switch))

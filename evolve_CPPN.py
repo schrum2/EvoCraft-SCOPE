@@ -40,14 +40,15 @@ class MinecraftBreeder(object):
         self.args = args
         self.block_list = block_list
 
-        self.startx = 0
-        self.starty = 5
-        self.startz = 0
-        
+        self.position_information = dict()
+        self.position_information["startx"] = 0
+        self.position_information["starty"] = 5
+        self.position_information["startz"] = 0
+        self.position_information["xrange"] = self.args.XRANGE
+        self.position_information["yrange"] = self.args.YRANGE
+        self.position_information["zrange"] = self.args.ZRANGE
+
         self.generation = 0
-        self.xrange = self.args.XRANGE
-        self.yrange = self.args.YRANGE
-        self.zrange = self.args.ZRANGE
         
         # Don't try any multithreading yet
         self.num_workers = 1
@@ -58,7 +59,7 @@ class MinecraftBreeder(object):
 
         # Place numbers 0-9, use yrange + 2
         for i in range(10): # Problems if pop_size is not 10!
-            minecraft_structures.place_number(self.client,self.startx+(i*(self.xrange+1))+int(self.xrange/2),self.starty+self.yrange+2,self.startz,i)
+            minecraft_structures.place_number(self.client,self.position_information["startx"]+(i*(self.position_information["xrange"]+1))+int(self.position_information["xrange"]/2),self.position_information["starty"]+self.position_information["yrange"]+2,self.position_information["startz"],i)
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
         """
@@ -82,7 +83,7 @@ class MinecraftBreeder(object):
         else:
             block_options = genome.block_list
 
-        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
+        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.position_information, self.args.POPULATION_SIZE)
 
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
@@ -120,9 +121,9 @@ class MinecraftBreeder(object):
             and assigns fitness values to each of the genome objects in
             the population.
         """                                                                                                                           
-        minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
-        minecraft_structures.reset_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.zrange, self.args.POPULATION_SIZE)
-        minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
+        minecraft_structures.clear_area(self.client, self.position_information["startx"], self.position_information["starty"], self.position_information["startz"], self.position_information["xrange"], self.position_information["yrange"], self.position_information["zrange"], self.args.POPULATION_SIZE)
+        minecraft_structures.reset_area(self.client, self.position_information["startx"], self.position_information["starty"], self.position_information["startz"], self.position_information["xrange"], self.position_information["zrange"], self.args.POPULATION_SIZE)
+        minecraft_structures.place_fences(self.client, self.position_information["startx"], self.position_information["starty"], self.position_information["startz"], self.position_information["xrange"], self.position_information["yrange"], self.position_information["zrange"], self.args.POPULATION_SIZE)
 
         
         selected = []
@@ -133,8 +134,8 @@ class MinecraftBreeder(object):
             # Initially, none are selected
             selected.append(False)
             # See how CPPN fills out the shape
-            corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
-            shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
+            corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+1), self.position_information["starty"], self.position_information["startz"])
+            shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information["xrange"], self.position_information["yrange"], self.position_information["zrange"]))
 
         # Render shapes in Minecraft world
         for i in range(len(shapes)):
@@ -143,9 +144,9 @@ class MinecraftBreeder(object):
 
         if self.args.IN_GAME_CONTROL:
 
-            # done_block_position = minecraft_structures.player_next_gen_switch(self.startx, self.startz, self.client) no longer needed?
-            on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.startx, self.startz, self.xrange)
-            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.startx, self.startz, self.xrange, self.client)
+            # done_block_position = minecraft_structures.player_next_gen_switch(self.position_information["startx"], self.position_information["startz"], self.client) no longer needed?
+            on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.position_information)
+            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.position_information["startx"], self.position_information["startz"], self.position_information["xrange"], self.client)
 
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
