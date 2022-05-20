@@ -82,8 +82,6 @@ class MinecraftBreeder(object):
         else:
             block_options = genome.block_list
 
-        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
-
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
         for xi in range(xrange):
@@ -231,7 +229,9 @@ class MinecraftBreeder(object):
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # Initially, none are selected
+            print(n)
             selected.append(False)
+            minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE,n)
             # See how CPPN fills out the shape
             corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))

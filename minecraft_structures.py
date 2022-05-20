@@ -233,14 +233,14 @@ def place_number(client,x,y,z,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client, startx, starty, startz, xrange, yrange, zrange, pop_size):
-    i =0
+def place_blocks_in_block_list(block_list,client, startx, starty, startz, xrange, yrange, zrange, pop_size,genome_id):
     blocks_in_list =[]
-    print(xrange)
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+8, y=starty-1,z=startz-9), type=block_list[0], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+6, y=starty-1,z=startz-9), type=block_list[1], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+4, y=starty-1,z=startz-9), type=block_list[2], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+2, y=starty-1,z=startz-9), type=block_list[3], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange, y=starty-1,z=startz-9), type=block_list[4], orientation=NORTH))
+    # for i  in range(pop_size):
+    print(genome_id)
+    blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+8, y=starty-1,z=startz-9), type=block_list[0], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+6, y=starty-1,z=startz-9), type=block_list[1], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+4, y=starty-1,z=startz-9), type=block_list[2], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+2, y=starty-1,z=startz-9), type=block_list[3], orientation=NORTH))
+    blocks_in_list.append(Block(position=Point(x=startx+11*genome_id, y=starty-1,z=startz-9), type=block_list[4], orientation=NORTH))
 
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
