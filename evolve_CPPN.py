@@ -76,10 +76,13 @@ class MinecraftBreeder(object):
         Returns:
         [Block]:List of Blocks to generate in Minecraft
         """
+        # If not evolving block list, use the static one specified lower in the code. Otherwise, use the genome's list
         if not self.args.BLOCK_LIST_EVOLVES:
             block_options = self.block_list
         else:
             block_options = genome.block_list
+
+        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
@@ -95,8 +98,6 @@ class MinecraftBreeder(object):
                     # First output determines whether there is a block at all.
                     # If there is a block, argmax determines the max value and places the specified block 
                     # from the list of possible blocks
-
-                    #print(output)
                                                 
                     if output[0] < self.args.PRESENCE_THRESHOLD: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
@@ -300,16 +301,20 @@ class MinecraftBreeder(object):
 # Various functions
 
 def run(args):
+    # If the block list evolves, customGenome is used. Otherwise it's the Default 
     if not args.BLOCK_LIST_EVOLVES:
-        # Contains all possible blocks that could be placed
-        # block_list = [REDSTONE_BLOCK,QUARTZ_BLOCK,EMERALD_BLOCK,GOLD_BLOCK,DIAMOND_BLOCK,REDSTONE_LAMP]
-        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
+        # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
+        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA] # TODO: Make this a command line parameter somehow?
         genome_type = neat.DefaultGenome
         config_file = 'cppn_minecraft_config'
+        block_list_length = len(block_list)
     else:
         block_list = [] # Won't be used, but parameter is still needed
         genome_type = cg.CustomBlocksGenome
         config_file = 'cppn_minecraft_custom_blocks_config'
+        block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
+        cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
+        #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
     mc = MinecraftBreeder(args,block_list)
 
@@ -324,12 +329,10 @@ def run(args):
 
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = args.BLOCK_LIST_SIZE+1
+    config.genome_config.num_outputs = block_list_length+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     pop = neat.Population(config)
-
-
 
     # Add a stdout reporter to show progress in the terminal.
     pop.add_reporter(neat.StdOutReporter(True))
