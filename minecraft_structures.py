@@ -269,16 +269,35 @@ def place_number(client,x,y,z,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client, position_information, pop_size):
-    i =0
-    blocks_in_list =[]
-    print(position_information["xrange"])
-    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+8, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[0], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+6, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[1], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+4, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[2], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"]+2, y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[3], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*position_information["xrange"], y=position_information["starty"]-1,z=position_information["startz"]-9), type=block_list[4], orientation=NORTH))
+def place_blocks_in_block_list(block_list,client,position_information,genome_id):
+    blocks_in_list = []
+    block_list_to_compare = []
+    # for i  in range(pop_size):
+    x=0
+    z=-9
+    index=0
 
+    
+    while(index<len(block_list)):
+        generated_block=(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z), type=block_list[index], orientation=NORTH))
+        blocks_in_list.append(generated_block)
+        blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-2,z=position_information["startz"]+z), type=EMERALD_BLOCK, orientation=NORTH))
+        
+        block_list_to_compare.append(generated_block)
+
+        if(generated_block.type==LAVA or generated_block.type==WATER):
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x-1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x+1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
+
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
+
+        # TODO: Generalize and explain these magic numbers. Define in terms of other position values
+        x=x+2
+        if(x>8):
+            z=z+2
+        index=index+1
+    # print(block_list_to_compare)
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
     
 def player_selection_switches(pop_size, client, position_information):
@@ -480,3 +499,30 @@ def next_gen_button(pop_size,position_information, client):
     client.spawnBlocks(Blocks(blocks=next_gen_button))
 
     return next_block_positions
+
+def read_current_block_options(client,placements,position_information):
+    """
+    Used when users can change the blocks in evolved shapes from within the game.
+    Checks the blocks on display in front of each evolved shape and collects them in a list,
+    where each such list is combined into a list of lists that is returned. The returned
+    list will indicate all block types currently specified (on display) for each shape.
+
+    Parameters:
+    client ():
+
+    """
+    blocks_for_shape = []
+    for corner in placements:
+        # Change these coordinates to be an appropriate offset based on start x/y/z and x/y/z range
+        blocks = client.readCube(Cube(
+                    min=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-9),
+                    max=Point(x=corner[0]+position_information["xrange"]-2, y=position_information["starty"]-1, z=position_information["startz"]-9)
+                 ))
+        
+        block_list = []
+        index = 0
+        while index < len(blocks.blocks):
+            block_list.append(blocks.blocks[index].type)
+            index += 2 # Skip over spaces between blocks 
+        blocks_for_shape.append(block_list)
+    return blocks_for_shape

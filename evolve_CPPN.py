@@ -80,8 +80,6 @@ class MinecraftBreeder(object):
         else:
             block_options = genome.block_list
 
-        minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.position_information, self.args.POPULATION_SIZE)
-
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
         for xi in range(self.position_information["xrange"]):
@@ -113,8 +111,6 @@ class MinecraftBreeder(object):
         
         return shape
 
-    
-
     def eval_fitness(self, genomes, config):
         """
         This function is expected by the NEAT-Python framework.
@@ -133,13 +129,16 @@ class MinecraftBreeder(object):
         
         selected = []
         shapes = []
+        placements = []
         
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # Initially, none are selected
             selected.append(False)
+            minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+1), self.position_information["starty"], self.position_information["startz"])
+            placements.append(corner)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information))
 
         # Place numbers 0-9, use yrange + 2
@@ -159,7 +158,7 @@ class MinecraftBreeder(object):
 
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
-
+            
             while not player_select_done: #player is still selecting
                
                 # constantly reads the position right below the redstone lamp
@@ -172,16 +171,10 @@ class MinecraftBreeder(object):
                     ))
                     selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
 
-                # if the player has clicked the switch for next, then 
-                # exit while 
-                #done_switch = self.client.readCube(Cube(
-                #    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
-                #    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])        to keep or not to keep, that is the question  
-                #))
-                #player_select_done = done_switch.blocks[0].type == REDSTONE_BLOCK
-
                 player_select_done = False
                 j = 0
+                # Checks the hidden Piston Heads associated with each next generation switch. 
+                # If any one is sensed, then player selection is done 
                 while not player_select_done and j < config.pop_size:
                     pressed = next_block_positions[j]
                     done_button = self.client.readCube(Cube(
@@ -190,10 +183,17 @@ class MinecraftBreeder(object):
                     ))
                     player_select_done = done_button.blocks[0].type == PISTON_HEAD
                     j += 1
-                    #print(done_button)
-                    #print("Next gen? : {}".format(player_select_done))
-                    #print("Pressed?: {}".format(pressed))
                     
+                # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
+                read_current_blocks=minecraft_structures.read_current_block_options(self.client,placements,self.position_information)
+
+                for n, (genome_id, genome) in enumerate(genomes):
+                    if(not genome.block_list==read_current_blocks[n]):
+                        for i in range(len(genome.block_list)):
+                            if(not genome.block_list[i]==read_current_blocks[n][i]):
+                                genome.block_list[i]=read_current_blocks[n][i]
+
+ 
                 #print(selected)
 
         else:
