@@ -98,8 +98,12 @@ class MinecraftBreeder(object):
                     # First output determines whether there is a block at all.
                     # If there is a block, argmax determines the max value and places the specified block 
                     # from the list of possible blocks
-                                                
-                    if output[0] < self.args.PRESENCE_THRESHOLD: 
+                    presence_threshold = self.args.PRESENCE_THRESHOLD 
+                    
+                    if self.args.DISTANCE_PRESENCE_THRESHOLD == True:
+                        presence_threshold = self.args.DISTANCE_PRESENCE_MULTIPLIER * util.distance((x,y,z),(0,0,0)) * math.sqrt(2)                            
+                    
+                    if output[0] < presence_threshold: 
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = util.argmax(output[1:])

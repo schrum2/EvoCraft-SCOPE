@@ -27,6 +27,10 @@ def main(argv):
                         help='The number of possible block list types when the block list is evolved.')
     parser.add_argument('--BLOCK_CHANGE_PROBABILITY', type=float, default=0.1, metavar='',
                         help='Probability of randomly changing a block type when the block list evolves.')
+    parser.add_argument('--DISTANCE_PRESENCE_THRESHOLD', type=bool, default=False, metavar='',
+                        help='Whether or not the presence threshold depends on the distance of the candidate block from the center of the generated shape.')
+    parser.add_argument('--DISTANCE_PRESENCE_MULTIPLIER', type=float, default=0.1, metavar='',
+                        help='The multiplier used when DISTANC_PRESENCE_THRESHOLD is true.')
 
     args = parser.parse_args()
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
@@ -54,6 +58,7 @@ def main(argv):
         raise ValueError("Block list size must at least two.")
 
     evolve_CPPN.run(args)
+
 
 if __name__ == '__main__':
     main(sys.argv)
