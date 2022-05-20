@@ -16,7 +16,7 @@ def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_siz
         is based off of instance variables, as is the location.
 
         Parameters:
-        client   (MinecraftServiceStub): TODO: put appropriate description here
+        client (MinecraftServiceStub): Minecraft server stub being used.
         startx   (int): Starting x coordinate value
         starty   (int): Starting y coordinate value
         startz   (int): Starting z coordinate value
@@ -55,7 +55,7 @@ def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
         large cube and filling it with air blocks.
 
         Parameters:
-        client (MinecraftServiceStub): TODO: put appropriate description here
+        client (MinecraftServiceStub): Minecraft server stub being used.
         startx (int): Starting value for x coordinate.
         starty (int): Starting value for y coordinate.
         startz (int): Starting value for z coordinate.
@@ -80,7 +80,7 @@ def place_number(client,x,y,z,num):
         in the range of 0-9. 
 
         Parameters:
-        client (MinecraftServiceStub): TODO
+        client (MinecraftServiceStub): Minecraft server stub being used.
         x (int): The x coordinate where the number will start
         y (int): The y coordinate where the number will start
         z (int): The z coordinate where the number will start
