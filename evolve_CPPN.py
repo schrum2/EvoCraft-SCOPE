@@ -161,20 +161,25 @@ class MinecraftBreeder(object):
 
                 # if the player has clicked the switch for next, then 
                 # exit while 
-                done_switch = self.client.readCube(Cube(
-                    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
-                    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
-                ))
+                #done_switch = self.client.readCube(Cube(
+                #    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
+                #    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
+                #))
+                #player_select_done = done_switch.blocks[0].type == REDSTONE_BLOCK
 
-                for j in range(config.pop_size):
+                player_select_done = False
+                j = 0
+                while not player_select_done and j < config.pop_size:
                     pressed = next_block_positions[j]
                     done_button = self.client.readCube(Cube(
-                        min=Point(x=next_block_positions[0], y=next_block_positions[1], z=next_block_positions[2]),
-                        max=Point(x=next_block_positions[0], y=next_block_positions[1], z=next_block_positions[2])
+                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
+                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
                     ))
-
-                player_select_done = done_switch.blocks[0].type == REDSTONE_BLOCK or done_button.blocks[0].type == PISTON
-                #print("Next gen? : {}".format(player_select_done))
+                    player_select_done = done_button.blocks[0].type == PISTON_HEAD
+                    j += 1
+                    #print(done_button)
+                    #print("Next gen? : {}".format(player_select_done))
+                    #print("Pressed?: {}".format(pressed))
                     
                 #print(selected)
 
