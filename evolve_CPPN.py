@@ -125,6 +125,7 @@ class MinecraftBreeder(object):
 
         done_block_position = minecraft_structures.player_next_gen_switch(self.startx, self.startz, self.client)
         on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.startx, self.startz, self.xrange)
+        next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.startx, self.startz, self.xrange, self.client)
         
         selected = []
         shapes = []
@@ -160,11 +161,19 @@ class MinecraftBreeder(object):
 
                 # if the player has clicked the switch for next, then 
                 # exit while 
-                done = self.client.readCube(Cube(
+                done_switch = self.client.readCube(Cube(
                     min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
                     max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
                 ))
-                player_select_done = done.blocks[0].type == REDSTONE_BLOCK
+
+                for j in range(config.pop_size):
+                    pressed = next_block_positions[j]
+                    done_button = self.client.readCube(Cube(
+                        min=Point(x=next_block_positions[0], y=next_block_positions[1], z=next_block_positions[2]),
+                        max=Point(x=next_block_positions[0], y=next_block_positions[1], z=next_block_positions[2])
+                    ))
+
+                player_select_done = done_switch.blocks[0].type == REDSTONE_BLOCK or done_button.blocks[0].type == PISTON
                 #print("Next gen? : {}".format(player_select_done))
                     
                 #print(selected)

@@ -387,3 +387,37 @@ def player_next_gen_switch(startx, startz, client):
     client.spawnBlocks(Blocks(blocks=next_gen_switch))
 
     return done_block_position
+
+def next_gen_button(pop_size,startx, startz, xrange, client):
+
+    next_gen_button = []
+
+    # stores the positions underneath the piston which indicate
+    # if the player wants to see the next generation of structures
+    next_block_positions = []
+
+    # z coordinate needs to back away from the shapes if they generate water or lava
+    zplacement = startz - 10
+
+    # clear out the hole for the next gen button
+    for n in range(pop_size):
+        client.fillCube(FillCubeRequest(  
+                cube=Cube(
+                    min=Point(x=startx + n*(xrange+1) + int(xrange/2) + 1, y=2, z=zplacement-5), 
+                    max=Point(x=startx + n*(xrange+1) + int(xrange/2) + 1, y=3, z=zplacement-5)  
+                ),
+                type=AIR
+            ))
+    
+    # add in the piston amd button
+    for p in range(pop_size):
+        # stores the position underneath one piston as it loops through
+        next_block_position = (startx + p*(xrange+1) + int(xrange/2) + 1,2,zplacement-5)
+        next_gen_button.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1]+1, z=next_block_position[2]), type=PISTON, orientation=DOWN))
+        next_block_positions.append(next_block_position)
+        next_gen_button.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) + 1, y=4, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
+    
+    # spawn in all the switches
+    client.spawnBlocks(Blocks(blocks=next_gen_button))
+
+    return next_block_positions
