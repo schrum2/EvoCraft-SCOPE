@@ -119,10 +119,15 @@ class MinecraftBreeder(object):
 
     def eval_fitness(self, genomes, config):
         """
-            This function is expected by the NEAT-Python framework.
-            It takes a population of genomes and configuration information,
-            and assigns fitness values to each of the genome objects in
-            the population.
+        This function is expected by the NEAT-Python framework.
+        It takes a population of genomes and configuration information,
+        and assigns fitness values to each of the genome objects in
+        the population. Nothing is returned, since the genomes themselves
+        are modified.
+        
+        Parameters:
+        genomes ([DefaultGenome]): list of CPPN genomes
+        config  (Config): NEAT configurations
         """                                                                                                                           
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
