@@ -58,7 +58,7 @@ class MinecraftBreeder(object):
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
 
-    def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
+    def query_cppn_for_shape(self, genome, config, corner, position_information):
         """
         Query CPPN at all voxel coordinates to generate the list of
         blocks that will eventually be rendered in the Minecraft server.
@@ -84,12 +84,12 @@ class MinecraftBreeder(object):
 
         net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
         shape = []
-        for xi in range(xrange):
-            x = util.scale_and_center(xi,xrange)
-            for yi in range(yrange):
-                y = util.scale_and_center(yi,yrange)
-                for zi in range(zrange):
-                    z = util.scale_and_center(zi,zrange)
+        for xi in range(self.position_information["xrange"]):
+            x = util.scale_and_center(xi,self.position_information["xrange"])
+            for yi in range(self.position_information["yrange"]):
+                y = util.scale_and_center(yi,self.position_information["yrange"])
+                for zi in range(self.position_information["zrange"]):
+                    z = util.scale_and_center(zi,self.position_information["zrange"])
                     # math.sqrt(2) is the usual scaling for radial distances in CPPNs
                     output = net.activate([x, y, z, util.distance((x,y,z),(0,0,0)) * math.sqrt(2), 1.0])
                     
@@ -132,7 +132,7 @@ class MinecraftBreeder(object):
             selected.append(False)
             # See how CPPN fills out the shape
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+1), self.position_information["starty"], self.position_information["startz"])
-            shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information["xrange"], self.position_information["yrange"], self.position_information["zrange"]))
+            shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information))
 
         # Place numbers 0-9, use yrange + 2
         for i in range(10): # Problems if pop_size is not 10!
