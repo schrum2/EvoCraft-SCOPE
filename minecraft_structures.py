@@ -263,7 +263,7 @@ def place_blocks_in_block_list(block_list,client, startx, starty, startz,genome_
     # print(block_list_to_compare)
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
 
-def read_current_block_options(client,startx,starty,startz,xrange,yrange,zrange,pop_size):
+def read_current_block_options(client,placements,starty,startz,xrange):
     """
     Used when users can change the blocks in evolved shapes from within the game.
     Checks the blocks on display in front of each evolved shape and collects them in a list,
@@ -275,19 +275,19 @@ def read_current_block_options(client,startx,starty,startz,xrange,yrange,zrange,
 
     """
     blocks_for_shape = []
-    for n in range(pop_size):
+    for corner in placements:
         # Change these coordinates to be an appropriate offset based on start x/y/z and x/y/z range
         blocks = client.readCube(Cube(
-                    min=Point(x=startx, y=starty-1, z=startz-9),
-                    max=Point(x=xrange, y=starty-1, z=startz-9)
+                    min=Point(x=corner[0], y=starty-1, z=startz-9),
+                    max=Point(x=corner[0]+xrange-2, y=starty-1, z=startz-9)
                  ))
         
         block_list = []
         index = 0
         while index < len(blocks.blocks):
             block_list.append(blocks.blocks[index])
-            index += 2 # Skip over spaces between blocks    
+            index += 2 # Skip over spaces between blocks 
 
-        blocks_for_shape.append(block_list)
-        print(blocks_for_shape)
+        blocks_for_shape.append(block_list.type)
+    print(blocks_for_shape)
     return blocks_for_shape

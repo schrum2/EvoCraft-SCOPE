@@ -226,6 +226,7 @@ class MinecraftBreeder(object):
         
         selected = []
         shapes = []
+        placements = []
         
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
@@ -234,6 +235,7 @@ class MinecraftBreeder(object):
             minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.startx, self.starty, self.startz,n)
             # See how CPPN fills out the shape
             corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
+            placements.append(corner)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
         
         
@@ -267,7 +269,7 @@ class MinecraftBreeder(object):
                 player_select_done = done.blocks[0].type == REDSTONE_BLOCK
                 #print("Next gen? : {}".format(player_select_done))
 
-                minecraft_structures.read_current_block_options(self.client,self.startx,self.starty,self.startz,self.xrange,self.yrange,self.zrange,self.args.POPULATION_SIZE)
+                minecraft_structures.read_current_block_options(self.client,placements,self.starty,self.startz,self.xrange)
  
                 #print(selected)
 
