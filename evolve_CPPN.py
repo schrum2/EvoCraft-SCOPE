@@ -121,6 +121,7 @@ class MinecraftBreeder(object):
             the population.
         """                                                                                                                           
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
+        minecraft_structures.reset_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
         
@@ -165,7 +166,7 @@ class MinecraftBreeder(object):
                 # exit while 
                 #done_switch = self.client.readCube(Cube(
                 #    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
-                #    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
+                #    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])        to keep or not to keep, that is the question  
                 #))
                 #player_select_done = done_switch.blocks[0].type == REDSTONE_BLOCK
 

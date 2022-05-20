@@ -71,15 +71,39 @@ def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
         zrange (int): Range for z coordinate values.
         pop_size (int): The size of the population.
         """
+
+        zplacement = startz - 10
+
         # clear out a big area rather than individual cubes
         client.fillCube(FillCubeRequest(  
                 cube=Cube(
-                    min=Point(x=startx-7, y=starty-1, z=startz-7),
+                    min=Point(x=startx-7, y=starty-1, z=zplacement-7),
                     max=Point(x=startx-1 + pop_size*(xrange+1)+7, y=starty+11, z=zrange+7)
                 ),
                 type=AIR
             ))
 
+def reset_area(client, startx, starty, startz, xrange, yrange, zrange, pop_size):
+
+    zplacement = startz - 10
+
+    # fill the ground with dirt up until bedrock
+    client.fillCube(FillCubeRequest(  
+        cube=Cube(
+            min=Point(x=startx-7, y=starty-4, z=zplacement-7),
+            max=Point(x=startx-1 + pop_size*(xrange+1)+7, y=starty-2, z=zrange+7)
+        ),
+        type=GRASS
+    ))
+
+    # fill out the bedrock since there may be pistons in there
+    client.fillCube(FillCubeRequest(  
+        cube=Cube(
+            min=Point(x=startx-7, y=starty-5, z=zplacement-7),
+            max=Point(x=startx-1 + pop_size*(xrange+1)+7, y=starty-5, z=zrange+7)
+        ),
+        type=BEDROCK
+    ))
 
 def place_number(client,x,y,z,num):
     """
