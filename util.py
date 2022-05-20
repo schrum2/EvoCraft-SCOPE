@@ -14,21 +14,27 @@ def argmax(l):
 
 def distance(v, u):
     """
-    Euclidean distance between two vectors of the same length.
-    :param u a vectors
-    :param v other vector
-    :return distance between vectors
+    This function uses two vectors of the same length, u and v, to 
+    find the Euclidean distance between the two vectors.
+    
+    Parameters:
+    u (Vector): Vector being used to find the distance.
+    v (Vector): Vector being used to find the distance.
+    
+    Returns:
+    int: Euclidean distance between two vectors u and v.
     """
     d = 0
     for i in range(len(u)):
         d += (u[i] - v[i])**2
     return math.sqrt(d)
 
-def scale_and_center(index, top):
+def scale_and_center(index, top):    
     """
-    This scales the block index to the range [-1,1]
-    
-    :param index: index of block along a given dimension
-    :param top: number of blocks along the given dimension
+    This scales the block index to the range [-1,1]. 
+
+    Parameters:
+    index (int): The x coordinate where the number will start.
+    top (int): The y coordinate where the number will start.
     """
-    return -1.0 + 2.0 * index / (top - 1)
+    return 0.0 if top == 1 else -1.0 + 2.0 * index / (top - 1)
