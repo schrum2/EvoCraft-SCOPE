@@ -27,9 +27,6 @@ import minecraft_structures
 # For InteractiveStagnation class
 import neat_stagnation
 
-BLOCK_LIST_EVOLVES = True
-BLOCK_LIST_SIZE = 5
-
 class MinecraftBreeder(object):
     def __init__(self, args, block_list):
         """
@@ -80,7 +77,7 @@ class MinecraftBreeder(object):
         [Block]:List of Blocks to generate in Minecraft
         """
         # If not evolving block list, use the static one specified lower in the code. Otherwise, use the genome's list
-        if not BLOCK_LIST_EVOLVES:
+        if not self.args.BLOCK_LIST_EVOLVES:
             block_options = self.block_list
         else:
             block_options = genome.block_list
@@ -106,6 +103,7 @@ class MinecraftBreeder(object):
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
                     else:
                         output_val = util.argmax(output[1:])
+                        assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
                         
 
@@ -304,9 +302,9 @@ class MinecraftBreeder(object):
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
-    if not BLOCK_LIST_EVOLVES:
+    if not args.BLOCK_LIST_EVOLVES:
         # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
-        block_list = [REDSTONE_BLOCK,PISTON,WATER,LAVA]
+        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA]
         genome_type = neat.DefaultGenome
         config_file = 'cppn_minecraft_config'
     else:
@@ -327,7 +325,7 @@ def run(args):
 
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = BLOCK_LIST_SIZE+1
+    config.genome_config.num_outputs = args.BLOCK_LIST_SIZE+1
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     pop = neat.Population(config)
