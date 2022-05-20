@@ -38,12 +38,12 @@ def place_fences(client, position_information, pop_size, space_between):
         fence = []
         
         # fill both x sides
-        for xi in range(xrange+2):
+        for xi in range(position_information["xrange"]+2):
             fence.append(Block(position=Point(x=position_information["startx"]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
             fence.append(Block(position=Point(x=position_information["startx"]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
 
         # fill both z sides
-        for zi in range(zrange+1):
+        for zi in range(position_information["zrange"]+1):
             fence.append(Block(position=Point(x=position_information["startx"]-1, y=position_information["starty"]-1,z=position_information["startz"] + zi), type=DARK_OAK_FENCE, orientation=NORTH))
             fence.append(Block(position=Point(x=position_information["startx"]-1 + position_information["xrange"]+1, y=position_information["starty"]-1,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
 
