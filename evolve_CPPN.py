@@ -211,14 +211,6 @@ class MinecraftBreeder(object):
 
         return (done_block_position, on_block_positions)
 
-    def read_blocks(self,client,genome):
-        read_cubes = True
-        while read_cubes==True:
-            blocks = self.client.readCube(Cube(
-                        min=Point(x=first[0], y=first[1], z=first[2]),
-                        max=Point(x=first[0], y=first[1], z=first[2])
-                    ))
-
 
     def eval_fitness(self, genomes, config):
         """
@@ -243,7 +235,9 @@ class MinecraftBreeder(object):
             # See how CPPN fills out the shape
             corner = (self.startx + n*(self.xrange+1), self.starty, self.startz)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.xrange, self.yrange, self.zrange))
-
+        
+        minecraft_structures.read_blocks(self,client)
+        
         # Render shapes in Minecraft world
         for i in range(len(shapes)):
             # fill the empty space with the evolved shape
@@ -252,7 +246,7 @@ class MinecraftBreeder(object):
         if self.args.IN_GAME_CONTROL:
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
-
+            
             while not player_select_done: #player is still selecting
                
                 # constantly reads the position right below the redstone lamp

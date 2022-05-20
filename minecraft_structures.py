@@ -259,3 +259,14 @@ def place_blocks_in_block_list(block_list,client, startx, starty, startz,genome_
 
     block_types[genome_id]=blocks_in_list
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
+
+def read_blocks(self,client):
+    read_cubes = True
+    while read_cubes==True:
+        blocks = self.client.readCube(Cube(
+                     min=Point(x=0, y=0, z=0),
+                     max=Point(x=0, y=0, z=0)
+                 ))
+        print(blocks)
+        if(blocks.blocks[0].type==DIAMOND_BLOCK):
+            read_cubes = False
