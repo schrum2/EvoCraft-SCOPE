@@ -1,6 +1,7 @@
 import argparse
 import sys
 import evolve_CPPN
+import random
 from os.path import exists
 from os import mkdir
 
@@ -31,6 +32,8 @@ def main(argv):
                         help='Whether or not the presence threshold depends on the distance of the candidate block from the center of the generated shape.')
     parser.add_argument('--DISTANCE_PRESENCE_MULTIPLIER', type=float, default=0.1, metavar='',
                         help='The multiplier used when DISTANC_PRESENCE_THRESHOLD is true.')
+    parser.add_argument('--RANDOM_SEED', type=random.Random, default=random.randrange(0,100,1), metavar='',
+                        help='Random seed of the shapes produced on the initial time.')
 
     args = parser.parse_args()
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
@@ -56,6 +59,8 @@ def main(argv):
 
     if args.NUM_EVOLVED_BLOCK_LIST_TYPES < 2:
         raise ValueError("Block list size must at least two.")
+
+    random.seed(args.RANDOM_SEED)
 
     evolve_CPPN.run(args)
 
