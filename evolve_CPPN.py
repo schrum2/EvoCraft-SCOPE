@@ -121,9 +121,9 @@ class MinecraftBreeder(object):
             and assigns fitness values to each of the genome objects in
             the population.
         """                                                                                                                           
-        minecraft_structures.clear_area(self.client, self.position_information["startx"], self.position_information["starty"], self.position_information["startz"], self.position_information["xrange"], self.position_information["yrange"], self.position_information["zrange"], self.args.POPULATION_SIZE)
-        minecraft_structures.reset_area(self.client, self.position_information["startx"], self.position_information["starty"], self.position_information["startz"], self.position_information["xrange"], self.position_information["zrange"], self.args.POPULATION_SIZE)
-        minecraft_structures.place_fences(self.client, self.position_information["startx"], self.position_information["starty"], self.position_information["startz"], self.position_information["xrange"], self.position_information["yrange"], self.position_information["zrange"], self.args.POPULATION_SIZE)
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE)
+        minecraft_structures.reset_area(self.client, self.position_information, self.args.POPULATION_SIZE)
+        minecraft_structures.place_fences(self.client, self.position_information, self.args.POPULATION_SIZE)
 
         
         selected = []

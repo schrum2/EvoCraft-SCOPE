@@ -8,7 +8,7 @@ kept in this module.
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_size):
+def place_fences(client, position_information, pop_size):
         """
         Places a fenced in area around each of the shapes from the population
         that will be rendered in Minecraft. The size of the fenced in areas
@@ -28,8 +28,8 @@ def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_siz
         # clear out previous fences
         client.fillCube(FillCubeRequest(  
                 cube=Cube(
-                    min=Point(x=startx-1, y=starty-1, z=startz-1),
-                    max=Point(x=startx-1 + pop_size*(xrange+1)+1, y=starty-1, z=zrange+2)
+                    min=Point(x=position_information["startx"]-1, y=position_information["starty"]-1, z=position_information["startz"]-1),
+                    max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+1, y=position_information["starty"]-1, z=position_information["startz"]+2)
                 ),
                 type=AIR
             ))
@@ -37,26 +37,26 @@ def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_siz
         fence = []
         # Make the first row because this is a fence post problem
         # 0 5 0 to 0 5 11
-        for first in range(zrange+2):
-            fence.append(Block(position=Point(x=startx-1, y=starty-1,z=startz-1 + first), type=DARK_OAK_FENCE, orientation=NORTH))
+        for first in range(position_information["zrange"]+2):
+            fence.append(Block(position=Point(x=position_information["startx"]-1, y=position_information["starty"]-1,z=position_information["startz"]-1 + first), type=DARK_OAK_FENCE, orientation=NORTH))
 
         # Make nested for loops that will make the fence going in the 
         # top and bottom and other column that divides each structure
         for m in range(pop_size): # still don't know how to get it to repeat itself
-            for i in range(xrange+2): 
+            for i in range(position_information["xrange"]+2): 
                 # do the fence in front of player going in the x direction (when facing south)
-                fence.append(Block(position=Point(x=startx-1 + m*(xrange + 1) + i, y=starty-1,z=startz-1), type=DARK_OAK_FENCE, orientation=NORTH))
-            for j in range(xrange+2):
+                fence.append(Block(position=Point(x=position_information["startx"]-1 + m*(position_information["xrange"] + 1) + i, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
+            for j in range(position_information["xrange"]+2):
                 # do the fence in back of the structure going in the x direction (when facing south)
-                fence.append(Block(position=Point(x=startx-1 + m*(xrange + 1) + j, y=starty-1,z=startz+zrange), type=DARK_OAK_FENCE, orientation=NORTH))
-            for k in range(zrange+2):
+                fence.append(Block(position=Point(x=position_information["startx"]-1 + m*(position_information["xrange"] + 1) + j, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
+            for k in range(position_information["zrange"]+2):
                 # do the one that divides the structures z changes
                 # there is problem with where the divisions are being placed. Each division isn't the same size
-                fence.append(Block(position=Point(x=startx-1 + (m+1)*(xrange + 1), y=starty-1,z=startz-1 + k), type=DARK_OAK_FENCE, orientation=NORTH)) 
+                fence.append(Block(position=Point(x=position_information["startx"]-1 + (m+1)*(position_information["xrange"] + 1), y=position_information["starty"]-1,z=position_information["startz"]-1 + k), type=DARK_OAK_FENCE, orientation=NORTH)) 
 
         client.spawnBlocks(Blocks(blocks=fence))
 
-def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
+def clear_area(client, position_information, pop_size):
         """
         This function clears a large area by creating one
         large cube and filling it with air blocks.
@@ -72,18 +72,18 @@ def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
         pop_size (int): The size of the population.
         """
 
-        zplacement = startz - 10
+        zplacement = position_information["startz"] - 10
 
         # clear out a big area rather than individual cubes
         client.fillCube(FillCubeRequest(  
                 cube=Cube(
-                    min=Point(x=startx-7, y=starty-1, z=zplacement-7),
-                    max=Point(x=startx-1 + pop_size*(xrange+1)+7, y=starty+11, z=zrange+7)
+                    min=Point(x=position_information["startx"]-7, y=position_information["starty"]-1, z=zplacement-7),
+                    max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=position_information["starty"]+11, z=position_information["zrange"]+7)
                 ),
                 type=AIR
             ))
 
-def reset_area(client, startx, starty, startz, xrange, zrange, pop_size):
+def reset_area(client, position_information, pop_size):
     """
     Resets the a wide that could have been damaged by the structures or 
     that may contain a selection switch. 
@@ -97,13 +97,13 @@ def reset_area(client, startx, starty, startz, xrange, zrange, pop_size):
     zrange (int): Range for the z coordinates
     pop_size (int): The size of the population
     """    
-    zplacement = startz - 10
+    zplacement = position_information["startz"] - 10
 
     # fill the ground with dirt up until bedrock
     client.fillCube(FillCubeRequest(  
         cube=Cube(
-            min=Point(x=startx-7, y=starty-4, z=zplacement-7),
-            max=Point(x=startx-1 + pop_size*(xrange+1)+7, y=starty-2, z=zrange+7)
+            min=Point(x=position_information["startx"]-7, y=position_information["starty"]-4, z=zplacement-7),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=position_information["starty"]-2, z=position_information["zrange"]+7)
         ),
         type=GRASS
     ))
@@ -111,8 +111,8 @@ def reset_area(client, startx, starty, startz, xrange, zrange, pop_size):
     # fill out the bedrock since there may be pistons in there
     client.fillCube(FillCubeRequest(  
         cube=Cube(
-            min=Point(x=startx-7, y=starty-5, z=zplacement-7),
-            max=Point(x=startx-1 + pop_size*(xrange+1)+7, y=starty-5, z=zrange+7)
+            min=Point(x=position_information["startx"]-7, y=position_information["starty"]-5, z=zplacement-7),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=position_information["starty"]-5, z=position_information["zrange"]+7)
         ),
         type=BEDROCK
     ))
