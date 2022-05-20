@@ -310,8 +310,8 @@ def player_selection_switches(pop_size, client, position_information):
     #add the lamp in first when there is still ground underneath it to avoid the spawning of the grass blocks
     for p in range(pop_size):
         lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"]-1, z=zplacement-4), type=REDSTONE_LAMP, orientation=UP))
-        lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2), y=position_information["starty"]-1, z=zplacement-4), type=AIR, orientation=UP))
-        lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"]-1, z=zplacement-5), type=AIR, orientation=UP))
+        #lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2), y=position_information["starty"]-1, z=zplacement-4), type=AIR, orientation=UP))
+        #lamps.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) - 1, y=position_information["starty"]-1, z=zplacement-5), type=AIR, orientation=UP))
     client.spawnBlocks(Blocks(blocks=lamps))
 
     # clear out the section for the redstone part of the swtich
@@ -323,8 +323,7 @@ def player_selection_switches(pop_size, client, position_information):
                 ),
                 type=AIR
             ))
-        
-        
+
     # Now spawn in everything for the selection switches
 
     # list that stores the position of the redstone block 
