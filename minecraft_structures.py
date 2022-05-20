@@ -365,7 +365,7 @@ def player_selection_switches(pop_size, client, position_information):
 
     return on_block_positions
 
-def player_next_gen_switch(startx, startz, client):
+def player_next_gen_switch(position_information, client):
     """
     Adds in all the blocks necessary to make a next generation
     button that the player can use to indicate when they want to
@@ -388,52 +388,52 @@ def player_next_gen_switch(startx, startz, client):
     lamp = []
     
     # z coordinate needs to back away from the shapes if they generate water or lava
-    zplacement = startz - 10
+    zplacement = position_information["startz"] - 10
 
     # add the lamp in first when there is still ground underneath it to avoid the spawning of the grass blocks
-    lamp.append(Block(position=Point(x=startx - 4, y=4, z=zplacement-4), type=REDSTONE_LAMP, orientation=DOWN))
-    lamp.append(Block(position=Point(x=startx - 3, y=4, z=zplacement-4), type=AIR, orientation=UP))
-    lamp.append(Block(position=Point(x=startx - 4, y=4, z=zplacement-5), type=AIR, orientation=UP))
+    lamp.append(Block(position=Point(x=position_information["startx"] - 4, y=position_information["starty"] - 1, z=zplacement-4), type=REDSTONE_LAMP, orientation=DOWN))
+    lamp.append(Block(position=Point(x=position_information["startx"] - 3, y=position_information["starty"] - 1, z=zplacement-4), type=AIR, orientation=UP))
+    lamp.append(Block(position=Point(x=position_information["startx"] - 4, y=position_information["starty"] - 1, z=zplacement-5), type=AIR, orientation=UP))
     client.spawnBlocks(Blocks(blocks=lamp))
 
     # clear out the section for the next gen switch
     client.fillCube(FillCubeRequest(  
             cube=Cube(
-                min=Point(x=startx - 6, y=1, z=zplacement-4), 
-                max=Point(x=startx - 4, y=3, z=zplacement-2)  
+                min=Point(x=position_information["startx"] - 6, y=position_information["starty"] - 4, z=zplacement-4), 
+                max=Point(x=position_information["startx"] - 4, y=position_information["starty"] - 2, z=zplacement-2)  
             ),
             type=AIR
         ))
         
     # add in all the components for the next gen switch to switch
-    next_gen_switch.append(Block(position=Point(x=startx - 4, y=0, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
-    next_gen_switch.append(Block(position=Point(x=startx - 4, y=1, z=zplacement-4), type=SLIME, orientation=UP))
-    done_block_position = (startx - 4, 3, zplacement-4)
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 4, y=position_information["starty"] - 5, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 4, y=position_information["starty"] - 4, z=zplacement-4), type=SLIME, orientation=UP))
+    done_block_position = (position_information["startx"] - 4, position_information["starty"]- 2, zplacement-4)
     next_gen_switch.append(Block(position=Point(x=done_block_position[0], y=done_block_position[1] - 1, z=done_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
 
     for slab in range(0,3):
-        next_gen_switch.append(Block(position=Point(x=startx - 2, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
-        next_gen_switch.append(Block(position=Point(x=startx - 3, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-        next_gen_switch.append(Block(position=Point(x=startx - 4, y=4, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
-        next_gen_switch.append(Block(position=Point(x=startx - 5, y=4, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-        next_gen_switch.append(Block(position=Point(x=startx - 6, y=4, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
-        next_gen_switch.append(Block(position=Point(x=startx - 5 + slab, y=4, z=zplacement- 1), type=EMERALD_BLOCK, orientation=NORTH)) # makes the tail less noticeable
+        next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 2, y=position_information["starty"] - 1, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 3, y=position_information["starty"] - 1, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 4, y=position_information["starty"] - 1, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
+        next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 5, y=position_information["starty"] - 1, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 6, y=position_information["starty"] - 1, z=zplacement-4 + slab), type=EMERALD_BLOCK, orientation=NORTH))
+        next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 5 + slab, y=position_information["starty"] - 1, z=zplacement- 1), type=EMERALD_BLOCK, orientation=NORTH)) # makes the tail less noticeable
 
     
-    next_gen_switch.append(Block(position=Point(x=startx - 6, y=4, z=zplacement-5), type=LEVER, orientation=UP))
-    next_gen_switch.append(Block(position=Point(x=startx - 6, y=1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
-    next_gen_switch.append(Block(position=Point(x=startx - 6, y=2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
-    next_gen_switch.append(Block(position=Point(x=startx - 4, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-    next_gen_switch.append(Block(position=Point(x=startx - 5, y=1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-    next_gen_switch.append(Block(position=Point(x=startx - 6, y=2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-    next_gen_switch.append(Block(position=Point(x=startx - 6, y=3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 6, y=position_information["starty"] - 1, z=zplacement-5), type=LEVER, orientation=UP))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 6, y=position_information["starty"] - 4, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 6, y=position_information["starty"] - 3, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 4, y=position_information["starty"] - 4, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 5, y=position_information["starty"] - 4, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 6, y=position_information["starty"] - 3, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+    next_gen_switch.append(Block(position=Point(x=position_information["startx"] - 6, y=position_information["starty"] - 2, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
 
     # spawn in the switches
     client.spawnBlocks(Blocks(blocks=next_gen_switch))
 
     return done_block_position
 
-def next_gen_button(pop_size,startx, startz, xrange, client):
+def next_gen_button(pop_size,position_information, client):
     """
     Spawns in a button and a piston at each of the switches
     that is used to more easily indicate if the player wants to move 
@@ -457,14 +457,14 @@ def next_gen_button(pop_size,startx, startz, xrange, client):
     next_block_positions = []
 
     # z coordinate needs to back away from the shapes if they generate water or lava
-    zplacement = startz - 10
+    zplacement = position_information["startz"] - 10
 
     # clear out the hole for the next gen button
     for n in range(pop_size):
         client.fillCube(FillCubeRequest(  
                 cube=Cube(
-                    min=Point(x=startx + n*(xrange+1) + int(xrange/2) + 1, y=2, z=zplacement-5), 
-                    max=Point(x=startx + n*(xrange+1) + int(xrange/2) + 1, y=3, z=zplacement-5)  
+                    min=Point(x=position_information["startx"] + n*(position_information["xrange"]+1) + int(position_information["xrange"]/2) + 1, y=position_information["starty"] - 3, z=zplacement-5), 
+                    max=Point(x=position_information["startx"] + n*(position_information["xrange"]+1) + int(position_information["xrange"]/2) + 1, y=position_information["starty"] - 2, z=zplacement-5)  
                 ),
                 type=AIR
             ))
@@ -472,10 +472,10 @@ def next_gen_button(pop_size,startx, startz, xrange, client):
     # add in the piston amd button
     for p in range(pop_size):
         # stores the position underneath one piston as it loops through
-        next_block_position = (startx + p*(xrange+1) + int(xrange/2) + 1,2,zplacement-5)
+        next_block_position = (position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) + 1,position_information["starty"] - 3,zplacement-5)
         next_gen_button.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1]+1, z=next_block_position[2]), type=PISTON, orientation=DOWN))
         next_block_positions.append(next_block_position)
-        next_gen_button.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) + 1, y=4, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
+        next_gen_button.append(Block(position=Point(x=position_information["startx"] + p*(position_information["xrange"]+1) + int(position_information["xrange"]/2) + 1, y=position_information["starty"] - 1, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
     
     # spawn in all the switches
     client.spawnBlocks(Blocks(blocks=next_gen_button))

@@ -144,9 +144,9 @@ class MinecraftBreeder(object):
 
         if self.args.IN_GAME_CONTROL:
 
-            # done_block_position = minecraft_structures.player_next_gen_switch(self.position_information["startx"], self.position_information["startz"], self.client) no longer needed?
+            # done_block_position = minecraft_structures.player_next_gen_switch(self.position_information, self.client) no longer needed?
             on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.position_information)
-            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.position_information["startx"], self.position_information["startz"], self.position_information["xrange"], self.client)
+            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.position_information, self.client)
 
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
