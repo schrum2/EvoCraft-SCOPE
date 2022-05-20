@@ -234,11 +234,10 @@ def place_number(client,x,y,z,num):
     client.spawnBlocks(Blocks(blocks=number))
 
 def place_blocks_in_block_list(block_list,client, startx, starty, startz,genome_id):
-    blocks_in_list =[]
-    rows, cols = (10, 5)
-    block_types = [[0]*cols]*rows
+    blocks_in_list = []
+    block_list_to_compare = []
     # for i  in range(pop_size):
-    x=8
+    x=0
     z=-9
     index=0
 
@@ -247,26 +246,34 @@ def place_blocks_in_block_list(block_list,client, startx, starty, startz,genome_
         generated_block=(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z), type=block_list[index], orientation=NORTH))
         blocks_in_list.append(generated_block)
         blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-2,z=startz+z), type=EMERALD_BLOCK, orientation=NORTH))
+        
+        block_list_to_compare.append(generated_block)
+
         if(generated_block.type==LAVA or generated_block.type==WATER):
             blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x-1, y=starty-1,z=startz+z), type=STONE_BRICK_STAIRS, orientation=EAST))
             blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x+1, y=starty-1,z=startz+z), type=STONE_BRICK_STAIRS, orientation=WEST))
+
             blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
             blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
-        x=x-2
-        if(x<0):
+
+        x=x+2
+        if(x>8):
             z=z+2
         index=index+1
-
-    block_types[genome_id]=blocks_in_list
+    # print(block_list_to_compare)
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
 
 def read_blocks(self,client):
+    indexed_blocks = []
     read_cubes = True
     while read_cubes==True:
         blocks = self.client.readCube(Cube(
-                     min=Point(x=0, y=0, z=0),
-                     max=Point(x=0, y=0, z=0)
+                     min=Point(x=0, y=4, z=-9),
+                     max=Point(x=107, y=4, z=-9)
                  ))
-        print(blocks)
+        #print(blocks)
+        for i in range(blocks):
+            if(blocks[i].type==AIR):
+                indexed_blocks.append(blocks[i])
         if(blocks.blocks[0].type==DIAMOND_BLOCK):
             read_cubes = False
