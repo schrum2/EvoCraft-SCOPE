@@ -235,15 +235,27 @@ def place_number(client,x,y,z,num):
 
 def place_blocks_in_block_list(block_list,client, startx, starty, startz,genome_id):
     blocks_in_list =[]
+    rows, cols = (10, 5)
+    block_types = [[0]*cols]*rows
     # for i  in range(pop_size):
     x=8
     z=-9
     index=0
+
+    
     while(index<len(block_list)):
-        blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z), type=block_list[index], orientation=NORTH))
+        generated_block=(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z), type=block_list[index], orientation=NORTH))
+        blocks_in_list.append(generated_block)
+        blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-2,z=startz+z), type=EMERALD_BLOCK, orientation=NORTH))
+        if(generated_block.type==LAVA or generated_block.type==WATER):
+            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x-1, y=starty-1,z=startz+z), type=STONE_BRICK_STAIRS, orientation=EAST))
+            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x+1, y=starty-1,z=startz+z), type=STONE_BRICK_STAIRS, orientation=WEST))
+            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
+            blocks_in_list.append(Block(position=Point(x=startx+11*genome_id+x, y=starty-1,z=startz+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
         x=x-2
         if(x<0):
             z=z+2
         index=index+1
 
+    block_types[genome_id]=blocks_in_list
     client.spawnBlocks(Blocks(blocks=blocks_in_list))

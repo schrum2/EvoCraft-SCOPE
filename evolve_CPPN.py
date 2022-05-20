@@ -211,6 +211,15 @@ class MinecraftBreeder(object):
 
         return (done_block_position, on_block_positions)
 
+    def read_blocks(self,client,genome):
+        read_cubes = True
+        while read_cubes==True:
+            blocks = self.client.readCube(Cube(
+                        min=Point(x=first[0], y=first[1], z=first[2]),
+                        max=Point(x=first[0], y=first[1], z=first[2])
+                    ))
+
+
     def eval_fitness(self, genomes, config):
         """
             This function is expected by the NEAT-Python framework.
