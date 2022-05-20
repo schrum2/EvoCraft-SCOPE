@@ -5,17 +5,18 @@ kept in this module.
 
 # for Minecraft
 #import grpc
+from re import S
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-def place_fences(client, position_information, pop_size):
+def place_fences(client, position_information, pop_size, space_between):
         """
         Places a fenced in area around each of the shapes from the population
         that will be rendered in Minecraft. The size of the fenced in areas
         is based off of instance variables, as is the location.
 
         Parameters:
-        client   (MinecraftServiceStub): TODO: put appropriate description here
+        client (MinecraftServiceStub): Minecraft server stub being used.
         startx   (int): Starting x coordinate value
         starty   (int): Starting y coordinate value
         startz   (int): Starting z coordinate value
@@ -35,24 +36,16 @@ def place_fences(client, position_information, pop_size):
             ))
 
         fence = []
-        # Make the first row because this is a fence post problem
-        # 0 5 0 to 0 5 11
-        for first in range(position_information["zrange"]+2):
-            fence.append(Block(position=Point(x=position_information["startx"]-1, y=position_information["starty"]-1,z=position_information["startz"]-1 + first), type=DARK_OAK_FENCE, orientation=NORTH))
+        
+        # fill both x sides
+        for xi in range(xrange+2):
+            fence.append(Block(position=Point(x=position_information["startx"]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=position_information["startx"]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
 
-        # Make nested for loops that will make the fence going in the 
-        # top and bottom and other column that divides each structure
-        for m in range(pop_size): # still don't know how to get it to repeat itself
-            for i in range(position_information["xrange"]+2): 
-                # do the fence in front of player going in the x direction (when facing south)
-                fence.append(Block(position=Point(x=position_information["startx"]-1 + m*(position_information["xrange"] + 1) + i, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
-            for j in range(position_information["xrange"]+2):
-                # do the fence in back of the structure going in the x direction (when facing south)
-                fence.append(Block(position=Point(x=position_information["startx"]-1 + m*(position_information["xrange"] + 1) + j, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
-            for k in range(position_information["zrange"]+2):
-                # do the one that divides the structures z changes
-                # there is problem with where the divisions are being placed. Each division isn't the same size
-                fence.append(Block(position=Point(x=position_information["startx"]-1 + (m+1)*(position_information["xrange"] + 1), y=position_information["starty"]-1,z=position_information["startz"]-1 + k), type=DARK_OAK_FENCE, orientation=NORTH)) 
+        # fill both z sides
+        for zi in range(zrange+1):
+            fence.append(Block(position=Point(x=position_information["startx"]-1, y=position_information["starty"]-1,z=position_information["startz"] + zi), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=position_information["startx"]-1 + position_information["xrange"]+1, y=position_information["starty"]-1,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
 
         client.spawnBlocks(Blocks(blocks=fence))
 
@@ -62,7 +55,7 @@ def clear_area(client, position_information, pop_size):
         large cube and filling it with air blocks.
 
         Parameters:
-        client (MinecraftServiceStub): TODO: put appropriate description here
+        client (MinecraftServiceStub): Minecraft server stub being used.
         startx (int): Starting value for x coordinate.
         starty (int): Starting value for y coordinate.
         startz (int): Starting value for z coordinate.
@@ -123,7 +116,7 @@ def place_number(client,x,y,z,num):
         in the range of 0-9. 
 
         Parameters:
-        client (MinecraftServiceStub): TODO
+        client (MinecraftServiceStub): Minecraft server stub being used.
         x (int): The x coordinate where the number will start
         y (int): The y coordinate where the number will start
         z (int): The z coordinate where the number will start
