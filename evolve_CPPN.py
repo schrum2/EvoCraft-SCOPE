@@ -57,9 +57,6 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        # Place numbers 0-9, use yrange + 2
-        for i in range(10): # Problems if pop_size is not 10!
-            minecraft_structures.place_number(self.client,self.position_information["startx"]+(i*(self.position_information["xrange"]+1))+int(self.position_information["xrange"]/2),self.position_information["starty"]+self.position_information["yrange"]+2,self.position_information["startz"],i)
 
     def query_cppn_for_shape(self, genome, config, corner, xrange, yrange, zrange):
         """
@@ -120,11 +117,11 @@ class MinecraftBreeder(object):
             It takes a population of genomes and configuration information,
             and assigns fitness values to each of the genome objects in
             the population.
-        """                                                                                                                           
+        """ 
+    
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE)
         minecraft_structures.reset_area(self.client, self.position_information, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.position_information, self.args.POPULATION_SIZE)
-
         
         selected = []
         shapes = []
@@ -136,6 +133,10 @@ class MinecraftBreeder(object):
             # See how CPPN fills out the shape
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+1), self.position_information["starty"], self.position_information["startz"])
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information["xrange"], self.position_information["yrange"], self.position_information["zrange"]))
+
+        # Place numbers 0-9, use yrange + 2
+        for i in range(10): # Problems if pop_size is not 10!
+            minecraft_structures.place_number(self.client,self.position_information["startx"]+(i*(self.position_information["xrange"]+1))+int(self.position_information["xrange"]/2),self.position_information["starty"]+self.position_information["yrange"]+2,self.position_information["startz"],i)
 
         # Render shapes in Minecraft world
         for i in range(len(shapes)):
