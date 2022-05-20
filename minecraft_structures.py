@@ -9,11 +9,13 @@ from re import S
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-def place_fences(client, position_information, pop_size, space_between):
+def place_fences(client, position_information, corner, pop_size):
         """
         Places a fenced in area around each of the shapes from the population
         that will be rendered in Minecraft. The size of the fenced in areas
         is based off of instance variables, as is the location.
+
+        THESE PARAMETERS NEED TO BE UPDATED!
 
         Parameters:
         client (MinecraftServiceStub): Minecraft server stub being used.
@@ -25,12 +27,11 @@ def place_fences(client, position_information, pop_size, space_between):
         zrange   (int): Range for z coordinate values
         pop_size (int): Fenced in areas to generate in a row
         """
-
         # clear out previous fences
         client.fillCube(FillCubeRequest(  
                 cube=Cube(
-                    min=Point(x=position_information["startx"]-1, y=position_information["starty"]-1, z=position_information["startz"]-1),
-                    max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+1, y=position_information["starty"]-1, z=position_information["startz"]+2)
+                    min=Point(x=corner[0]-1, y=position_information["starty"]-1, z=position_information["startz"]-1),
+                    max=Point(x=corner[0]-1 + pop_size*(position_information["xrange"]+1)+1, y=position_information["starty"]-1, z=position_information["startz"]+2)
                 ),
                 type=AIR
             ))
@@ -39,13 +40,13 @@ def place_fences(client, position_information, pop_size, space_between):
         
         # fill both x sides
         for xi in range(position_information["xrange"]+2):
-            fence.append(Block(position=Point(x=position_information["startx"]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
-            fence.append(Block(position=Point(x=position_information["startx"]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=corner[0]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=corner[0]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
 
         # fill both z sides
         for zi in range(position_information["zrange"]+1):
-            fence.append(Block(position=Point(x=position_information["startx"]-1, y=position_information["starty"]-1,z=position_information["startz"] + zi), type=DARK_OAK_FENCE, orientation=NORTH))
-            fence.append(Block(position=Point(x=position_information["startx"]-1 + position_information["xrange"]+1, y=position_information["starty"]-1,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=corner[0]-1, y=position_information["starty"]-1,z=position_information["startz"] + zi), type=DARK_OAK_FENCE, orientation=NORTH))
+            fence.append(Block(position=Point(x=corner[0]-1 + position_information["xrange"]+1, y=position_information["starty"]-1,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
 
         client.spawnBlocks(Blocks(blocks=fence))
 

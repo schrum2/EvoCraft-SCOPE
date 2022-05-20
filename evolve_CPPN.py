@@ -125,13 +125,7 @@ class MinecraftBreeder(object):
         """                                                                                                                           
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE)
         minecraft_structures.reset_area(self.client, self.position_information, self.args.POPULATION_SIZE)
-        for i in range(self.args.POPULATION_SIZE):
-            #minecraft_structures.place_fences(self.client, self.startx+(i*(self.xrange+2+self.args.SPACE_BETWEEN)), self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-            minecraft_structures.place_fences(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
-        # Why?
-        #(done_block_position, on_block_positions) = self.player_selection_switches(self.args.POPULATION_SIZE)
-        
         selected = []
         shapes = []
         placements = []
@@ -145,6 +139,9 @@ class MinecraftBreeder(object):
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+2+self.args.SPACE_BETWEEN), self.position_information["starty"], self.position_information["startz"])
             placements.append(corner)
             shapes.append(self.query_cppn_for_shape(genome, config, corner, self.position_information))
+
+            # Place the fences where the shape will appear
+            minecraft_structures.place_fences(self.client, self.position_information, corner, self.args.POPULATION_SIZE)
 
         # Place numbers 0-9, use yrange + 2
         for i in range(10): # Problems if pop_size is not 10!
