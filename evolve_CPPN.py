@@ -132,8 +132,6 @@ class MinecraftBreeder(object):
         minecraft_structures.clear_area(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
         minecraft_structures.place_fences(self.client, self.startx, self.starty, self.startz, self.xrange, self.yrange, self.zrange, self.args.POPULATION_SIZE)
 
-        done_block_position = minecraft_structures.player_next_gen_switch(self.startx, self.startz, self.client)
-        on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.startx, self.startz, self.xrange)
         
         selected = []
         shapes = []
@@ -152,6 +150,11 @@ class MinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shapes[i]))
 
         if self.args.IN_GAME_CONTROL:
+
+            # done_block_position = minecraft_structures.player_next_gen_switch(self.startx, self.startz, self.client) no longer needed?
+            on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.startx, self.startz, self.xrange)
+            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.startx, self.startz, self.xrange, self.client)
+
             selected = [False for chosen in range(config.pop_size)]
             player_select_done = False
 
@@ -169,12 +172,25 @@ class MinecraftBreeder(object):
 
                 # if the player has clicked the switch for next, then 
                 # exit while 
-                done = self.client.readCube(Cube(
-                    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
-                    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
-                ))
-                player_select_done = done.blocks[0].type == REDSTONE_BLOCK
-                #print("Next gen? : {}".format(player_select_done))
+                #done_switch = self.client.readCube(Cube(
+                #    min=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2]),
+                #    max=Point(x=done_block_position[0], y=done_block_position[1], z=done_block_position[2])
+                #))
+                #player_select_done = done_switch.blocks[0].type == REDSTONE_BLOCK
+
+                player_select_done = False
+                j = 0
+                while not player_select_done and j < config.pop_size:
+                    pressed = next_block_positions[j]
+                    done_button = self.client.readCube(Cube(
+                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
+                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
+                    ))
+                    player_select_done = done_button.blocks[0].type == PISTON_HEAD
+                    j += 1
+                    #print(done_button)
+                    #print("Next gen? : {}".format(player_select_done))
+                    #print("Pressed?: {}".format(pressed))
                     
                 #print(selected)
 

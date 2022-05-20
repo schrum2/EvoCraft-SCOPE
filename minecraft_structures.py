@@ -255,6 +255,10 @@ def player_selection_switches(pop_size, client, startx, startz, xrange):
 
     Parameters:
     pop_size (int): Number of selection switches being selected
+    client (MinecraftServiceStub) TODO
+    startx (int): Integer that indicates the start of the range in x direction
+    startz (int): Integer that indicates the start of the range in z direction
+    xrange (int): Range of the x coordinate values
 
     Returns:
     [(int,int,int)]:The position of the space below the redstone lamp for the
@@ -333,6 +337,11 @@ def player_next_gen_switch(startx, startz, client):
     position under the redstone lamp that indicates whether the player
     is done or not.
 
+    Parameters:
+    startx (int): Integer that indicates the start of the range in x direction
+    startz (int): Integer that indicates the start of the range in z direction
+    client (MinecraftServiceStub): TODO
+
     Returns:
     (int, int, int): Position of the space underneath the redstone lamp that
             is used to indicate if the player is ready to see the next generation
@@ -387,3 +396,52 @@ def player_next_gen_switch(startx, startz, client):
     client.spawnBlocks(Blocks(blocks=next_gen_switch))
 
     return done_block_position
+
+def next_gen_button(pop_size,startx, startz, xrange, client):
+    """
+    Spawns in a button and a piston at each of the switches
+    that is used to more easily indicate if the player wants to move 
+    on to the next generation and returns the point right below the piston
+    which is useful in knowing if the button was pressed or not
+
+    Parameters:
+    pop_size (int): Number of buttons and pistons that will be generated
+    startx (int): Integer that indicates the start of the range in x direction
+    startz (int): Integer that indicates the start of the range in z direction
+    xrange (int): Range of the x coordinate values
+    client (MinecraftServiceStub) TODO
+
+    Returns:
+    [(int,int,int)]: List of all the positions right under the pistons
+    """
+    next_gen_button = []
+
+    # stores the positions underneath the piston which indicate
+    # if the player wants to see the next generation of structures
+    next_block_positions = []
+
+    # z coordinate needs to back away from the shapes if they generate water or lava
+    zplacement = startz - 10
+
+    # clear out the hole for the next gen button
+    for n in range(pop_size):
+        client.fillCube(FillCubeRequest(  
+                cube=Cube(
+                    min=Point(x=startx + n*(xrange+1) + int(xrange/2) + 1, y=2, z=zplacement-5), 
+                    max=Point(x=startx + n*(xrange+1) + int(xrange/2) + 1, y=3, z=zplacement-5)  
+                ),
+                type=AIR
+            ))
+    
+    # add in the piston amd button
+    for p in range(pop_size):
+        # stores the position underneath one piston as it loops through
+        next_block_position = (startx + p*(xrange+1) + int(xrange/2) + 1,2,zplacement-5)
+        next_gen_button.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1]+1, z=next_block_position[2]), type=PISTON, orientation=DOWN))
+        next_block_positions.append(next_block_position)
+        next_gen_button.append(Block(position=Point(x=startx + p*(xrange+1) + int(xrange/2) + 1, y=4, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
+    
+    # spawn in all the switches
+    client.spawnBlocks(Blocks(blocks=next_gen_button))
+
+    return next_block_positions
