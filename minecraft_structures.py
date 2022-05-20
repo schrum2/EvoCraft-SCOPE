@@ -271,7 +271,7 @@ def read_current_block_options(client,placements,starty,startz,xrange):
     list will indicate all block types currently specified (on display) for each shape.
 
     Parameters:
-
+    client ():
 
     """
     blocks_for_shape = []
