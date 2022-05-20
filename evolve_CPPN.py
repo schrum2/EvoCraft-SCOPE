@@ -272,10 +272,23 @@ class MinecraftBreeder(object):
                 read_current_blocks=minecraft_structures.read_current_block_options(self.client,placements,self.starty,self.startz,self.xrange)
 
                 for n, (genome_id, genome) in enumerate(genomes):
-                    print(genome.block_list)
-                    print(read_current_blocks[n])
-                    print(genome.block_list==read_current_blocks[n])
-                    print("------------------------------------")
+                    if(not genome.block_list==read_current_blocks[n]):
+                        for i in range(len(genome.block_list)):
+                            if(not genome.block_list[i]==read_current_blocks[n][i]):
+                                print(read_current_blocks[n])
+                                print(genome.block_list)
+                                genome.block_list[i]=read_current_blocks[n][i]
+                                print(genome.block_list)
+
+
+
+                        # #diff = list(set(genome.block_list)-set(read_current_blocks[n]))
+                        # print("------------------------------------")
+                        # #For debugging
+                        # print(genome.block_list)
+                        # print(read_current_blocks[n])
+                        # print(genome.block_list==read_current_blocks[n])
+                        # print("------------------------------------")
  
                 #print(selected)
 
