@@ -54,10 +54,9 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        # The space for evolved shapes is cleared on each generation, but go 
-        # ahead and clear a bigger space at the start in case garbage from a
-        # previous evolutionary run is left over. 
-        minecraft_structures.clear_area(self.client, self.position_information, 20, 5)
+        # Clear space at the start of evolution
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+        minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
         # Figure out the lower corner of each shape in advance
         self.corners = []
@@ -118,7 +117,7 @@ class MinecraftBreeder(object):
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
                         shape.append(block)
         
-        print("options: {}, generated: {}".format(block_options,len(shape)))
+        #print("options: {}, generated: {}".format(block_options,len(shape)))
         
         return shape
 
@@ -134,9 +133,6 @@ class MinecraftBreeder(object):
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
         """                                                                                                                           
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-        minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-
         selected = []
         
         # This loop could be parallelized
@@ -232,7 +228,7 @@ def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
     if not args.BLOCK_LIST_EVOLVES:
         # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
-        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA] # TODO: Make this a command line parameter somehow?
+        block_list = [REDSTONE_BLOCK,PISTON,STONE, SLIME] # TODO: Make this a command line parameter somehow?
         genome_type = neat.DefaultGenome
         config_file = 'cppn_minecraft_config'
         block_list_length = len(block_list)
