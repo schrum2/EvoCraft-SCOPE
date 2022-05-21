@@ -128,14 +128,14 @@ class MinecraftBreeder(object):
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
         """                                                                                                                           
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE)
-        minecraft_structures.reset_area(self.client, self.position_information, self.args.POPULATION_SIZE)
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+        minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
         selected = []
         shapes = []
         
         # This loop could be parallelized
-        for n, (genome_id, genome) in enumerate(genomes):
+        for n, (_, genome) in enumerate(genomes):
             # Initially, none are selected
             selected.append(False)
             minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)

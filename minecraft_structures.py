@@ -9,6 +9,9 @@ from re import S
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
+# Extra space around the populated area to clear and reset
+BUFFER_ZONE = 10
+
 def place_fences(client, position_information, corner, pop_size):
     """
     Places a fenced in area around each of the shapes from the population
@@ -46,7 +49,7 @@ def place_fences(client, position_information, corner, pop_size):
 
     client.spawnBlocks(Blocks(blocks=fence))
 
-def clear_area(client, position_information, pop_size):
+def clear_area(client, position_information, pop_size, space_between):
     """
     This function clears a large area by creating one
     large cube and filling it with air blocks.
@@ -55,36 +58,38 @@ def clear_area(client, position_information, pop_size):
     client (MinecraftServiceStub): Minecraft server stub being used.
     position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
     pop_size (int): The size of the population.
+    space_between (int): block units between adjacent shapes
     """
-
-    zplacement = position_information["startz"] - 10
+    # Block units around the area that are also wiped
+    zplacement = position_information["startz"] - BUFFER_ZONE
 
     # clear out a big area rather than individual cubes
     client.fillCube(FillCubeRequest(  
         cube=Cube(
-            min=Point(x=position_information["startx"]-7, y=position_information["starty"]-1, z=zplacement-7),
-            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=position_information["starty"]+11, z=position_information["zrange"]+7)
+            min=Point(x=position_information["startx"]-BUFFER_ZONE, y=position_information["starty"]-1, z=zplacement-BUFFER_ZONE),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=position_information["starty"]+BUFFER_ZONE, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
         ),
         type=AIR
     ))
 
-def reset_area(client, position_information, pop_size):
+def restore_ground(client, position_information, pop_size, space_between):
     """
-    Resets the a wide that could have been damaged by the structures or 
+    Resets the ground that could have been damaged by the structures or 
     that may contain a selection switch. 
 
     Parameters:
     client (MinecraftServiceStub): Minecraft server stub being used.
     position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
     pop_size (int): The size of the population
+    space_between (int): block units between adjacent shapes
     """    
-    zplacement = position_information["startz"] - 10
+    zplacement = position_information["startz"] - BUFFER_ZONE
 
     # fill the ground with dirt up until bedrock
     client.fillCube(FillCubeRequest(  
         cube=Cube(
-            min=Point(x=position_information["startx"]-7, y=position_information["starty"]-4, z=zplacement-7),
-            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=position_information["starty"]-2, z=position_information["zrange"]+7)
+            min=Point(x=position_information["startx"]-BUFFER_ZONE, y=position_information["starty"]-4, z=zplacement-BUFFER_ZONE),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=position_information["starty"]-2, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
         ),
         type=GRASS
     ))
