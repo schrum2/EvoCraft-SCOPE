@@ -110,15 +110,15 @@ class MinecraftBreeder(object):
                     
                     if self.args.DISTANCE_PRESENCE_THRESHOLD == True:
                         presence_threshold = self.args.DISTANCE_PRESENCE_MULTIPLIER * center_dist                            
-                    
-                    if output[0] < presence_threshold: 
-                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
-                    else:
+
+                    # Only generate non-air blocks
+                    if output[0] >= presence_threshold: 
                         output_val = util.argmax(output[1:])
                         assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
-                        
-                    shape.append(block)
+                        shape.append(block)
+        
+        print("options: {}, generated: {}".format(block_options,len(shape)))
         
         return shape
 
@@ -143,7 +143,8 @@ class MinecraftBreeder(object):
         for n, (_, genome) in enumerate(genomes):
             # Initially, none are selected
             selected.append(False)
-            minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
+            if self.args.BLOCK_LIST_EVOLVES:
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
             shape = self.query_cppn_for_shape(genome, config, self.corners[n])
             # fill the empty space with the evolved shape
@@ -182,14 +183,15 @@ class MinecraftBreeder(object):
                     player_select_done = done_button.blocks[0].type == PISTON_HEAD
                     j += 1
                     
-                # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
-                read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
+                if self.args.BLOCK_LIST_EVOLVES:
+                    # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
+                    read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
 
-                for n, (genome_id, genome) in enumerate(genomes):
-                    if(not genome.block_list==read_current_blocks[n]):
-                        for i in range(len(genome.block_list)):
-                            if(not genome.block_list[i]==read_current_blocks[n][i]):
-                                genome.block_list[i]=read_current_blocks[n][i]
+                    for n, (_, genome) in enumerate(genomes):
+                        if(not genome.block_list==read_current_blocks[n]):
+                            for i in range(len(genome.block_list)):
+                                if(not genome.block_list[i]==read_current_blocks[n][i]):
+                                    genome.block_list[i]=read_current_blocks[n][i]
 
  
                 #print(selected)
