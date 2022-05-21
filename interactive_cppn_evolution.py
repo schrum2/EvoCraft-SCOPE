@@ -54,8 +54,7 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        # Clear space at the start of evolution
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+        # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
         # Figure out the lower corner of each shape in advance
@@ -132,7 +131,8 @@ class MinecraftBreeder(object):
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """                                                                                                                           
+        """            
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
         selected = []
         
         # This loop could be parallelized
