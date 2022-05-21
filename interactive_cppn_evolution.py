@@ -54,6 +54,11 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
+        # The space for evolved shapes is cleared on each generation, but go 
+        # ahead and clear a bigger space at the start in case garbage from a
+        # previous evolutionary run is left over. 
+        minecraft_structures.clear_area(self.client, self.position_information, 20, 5)
+
         # Figure out the lower corner of each shape in advance
         self.corners = []
         for n in range(self.args.POPULATION_SIZE):
