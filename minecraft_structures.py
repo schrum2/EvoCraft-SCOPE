@@ -304,9 +304,7 @@ def player_selection_switches(client, position_information, corners):
                                         to switch to the next generation.
     """
     # Block lists that will be spawned
-    switch = []
-    lamps = []
-    next_gen_button = []
+    to_spawn = []
 
     # z coordinate needs to back away from the shapes if they generate water or lava
     zplacement = position_information["startz"] - BUFFER_ZONE
@@ -322,7 +320,7 @@ def player_selection_switches(client, position_information, corners):
     #add the lamp in first when there is still ground underneath it to avoid the spawning of the grass blocks
     for corner in corners:
         middle = corner[0] + int(position_information["xrange"]/2)
-        lamps.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL, z=zplacement-4), type=REDSTONE_LAMP, orientation=UP))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL, z=zplacement-4), type=REDSTONE_LAMP, orientation=UP))
         # clear out the section for the redstone part of the swtich
         client.fillCube(FillCubeRequest(  
             cube=Cube(
@@ -334,52 +332,48 @@ def player_selection_switches(client, position_information, corners):
 
         # Now spawn in everything for the selection switches
         # add in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust to switch
-        switch.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
-        switch.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL+1, z=zplacement-4), type=SLIME, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL+1, z=zplacement-4), type=SLIME, orientation=NORTH))
 
         # this is the position of each redstone block when the lever is switched on
         on_block_position = (middle - 1, GROUND_LEVEL-1, zplacement-4)
-        switch.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
         # stores the positions from above
         on_block_positions.append(on_block_position)
 
         # Ground that was emptied into AIR earlier. Some of it needs to be restored
-        switch.append(Block(position=Point(x=middle,     y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
-        switch.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH)) # has a tail now
-        switch.append(Block(position=Point(x=middle - 2, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
-        switch.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle,     y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH)) # has a tail now
+        to_spawn.append(Block(position=Point(x=middle - 2, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
 
         # slabs to put around the mechanism
         for slab in range(0,3):
-            switch.append(Block(position=Point(x=middle + 1, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
-            switch.append(Block(position=Point(x=middle,     y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-            switch.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
-            switch.append(Block(position=Point(x=middle - 2, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
-            switch.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
-            switch.append(Block(position=Point(x=middle - 2 + slab, y=GROUND_LEVEL, z=zplacement- 1), type=STONEBRICK, orientation=NORTH)) # makes tail less noticeable
+            to_spawn.append(Block(position=Point(x=middle + 1, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle,     y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
+            to_spawn.append(Block(position=Point(x=middle - 2, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle - 2 + slab, y=GROUND_LEVEL, z=zplacement- 1), type=STONEBRICK, orientation=NORTH)) # makes tail less noticeable
 
         # add in the rest of the blocks needed 
-        switch.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL, z=zplacement-5), type=LEVER, orientation=UP))
-        switch.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
-        switch.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
-        switch.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL+1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=middle - 2, y=BEDROCK_LEVEL+1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
-        switch.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL, z=zplacement-5), type=LEVER, orientation=UP))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL+1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 2, y=BEDROCK_LEVEL+1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
    
         # add in the piston and button
         # stores the position underneath one piston as it loops through
         next_block_position = (middle + 1,GROUND_LEVEL - 2,zplacement-5)
-        next_gen_button.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1]+1, z=next_block_position[2]), type=PISTON, orientation=DOWN))
+        to_spawn.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1]+1, z=next_block_position[2]), type=PISTON, orientation=DOWN))
         next_block_positions.append(next_block_position)
-        next_gen_button.append(Block(position=Point(x=next_block_position[0], y=GROUND_LEVEL, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=next_block_position[0], y=GROUND_LEVEL, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
     
-    # spawn in all the switches
-    client.spawnBlocks(Blocks(blocks=switch))
-    # spawn in all the switches
-    client.spawnBlocks(Blocks(blocks=next_gen_button))
-    # Spawn lamps
-    client.spawnBlocks(Blocks(blocks=lamps))
+    # spawn in all the blocks
+    client.spawnBlocks(Blocks(blocks=to_spawn))
 
     return (on_block_positions,next_block_positions)
 
