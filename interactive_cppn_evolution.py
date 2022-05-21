@@ -54,6 +54,9 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
+        # Restore ground at the start of evolution
+        minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+
         # Figure out the lower corner of each shape in advance
         self.corners = []
         for n in range(self.args.POPULATION_SIZE):
@@ -105,15 +108,15 @@ class MinecraftBreeder(object):
                     
                     if self.args.DISTANCE_PRESENCE_THRESHOLD == True:
                         presence_threshold = self.args.DISTANCE_PRESENCE_MULTIPLIER * center_dist                            
-                    
-                    if output[0] < presence_threshold: 
-                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=AIR, orientation=NORTH)
-                    else:
+
+                    # Only generate non-air blocks
+                    if output[0] >= presence_threshold: 
                         output_val = util.argmax(output[1:])
                         assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
-                        
-                    shape.append(block)
+                        shape.append(block)
+        
+        #print("options: {}, generated: {}".format(block_options,len(shape)))
         
         return shape
 
@@ -128,17 +131,16 @@ class MinecraftBreeder(object):
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """                                                                                                                           
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-        minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-
+        """            
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
         selected = []
         
         # This loop could be parallelized
         for n, (_, genome) in enumerate(genomes):
             # Initially, none are selected
             selected.append(False)
-            minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
+            if self.args.BLOCK_LIST_EVOLVES:
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
             shape = self.query_cppn_for_shape(genome, config, self.corners[n])
             # fill the empty space with the evolved shape
@@ -177,14 +179,15 @@ class MinecraftBreeder(object):
                     player_select_done = done_button.blocks[0].type == PISTON_HEAD
                     j += 1
                     
-                # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
-                read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
+                if self.args.BLOCK_LIST_EVOLVES:
+                    # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
+                    read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
 
-                for n, (genome_id, genome) in enumerate(genomes):
-                    if(not genome.block_list==read_current_blocks[n]):
-                        for i in range(len(genome.block_list)):
-                            if(not genome.block_list[i]==read_current_blocks[n][i]):
-                                genome.block_list[i]=read_current_blocks[n][i]
+                    for n, (_, genome) in enumerate(genomes):
+                        if(not genome.block_list==read_current_blocks[n]):
+                            for i in range(len(genome.block_list)):
+                                if(not genome.block_list[i]==read_current_blocks[n][i]):
+                                    genome.block_list[i]=read_current_blocks[n][i]
 
  
                 #print(selected)
@@ -225,7 +228,7 @@ def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
     if not args.BLOCK_LIST_EVOLVES:
         # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
-        block_list = [REDSTONE_BLOCK,PISTON,WATER, LAVA] # TODO: Make this a command line parameter somehow?
+        block_list = [REDSTONE_BLOCK,PISTON,STONE, SLIME] # TODO: Make this a command line parameter somehow?
         genome_type = neat.DefaultGenome
         config_file = 'cppn_minecraft_config'
         block_list_length = len(block_list)
@@ -260,9 +263,18 @@ def run(args):
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
 
-    while 1:
-        mc.generation = pop.generation + 1
-        pop.run(mc.eval_fitness, 1)
+    # Evolve forever: TODO: Add use means of stopping
+    try:
+        while True:
+            mc.generation = pop.generation + 1
+            pop.run(mc.eval_fitness, 1)
+    finally:
+        # Clear and reset lots of extra space on exit/crash. Population size doubled to clear more space
+        minecraft_structures.restore_ground(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)
+        minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)                                                                                                               
+        # Clear space in the air to get rid of numbers
+        mc.position_information["starty"] = mc.position_information["starty"]+mc.position_information["yrange"]
+        minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)                                                                                                               
 
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")
