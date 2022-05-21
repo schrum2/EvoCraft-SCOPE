@@ -50,21 +50,22 @@ class MinecraftBreeder(object):
         self.position_information["yrange"] = self.args.YRANGE
         self.position_information["zrange"] = self.args.ZRANGE
 
+        # Connect to Minecraft server
+        channel = grpc.insecure_channel('localhost:5001')
+        self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
+
         # Figure out the lower corner of each shape in advance
         self.corners = []
         for n in range(self.args.POPULATION_SIZE):
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+2+self.args.SPACE_BETWEEN), self.position_information["starty"], self.position_information["startz"])
             self.corners.append(corner)
+            # Place the numbers just once. Only works for 0-9
+            minecraft_structures.place_number(self.client,self.position_information,corner,n)
 
         self.generation = 0
         
         # Don't try any multithreading yet, but consider for later
         self.num_workers = 1
-
-        # Connect to Minecraft server
-        channel = grpc.insecure_channel('localhost:5001')
-        self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
-
 
     def query_cppn_for_shape(self, genome, config, corner):
         """
@@ -144,10 +145,6 @@ class MinecraftBreeder(object):
 
             # Place the fences where the shape will appear
             minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
-
-        # Place numbers 0-9, use yrange + 2
-        for i in range(10): # Problems if pop_size is not 10!
-            minecraft_structures.place_number(self.client,self.position_information["startx"]+(i*(self.position_information["xrange"]+1))+int(self.position_information["xrange"]/2),self.position_information["starty"]+self.position_information["yrange"]+2,self.position_information["startz"],i)
 
         # Render shapes in Minecraft world
         for i in range(len(shapes)):

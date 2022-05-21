@@ -11,6 +11,8 @@ from minecraft_pb2 import *
 
 # Extra space around the populated area to clear and reset
 BUFFER_ZONE = 10
+# Space above shapes to place the numbers
+HEADROOM = 5
 
 def place_fences(client, position_information, corner):
     """
@@ -92,19 +94,23 @@ def restore_ground(client, position_information, pop_size, space_between):
         type=BEDROCK
     ))
 
-def place_number(client,x,y,z,num):
+def place_number(client,position_information,corner,num):
     """
-        Places a glowstone-generated number above a generated shape depending on what digit it is
-        in the range of 0-9. 
+    Places a glowstone-generated number above a generated shape depending on what digit it is
+    in the range of 0-9. 
 
-        Parameters:
-        client (MinecraftServiceStub): Minecraft server stub being used.
-        x (int): The x coordinate where the number will start
-        y (int): The y coordinate where the number will start
-        z (int): The z coordinate where the number will start
-        num (int): The digit that will be placed
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    corner (int,int,int): 3-tuple defining minimal coordinates of generated object
+    num (int): The digit that will be placed
     """
-        
+
+    # Coordinates for bottom of number shape
+    x = corner[0] + int(position_information["xrange"]/2) - 2
+    y = corner[1] + position_information["yrange"] + HEADROOM
+    z = corner[2]
+
     if num == 0:
         number = [
             Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
