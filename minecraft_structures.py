@@ -10,72 +10,63 @@ import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 def place_fences(client, position_information, corner, pop_size):
-        """
-        Places a fenced in area around each of the shapes from the population
-        that will be rendered in Minecraft. The size of the fenced in areas
-        is based off of instance variables, as is the location.
+    """
+    Places a fenced in area around each of the shapes from the population
+    that will be rendered in Minecraft. The size of the fenced in areas
+    is based off of instance variables, as is the location.
 
-        THESE PARAMETERS NEED TO BE UPDATED!
+    THESE PARAMETERS NEED TO BE UPDATED!
 
-        Parameters:
-        client (MinecraftServiceStub): Minecraft server stub being used.
-        startx   (int): Starting x coordinate value
-        starty   (int): Starting y coordinate value
-        startz   (int): Starting z coordinate value
-        xrange   (int): Range for x coordinate values
-        yrange   (int): Range for y coordinate values
-        zrange   (int): Range for z coordinate values
-        pop_size (int): Fenced in areas to generate in a row
-        """
-        # clear out previous fences
-        client.fillCube(FillCubeRequest(  
-                cube=Cube(
-                    min=Point(x=corner[0]-1, y=position_information["starty"]-1, z=position_information["startz"]-1),
-                    max=Point(x=corner[0]-1 + pop_size*(position_information["xrange"]+1)+1, y=position_information["starty"]-1, z=position_information["startz"]+2)
-                ),
-                type=AIR
-            ))
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    corner (???): ???
+    pop_size (int): Fenced in areas to generate in a row
+    """
+    # clear out previous fences
+    client.fillCube(FillCubeRequest(  
+            cube=Cube(
+                min=Point(x=corner[0]-1, y=position_information["starty"]-1, z=position_information["startz"]-1),
+                max=Point(x=corner[0]-1 + pop_size*(position_information["xrange"]+1)+1, y=position_information["starty"]-1, z=position_information["startz"]+2)
+            ),
+            type=AIR
+        ))
 
-        fence = []
+    fence = []
         
-        # fill both x sides
-        for xi in range(position_information["xrange"]+2):
-            fence.append(Block(position=Point(x=corner[0]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
-            fence.append(Block(position=Point(x=corner[0]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
+    # fill both x sides
+    for xi in range(position_information["xrange"]+2):
+        fence.append(Block(position=Point(x=corner[0]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
+        fence.append(Block(position=Point(x=corner[0]-1 + xi, y=position_information["starty"]-1,z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
 
-        # fill both z sides
-        for zi in range(position_information["zrange"]+1):
-            fence.append(Block(position=Point(x=corner[0]-1, y=position_information["starty"]-1,z=position_information["startz"] + zi), type=DARK_OAK_FENCE, orientation=NORTH))
-            fence.append(Block(position=Point(x=corner[0]-1 + position_information["xrange"]+1, y=position_information["starty"]-1,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
+    # fill both z sides
+    for zi in range(position_information["zrange"]+1):
+        fence.append(Block(position=Point(x=corner[0]-1, y=position_information["starty"]-1,z=position_information["startz"] + zi), type=DARK_OAK_FENCE, orientation=NORTH))
+        fence.append(Block(position=Point(x=corner[0]-1 + position_information["xrange"]+1, y=position_information["starty"]-1,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
 
-        client.spawnBlocks(Blocks(blocks=fence))
+    client.spawnBlocks(Blocks(blocks=fence))
 
 def clear_area(client, position_information, pop_size):
-        """
-        This function clears a large area by creating one
-        large cube and filling it with air blocks.
+    """
+    This function clears a large area by creating one
+    large cube and filling it with air blocks.
 
-        Parameters:
-        client (MinecraftServiceStub): Minecraft server stub being used.
-        startx (int): Starting value for x coordinate.
-        starty (int): Starting value for y coordinate.
-        startz (int): Starting value for z coordinate.
-        xrange (int): Range for x coordinate values.
-        yrange   (int): Range for y coordinate values.
-        zrange (int): Range for z coordinate values.
-        pop_size (int): The size of the population.
-        """
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    pop_size (int): The size of the population.
+    """
 
-        zplacement = position_information["startz"] - 10
+    zplacement = position_information["startz"] - 10
 
-        # clear out a big area rather than individual cubes
-        client.fillCube(FillCubeRequest(  
-                cube=Cube(
-                    min=Point(x=position_information["startx"]-7, y=position_information["starty"]-1, z=zplacement-7),
-                    max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=position_information["starty"]+11, z=position_information["zrange"]+7)
-                ),
-                type=AIR
-            ))
+    # clear out a big area rather than individual cubes
+    client.fillCube(FillCubeRequest(  
+        cube=Cube(
+            min=Point(x=position_information["startx"]-7, y=position_information["starty"]-1, z=zplacement-7),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=position_information["starty"]+11, z=position_information["zrange"]+7)
+        ),
+        type=AIR
+    ))
 
 def reset_area(client, position_information, pop_size):
     """
@@ -83,12 +74,8 @@ def reset_area(client, position_information, pop_size):
     that may contain a selection switch. 
 
     Parameters:
-    client (MinecraftServiceStub): TODO
-    startx (int): Integer that indicates the start of the range in x direction
-    starty (int): Integer that indicates the start of the range in y direction
-    startz (int): Integer that indicates the start of the range in z direction
-    xrange (int): Range for the x coordinates
-    zrange (int): Range for the z coordinates
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
     pop_size (int): The size of the population
     """    
     zplacement = position_information["startz"] - 10

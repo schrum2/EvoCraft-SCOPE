@@ -63,9 +63,8 @@ def main(argv):
         raise ValueError("Block list size must at least two.")
 
     random.seed(args.RANDOM_SEED)
-
+    
     ice.run(args)
-
 
 if __name__ == '__main__':
     main(sys.argv)
