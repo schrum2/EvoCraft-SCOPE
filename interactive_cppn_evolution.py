@@ -133,7 +133,6 @@ class MinecraftBreeder(object):
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
         selected = []
-        shapes = []
         
         # This loop could be parallelized
         for n, (_, genome) in enumerate(genomes):
@@ -141,23 +140,16 @@ class MinecraftBreeder(object):
             selected.append(False)
             minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
-            shapes.append(self.query_cppn_for_shape(genome, config, self.corners[n]))
-
+            shape = self.query_cppn_for_shape(genome, config, self.corners[n])
+            # fill the empty space with the evolved shape
+            self.client.spawnBlocks(Blocks(blocks=shape))
             # Place the fences where the shape will appear
             minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
 
-        # Render shapes in Minecraft world
-        for i in range(len(shapes)):
-            # fill the empty space with the evolved shape
-            self.client.spawnBlocks(Blocks(blocks=shapes[i]))
-
         if self.args.IN_GAME_CONTROL:
+            (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
 
-            # done_block_position = minecraft_structures.player_next_gen_switch(self.position_information, self.client) no longer needed?
-            on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.position_information)
-            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.position_information, self.client)
-
-            selected = [False for chosen in range(config.pop_size)]
+            selected = [False for _ in range(config.pop_size)]
             player_select_done = False
             
             while not player_select_done: #player is still selecting
