@@ -9,84 +9,112 @@ from re import S
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-def place_fences(client, startx, starty, startz, xrange, yrange, zrange, pop_size, space_between):
-        """
-        Places a fenced in area around each of the shapes from the population
-        that will be rendered in Minecraft. The size of the fenced in areas
-        is based off of instance variables, as is the location.
+# Extra space around the populated area to clear and reset
+BUFFER_ZONE = 10
+# Space above shapes to place the numbers
+HEADROOM = 5
+# y-coordinate for the ground
+GROUND_LEVEL = 4
+# y-coordinate for bedrock bottom
+BEDROCK_LEVEL = 0
 
-        Parameters:
-        client (MinecraftServiceStub): Minecraft server stub being used.
-        startx   (int): Starting x coordinate value
-        starty   (int): Starting y coordinate value
-        startz   (int): Starting z coordinate value
-        xrange   (int): Range for x coordinate values
-        yrange   (int): Range for y coordinate values
-        zrange   (int): Range for z coordinate values
-        pop_size (int): Fenced in areas to generate in a row
-        """
-
-        # clear out previous fences
-        client.fillCube(FillCubeRequest(  
-                cube=Cube(
-                    min=Point(x=startx-1, y=starty-1, z=startz-1),
-                    max=Point(x=startx-1 + pop_size*(xrange+1)+1, y=starty-1, z=zrange+2)
-                ),
-                type=AIR
-            ))
-
-        fence = []
-        
-        # fill both x sides
-        for xi in range(xrange+2):
-            fence.append(Block(position=Point(x=startx-1 + xi, y=starty-1,z=startz-1), type=DARK_OAK_FENCE, orientation=NORTH))
-            fence.append(Block(position=Point(x=startx-1 + xi, y=starty-1,z=startz+zrange), type=DARK_OAK_FENCE, orientation=NORTH))
-
-        # fill both z sides
-        for zi in range(zrange+1):
-            fence.append(Block(position=Point(x=startx-1, y=starty-1,z=startz + zi), type=DARK_OAK_FENCE, orientation=NORTH))
-            fence.append(Block(position=Point(x=startx-1 + xrange+1, y=starty-1,z=startz+zi), type=DARK_OAK_FENCE, orientation=NORTH))
-
-        client.spawnBlocks(Blocks(blocks=fence))
-
-def clear_area(client, startx, starty, startz, xrange,yrange, zrange, pop_size):
-        """
-        This function clears a large area by creating one
-        large cube and filling it with air blocks.
-
-        Parameters:
-        client (MinecraftServiceStub): Minecraft server stub being used.
-        startx (int): Starting value for x coordinate.
-        starty (int): Starting value for y coordinate.
-        startz (int): Starting value for z coordinate.
-        xrange (int): Range for x coordinate values.
-        yrange   (int): Range for y coordinate values.
-        zrange (int): Range for z coordinate values.
-        pop_size (int): The size of the population.
-        """
-        # clear out a big area rather than individual cubes
-        client.fillCube(FillCubeRequest(  
-                cube=Cube(
-                    min=Point(x=startx-7, y=starty-1, z=startz-7),
-                    max=Point(x=startx-1 + pop_size*(xrange+1)+7, y=starty+11, z=zrange+7)
-                ),
-                type=AIR
-            ))
-
-
-def place_number(client,x,y,z,num):
+def place_fences(client, position_information, corner):
     """
-        Places a glowstone-generated number above a generated shape depending on what digit it is
-        in the range of 0-9. 
+    Places a fenced in area around a specific shape from the population
+    that will be rendered in Minecraft. The size of the fenced in area
+    is based off of the position_information and the mininal corner of the object.
 
-        Parameters:
-        client (MinecraftServiceStub): Minecraft server stub being used.
-        x (int): The x coordinate where the number will start
-        y (int): The y coordinate where the number will start
-        z (int): The z coordinate where the number will start
-        num (int): The digit that will be placed
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    corner (int,int,int): 3-tuple defining minimal coordinates of generated object
     """
+
+    fence = []
         
+    # fill both x sides
+    for xi in range(position_information["xrange"]+2):
+        fence.append(Block(position=Point(x=corner[0]-1 + xi, y=GROUND_LEVEL, z=position_information["startz"]-1), type=DARK_OAK_FENCE, orientation=NORTH))
+        fence.append(Block(position=Point(x=corner[0]-1 + xi, y=GROUND_LEVEL, z=position_information["startz"]+position_information["zrange"]), type=DARK_OAK_FENCE, orientation=NORTH))
+
+    # fill both z sides
+    for zi in range(position_information["zrange"]):
+        fence.append(Block(position=Point(x=corner[0]-1,                                    y=GROUND_LEVEL,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
+        fence.append(Block(position=Point(x=corner[0]-1 + position_information["xrange"]+1, y=GROUND_LEVEL,z=position_information["startz"]+zi), type=DARK_OAK_FENCE, orientation=NORTH))
+
+    client.spawnBlocks(Blocks(blocks=fence))
+
+def clear_area(client, position_information, pop_size, space_between):
+    """
+    This function clears a large area by creating one
+    large cube and filling it with air blocks.
+
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    pop_size (int): The size of the population.
+    space_between (int): block units between adjacent shapes
+    """
+    # Block units around the area that are also wiped
+    zplacement = position_information["startz"] - BUFFER_ZONE
+
+    # clear out a big area rather than individual cubes
+    client.fillCube(FillCubeRequest(  
+        cube=Cube(
+            min=Point(x=position_information["startx"]-BUFFER_ZONE, y=GROUND_LEVEL, z=zplacement-BUFFER_ZONE),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=position_information["starty"]+BUFFER_ZONE, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
+        ),
+        type=AIR
+    ))
+
+def restore_ground(client, position_information, pop_size, space_between):
+    """
+    Resets the ground that could have been damaged by the structures or 
+    that may contain a selection switch. 
+
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    pop_size (int): The size of the population
+    space_between (int): block units between adjacent shapes
+    """    
+    zplacement = position_information["startz"] - BUFFER_ZONE
+
+    # fill the ground with dirt up until bedrock
+    client.fillCube(FillCubeRequest(  
+        cube=Cube(
+            min=Point(x=position_information["startx"]-BUFFER_ZONE, y=GROUND_LEVEL-3, z=zplacement-BUFFER_ZONE),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=GROUND_LEVEL-1, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
+        ),
+        type=GRASS
+    ))
+
+    # fill out the bedrock since there may be pistons in there
+    client.fillCube(FillCubeRequest(  
+        cube=Cube(
+            min=Point(x=position_information["startx"]-7, y=BEDROCK_LEVEL, z=zplacement-7),
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+1)+7, y=BEDROCK_LEVEL, z=position_information["zrange"]+7)
+        ),
+        type=BEDROCK
+    ))
+
+def place_number(client,position_information,corner,num):
+    """
+    Places a glowstone-generated number above a generated shape depending on what digit it is
+    in the range of 0-9. 
+
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    corner (int,int,int): 3-tuple defining minimal coordinates of generated object
+    num (int): The digit that will be placed
+    """
+
+    # Coordinates for bottom of number shape
+    x = corner[0] + int(position_information["xrange"]/2) - 2
+    y = corner[1] + position_information["yrange"] + HEADROOM
+    z = corner[2]
+
     if num == 0:
         number = [
             Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
@@ -226,14 +254,152 @@ def place_number(client,x,y,z,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client, startx, starty, startz, xrange, yrange, zrange, pop_size):
-    i =0
-    blocks_in_list =[]
-    print(xrange)
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+8, y=starty-1,z=startz-9), type=block_list[0], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+6, y=starty-1,z=startz-9), type=block_list[1], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+4, y=starty-1,z=startz-9), type=block_list[2], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange+2, y=starty-1,z=startz-9), type=block_list[3], orientation=NORTH))
-    blocks_in_list.append(Block(position=Point(x=startx+11*xrange, y=starty-1,z=startz-9), type=block_list[4], orientation=NORTH))
+def place_blocks_in_block_list(block_list,client,position_information,genome_id):
+    blocks_in_list = []
+    block_list_to_compare = []
+    # for i  in range(pop_size):
+    x=0
+    z=-9
+    index=0
 
+    
+    while(index<len(block_list)):
+        generated_block=(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z), type=block_list[index], orientation=NORTH))
+        blocks_in_list.append(generated_block)
+        blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-2,z=position_information["startz"]+z), type=EMERALD_BLOCK, orientation=NORTH))
+        
+        block_list_to_compare.append(generated_block)
+
+        if(generated_block.type==LAVA or generated_block.type==WATER):
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x-1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x+1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
+
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
+            blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
+
+        # TODO: Generalize and explain these magic numbers. Define in terms of other position values
+        x=x+2
+        if(x>8):
+            z=z+2
+        index=index+1
+    # print(block_list_to_compare)
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
+    
+def player_selection_switches(client, position_information, corners):
+    """
+    Spawns the switches the a player can use to select their preferred
+    structures along with the switch that is used to indicate that they are
+    done selecting. Then it returns the position of all the points
+    right below the redstone lamps for both the selection switches and
+    the next generation switch
+
+    Parameters:
+    client (MinecraftServiceStub): Interface to Minecraft
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    corners [(int,int,int)]: list of 3-tuples defining minimal coordinates of each generated object
+
+    Returns:
+    ([(int,int,int)],[(int,int,int)]):  List of positions of the spaces below the redstone lamps for 
+                                        selection, followed by list of spaces below pistons that activate
+                                        to switch to the next generation.
+    """
+    # Block lists that will be spawned
+    to_spawn = []
+
+    # z coordinate needs to back away from the shapes if they generate water or lava
+    zplacement = position_information["startz"] - BUFFER_ZONE
+
+    # list that stores the position of the redstone block 
+    # that is moved when the player flicks the switch
+    on_block_positions = []
+
+    # stores the positions underneath the piston which indicate
+    # if the player wants to see the next generation of structures
+    next_block_positions = []
+
+    #add the lamp in first when there is still ground underneath it to avoid the spawning of the grass blocks
+    for corner in corners:
+        middle = corner[0] + int(position_information["xrange"]/2)
+        to_spawn.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL, z=zplacement-4), type=REDSTONE_LAMP, orientation=UP))
+        # clear out the section for the redstone part of the swtich
+        client.fillCube(FillCubeRequest(  
+            cube=Cube(
+                min=Point(x=middle - 3, y=GROUND_LEVEL-3, z=zplacement-5), 
+                max=Point(x=middle + 1, y=GROUND_LEVEL-1, z=zplacement-2)   
+            ),
+            type=AIR
+        ))
+
+        # Now spawn in everything for the selection switches
+        # add in the piston, redstone block, redstone lamp, lever, cobblestone blocks, and redstone dust to switch
+        to_spawn.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL, z=zplacement-4), type=STICKY_PISTON, orientation=UP))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL+1, z=zplacement-4), type=SLIME, orientation=NORTH))
+
+        # this is the position of each redstone block when the lever is switched on
+        on_block_position = (middle - 1, GROUND_LEVEL-1, zplacement-4)
+        to_spawn.append(Block(position=Point(x=on_block_position[0], y=on_block_position[1] - 1, z=on_block_position[2]), type=REDSTONE_BLOCK, orientation=NORTH))
+        # stores the positions from above
+        on_block_positions.append(on_block_position)
+
+        # Ground that was emptied into AIR earlier. Some of it needs to be restored
+        to_spawn.append(Block(position=Point(x=middle,     y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH)) # has a tail now
+        to_spawn.append(Block(position=Point(x=middle - 2, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL-1, z=zplacement-5), type=GRASS, orientation=NORTH))
+
+        # slabs to put around the mechanism
+        for slab in range(0,3):
+            to_spawn.append(Block(position=Point(x=middle + 1, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle,     y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle - 1, y=GROUND_LEVEL, z=zplacement-3 + slab), type=STONE_SLAB, orientation=NORTH)) # has a tail now
+            to_spawn.append(Block(position=Point(x=middle - 2, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONE_SLAB, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL, z=zplacement-4 + slab), type=STONEBRICK, orientation=NORTH))
+            to_spawn.append(Block(position=Point(x=middle - 2 + slab, y=GROUND_LEVEL, z=zplacement- 1), type=STONEBRICK, orientation=NORTH)) # makes tail less noticeable
+
+        # add in the rest of the blocks needed 
+        to_spawn.append(Block(position=Point(x=middle - 3, y=GROUND_LEVEL, z=zplacement-5), type=LEVER, orientation=UP))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+1, z=zplacement-3), type=COBBLESTONE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+2, z=zplacement-4), type=COBBLESTONE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 1, y=BEDROCK_LEVEL+1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 2, y=BEDROCK_LEVEL+1, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+2, z=zplacement-3), type=REDSTONE_WIRE, orientation=NORTH))
+        to_spawn.append(Block(position=Point(x=middle - 3, y=BEDROCK_LEVEL+3, z=zplacement-4), type=REDSTONE_WIRE, orientation=NORTH))
+   
+        # add in the piston and button
+        # stores the position underneath one piston as it loops through
+        next_block_position = (middle + 1,GROUND_LEVEL - 2,zplacement-5)
+        to_spawn.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1]+1, z=next_block_position[2]), type=PISTON, orientation=DOWN))
+        next_block_positions.append(next_block_position)
+        to_spawn.append(Block(position=Point(x=next_block_position[0], y=GROUND_LEVEL, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
+    
+    # spawn in all the blocks
+    client.spawnBlocks(Blocks(blocks=to_spawn))
+
+    return (on_block_positions,next_block_positions)
+
+def read_current_block_options(client,placements,position_information):
+    """
+    Used when users can change the blocks in evolved shapes from within the game.
+    Checks the blocks on display in front of each evolved shape and collects them in a list,
+    where each such list is combined into a list of lists that is returned. The returned
+    list will indicate all block types currently specified (on display) for each shape.
+
+    Parameters:
+    client ():
+
+    """
+    blocks_for_shape = []
+    for corner in placements:
+        # Change these coordinates to be an appropriate offset based on start x/y/z and x/y/z range
+        blocks = client.readCube(Cube(
+                    min=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-9),
+                    max=Point(x=corner[0]+position_information["xrange"]-2, y=position_information["starty"]-1, z=position_information["startz"]-9)
+                 ))
+        
+        block_list = []
+        index = 0
+        while index < len(blocks.blocks):
+            block_list.append(blocks.blocks[index].type)
+            index += 2 # Skip over spaces between blocks 
+        blocks_for_shape.append(block_list)
+    return blocks_for_shape

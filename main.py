@@ -1,6 +1,6 @@
 import argparse
 import sys
-import evolve_CPPN
+import interactive_cppn_evolution as ice
 import random
 from os.path import exists
 from os import mkdir
@@ -63,9 +63,8 @@ def main(argv):
         raise ValueError("Block list size must at least two.")
 
     random.seed(args.RANDOM_SEED)
-
-    evolve_CPPN.run(args)
-
+    
+    ice.run(args)
 
 if __name__ == '__main__':
     main(sys.argv)
