@@ -1,6 +1,7 @@
 import argparse
 import sys
-import evolve_CPPN
+import interactive_cppn_evolution as ice
+import random
 from os.path import exists
 from os import mkdir
 
@@ -27,6 +28,14 @@ def main(argv):
                         help='The number of possible block list types when the block list is evolved.')
     parser.add_argument('--BLOCK_CHANGE_PROBABILITY', type=float, default=0.1, metavar='',
                         help='Probability of randomly changing a block type when the block list evolves.')
+    parser.add_argument('--DISTANCE_PRESENCE_THRESHOLD', type=bool, default=False, metavar='',
+                        help='Whether or not the presence threshold depends on the distance of the candidate block from the center of the generated shape.')
+    parser.add_argument('--DISTANCE_PRESENCE_MULTIPLIER', type=float, default=0.1, metavar='',
+                        help='The multiplier used when DISTANC_PRESENCE_THRESHOLD is true.')
+    parser.add_argument('--RANDOM_SEED', type=random.Random, default=random.randrange(0,100,1), metavar='',
+                        help='Random seed of the shapes produced on the initial time.')
+    parser.add_argument('--SPACE_BETWEEN', type=int, default=1, metavar='',
+                        help='The space between the fences of each shape.')
 
     args = parser.parse_args()
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
@@ -53,7 +62,9 @@ def main(argv):
     if args.NUM_EVOLVED_BLOCK_LIST_TYPES < 2:
         raise ValueError("Block list size must at least two.")
 
-    evolve_CPPN.run(args)
+    random.seed(args.RANDOM_SEED)
+    
+    ice.run(args)
 
 if __name__ == '__main__':
     main(sys.argv)

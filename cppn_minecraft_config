@@ -4,7 +4,7 @@
 fitness_criterion     = max
 fitness_threshold     = 1.01
 pop_size              = 0
-reset_on_extinction   = False
+reset_on_extinction   = True
 
 # Genome will have x, y, z, r, and bias inputs.
 # Outputs starting very simply (improve later): Just presence (Air vs Something) and two block types (one chosen if not Air)
