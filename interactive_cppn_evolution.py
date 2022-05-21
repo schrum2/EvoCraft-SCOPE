@@ -147,12 +147,9 @@ class MinecraftBreeder(object):
             minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
 
         if self.args.IN_GAME_CONTROL:
+            (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
 
-            # done_block_position = minecraft_structures.player_next_gen_switch(self.position_information, self.client) no longer needed?
-            on_block_positions = minecraft_structures.player_selection_switches(self.args.POPULATION_SIZE, self.client, self.position_information)
-            next_block_positions = minecraft_structures.next_gen_button(self.args.POPULATION_SIZE, self.position_information, self.client)
-
-            selected = [False for chosen in range(config.pop_size)]
+            selected = [False for _ in range(config.pop_size)]
             player_select_done = False
             
             while not player_select_done: #player is still selecting
