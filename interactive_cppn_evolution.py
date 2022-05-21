@@ -143,7 +143,7 @@ class MinecraftBreeder(object):
             shapes.append(self.query_cppn_for_shape(genome, config, self.corners[n]))
 
             # Place the fences where the shape will appear
-            minecraft_structures.place_fences(self.client, self.position_information, self.corners[n], self.args.POPULATION_SIZE)
+            minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
 
         # Place numbers 0-9, use yrange + 2
         for i in range(10): # Problems if pop_size is not 10!
