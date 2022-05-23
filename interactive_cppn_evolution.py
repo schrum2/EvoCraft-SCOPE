@@ -76,7 +76,7 @@ class MinecraftBreeder(object):
         """            
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
         selected = []
-        
+
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # Initially, none are selected
