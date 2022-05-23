@@ -16,28 +16,22 @@ def type_count(client, position_information, corner, block_type):
     int: The number of occurences of the specified block.
     """
 
-    block_count = 0
     endx= corner[0] + position_information["xrange"]
     endy= corner[1] + position_information["yrange"]
     endz= corner[2] + position_information["zrange"]
     
-    # loop through x coordinates
-    for xi in range(endx):
+    # read all the blocks at once as one big block
+    block_collection = client.readCube(Cube(
+        min=Point(x=corner[0], y=corner[1], z=corner[2]),
+        max=Point(x=endx, y=endy, z=endz)
+    ))
 
-        # loop through y coordinates
-        for yi in range(endy):
-
-            # loop through z coordinates
-            for zi in range(endz):
-
-                # get the block to compare
-                current_block = client.readCube(Cube(
-                min=Point(x=corner[0] + xi, y=corner[1] + yi, z=corner[2] + zi),
-                min=Point(x=corner[0] + xi, y=corner[1] + yi, z=corner[2] + zi)
-                ))
-
-                # increase block_count if the block is the same as block_type
-                if current_block.blocks[0].type == block_type:
-                    block_count += 1 
+    # The number of blocks is equal to the number of blocks in each coordinate times each other (x * y * z)
+    block_count = 0
+    for block in block_collection.blocks:
+        if block.type == block_type:
+            block_count += 1
 
     return block_count        
+
+#def eval_fitness(genomes, config, fitness):
