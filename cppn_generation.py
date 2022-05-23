@@ -4,6 +4,9 @@ import neat
 # For utility functions
 import util
 
+# For the dictionary of position information
+import interactive_cppn_evolution
+
 # For simple math functions
 import math
 
@@ -21,7 +24,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
         genome (DefaultGenome): A CPPN or some class that extends CPPNs
         config (Config): NEAT configurations
         corner (int,int,int): three-tuple of initial/minimal x,y,z coordinates for shape
-        args ():
+        args (argparse.Namespace): a collection of argument values collected at the command line
         block_list ([Block]): List of blocks that can be spawned in
 
         Returns:
@@ -65,9 +68,9 @@ def generate_block(genome, config, corner, args, block_options, scaled_point, ch
     genome (DefaultGenome): A CPPN or a class that extends CPPNs
     config (Config): NEAT configurations
     corner (int, int, int): three-tuple of initial/minimal x,y,z coordinates for shape
-    args ():
+    args (argparse.Namespace): a collection of argument values collected at the command line 
     block_options ([Block]): List of blocks that can be spawned in 
-    point (int, int, int): three-tuple of the position being looked at
+    scaled_point (int, int, int): three-tuple of the position being looked at
     change (int, int, int): three-tuple used to scale the position of the point
 
     Returns:
@@ -117,8 +120,10 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         x = util.scale_and_center(xi,position_information["xrange"])
         y = util.scale_and_center(yi,position_information["yrange"])
         z = util.scale_and_center(zi,position_information["zrange"])
+
+        if 
         scaled_point = (x, y, z)
-        
+
         block = generate_block(genome, config, corner, args, block_options, scaled_point, change)
         if block is not None:
             snake.append(block)
