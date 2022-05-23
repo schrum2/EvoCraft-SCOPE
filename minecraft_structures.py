@@ -262,10 +262,9 @@ def place_blocks_in_block_list(block_list,client,corners):
     Parameters:
     block_list(list of ints): holds all of the block types to be placed 
     client (MinecraftServiceStub): Minecraft server stub being used
-    corners():
+    corners(tuple): holds the points to be used for placing the blocks
     """
     blocks_in_list = []
-    print(type(corners))
     # Positions relative to each of the shape's corners
     x=0 
     z=-8 # need to change to go in line with  size of shape

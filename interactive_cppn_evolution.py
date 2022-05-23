@@ -95,7 +95,7 @@ class MinecraftBreeder(object):
             # Initially, none are selected
             selected.append(False)
             if self.args.BLOCK_LIST_EVOLVES:
-                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n])
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information)
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
             shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
