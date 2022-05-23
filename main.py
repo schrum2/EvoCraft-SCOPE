@@ -51,6 +51,8 @@ def main(argv):
                         help='Random seed of the shapes produced on the initial time.')
     parser.add_argument('--SPACE_BETWEEN', type=int, default=1, metavar='',
                         help='The space between the fences of each shape.')
+    parser.add_argument('--KEEP_WORLD_ON_EXIT', type = boolean_string, default = False, metavar='',
+                        help='Whether or not the world is reset whenever the program exits.')
     parser.add_argument('--EVOLVE_SNAKE', type=boolean_string, default=False, metavar='',
                         help='Changes the CPPN to generate snake-like structures.')
     parser.add_argument('--MAX_SNAKE_LENGTH', type=int, default=100, metavar='',
