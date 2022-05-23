@@ -85,7 +85,12 @@ class MinecraftBreeder(object):
                 minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n])
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            # If EVOLVE_SNAKE is true, it will generate a snake,
+            # otherwise it will create the normal structures
+            if self.args.EVOLVE_SNAKE:
+                shape = cppn_generation.query_cppn_for_snake_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            else:
+                shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
             # Place the fences where the shape will appear
