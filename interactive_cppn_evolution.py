@@ -141,12 +141,13 @@ class MinecraftBreeder(object):
         selected = []
         
         # This loop could be parallelized
-        for n, (_, genome) in enumerate(genomes):
+        for n, (genome_id, genome) in enumerate(genomes):
             # Initially, none are selected
             selected.append(False)
             if self.args.BLOCK_LIST_EVOLVES:
                 minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
+            print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
             shape = self.query_cppn_for_shape(genome, config, self.corners[n])
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
@@ -218,6 +219,7 @@ class MinecraftBreeder(object):
                 genome.fitness = 1.0
             else:
                 genome.fitness = 0.0
+            print("{}. {}: {}".format(n,genome_id,genome.fitness))
 
         if self.args.USE_ELITISM:
             # To assure that all selected individuals survive, the elitism setting is changed
