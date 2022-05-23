@@ -254,7 +254,7 @@ def place_number(client,position_information,corner,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client,corners):
+def place_blocks_in_block_list(block_list,client,corners,position_information):
     """
     Takes in the block list from a genome and places instances of each of the blocks
     in front of the generated shape.
@@ -262,20 +262,20 @@ def place_blocks_in_block_list(block_list,client,corners):
     Parameters:
     block_list(list of ints): holds all of the block types to be placed 
     client (MinecraftServiceStub): Minecraft server stub being used
-    corners(tuple): holds the points to be used for placing the blocks
+    corners(tuple(int,int,int)): holds the points to be used for placing the blocks
     """
     blocks_in_list = []
     # Positions relative to each of the shape's corners
     x=0 
-    z=-8 # need to change to go in line with  size of shape
+    z=-8 # need to change to go in line with size of shape
     index=0
 
-    # Working on new code here
     while(index<len(block_list)):
         generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
         blocks_in_list.append(generated_block)
         blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=EMERALD_BLOCK, orientation=NORTH))
 
+        # If the block is lava or water, places a box around it
         if(generated_block.type==LAVA or generated_block.type==WATER or generated_block.type==FLOWING_LAVA or generated_block.type==FLOWING_WATER):
             blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
             blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
@@ -284,31 +284,9 @@ def place_blocks_in_block_list(block_list,client,corners):
 
         index=index+1
         x=x+2 # x increase by two for a one block gap
-        if(x>8): # Once it getsto the end (5 blocks), goes to the next row
+        if(x>=position_information["xrange"]): # Once it gets to the end (5 blocks), goes to the next row
             z=z+2
 
-
-
-    # while(index<len(block_list)):
-    #     generated_block=(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z), type=block_list[index], orientation=NORTH))
-    #     blocks_in_list.append(generated_block)
-    #     blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-2,z=position_information["startz"]+z), type=EMERALD_BLOCK, orientation=NORTH))
-        
-    #     block_list_to_compare.append(generated_block)
-
-    #     if(generated_block.type==LAVA or generated_block.type==WATER):
-    #         blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x-1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
-    #         blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x+1, y=position_information["starty"]-1,z=position_information["startz"]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
-
-    #         blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
-    #         blocks_in_list.append(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
-
-    #     # TODO: Generalize and explain these magic numbers. Define in terms of other position values
-    #     x=x+2
-    #     if(x>8):
-    #         z=z+2
-    #     index=index+1
-    # #print(block_list_to_compare)
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
     
 def player_selection_switches(client, position_information, corners):
@@ -428,6 +406,5 @@ def read_current_block_options(client,placements,position_information):
         while index < len(blocks.blocks):
             block_list.append(blocks.blocks[index].type)
             index += 2 # Skip over spaces between blocks 
-        print(block_list)
         blocks_for_shape.append(block_list)
     return blocks_for_shape

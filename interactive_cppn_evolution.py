@@ -133,8 +133,10 @@ class MinecraftBreeder(object):
                             #print(genome.block_list)
                             for i in range(len(genome.block_list)):
                                 if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
-                                    print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
+                                    # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
                                     genome.block_list[i]=read_current_blocks[n][i]
+                                    shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+                                    self.client.spawnBlocks(Blocks(blocks=shape))
 
                             #print("---------------------------------------------")
                                                      
