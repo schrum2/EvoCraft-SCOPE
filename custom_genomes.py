@@ -32,8 +32,14 @@ class CustomBlocksGenome(neat.DefaultGenome):
         super().configure_new(config)
         # The number of blocks in the list is one less than the number of outputs (since the first determines presence)
         self.block_list = random.sample(list(mc.BlockType.values()), config.num_outputs - 1)
+        # print("genome_id=",self.key)
+        # print("newly configured block list: ",self.block_list)
         
     def configure_crossover(self, genome1, genome2, config):
+        # print("genome_id=",self.key)
+        # print("genome_block_list 1: ",genome1.block_list)
+        # print("genome_block_list 2: ",genome2.block_list)
+        # print()
         """
         Randomly selects one block list from the two genomes using multi-point crossover,
         also configues the rest of the default genome
@@ -53,8 +59,12 @@ class CustomBlocksGenome(neat.DefaultGenome):
             else:
                 self.block_list.append(genome2.block_list[index])
             index = index + 1
+        # print("New block list: ",self.block_list)
+        # print("--------------------------------------------")
                
     def mutate(self, config):
+        # print("genome_id=",self.key)
+        # print("Block_list before mutation:",self.block_list)
         """
         Based on BLOCK_CHANGE_PROBABILITY, if the random condition is satisfied, selects a random index 
         and replaces it with a new random block. Also mutates the rest of the default genome
@@ -64,11 +74,13 @@ class CustomBlocksGenome(neat.DefaultGenome):
         """
         super().mutate(config)
         global BLOCK_CHANGE_PROBABILITY
-        #print("BLOCK_CHANGE_PROBABILITY = {}".format(BLOCK_CHANGE_PROBABILITY))
         r = random.uniform(0.0,1.0) 
         if(r<BLOCK_CHANGE_PROBABILITY):
             random_int = random.randint(0,len(self.block_list)-1) 
-            self.block_list[random_int] = random.choice(list(mc.BlockType.values()))#<--
+            self.block_list[random_int] = random.choice(list(mc.BlockType.values()))
+        # print("Block_list after mutation:",self.block_list)
+        # print("--------------------------------------------")
+
     
     # Arbitrary value for the difference calculated by inceasing the distance for each difference 
     # in the two lists, will likley change later
