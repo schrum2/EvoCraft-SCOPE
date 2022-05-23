@@ -254,10 +254,18 @@ def place_number(client,position_information,corner,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client,corners,position_information,genome_id):
-    blocks_in_list = []
-    block_list_to_compare = []
+def place_blocks_in_block_list(block_list,client,corners):
+    """
+    Takes in the block list from a genome and places instances of each of the blocks
+    in front of the generated shape.
 
+    Parameters:
+    block_list(list of ints): holds all of the block types to be placed 
+    client (MinecraftServiceStub): Minecraft server stub being used
+    corners():
+    """
+    blocks_in_list = []
+    print(type(corners))
     # Positions relative to each of the shape's corners
     x=0 
     z=-8 # need to change to go in line with  size of shape
