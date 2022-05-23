@@ -4,9 +4,6 @@ import neat
 # For utility functions
 import util
 
-# For the dictionary of position information
-import interactive_cppn_evolution
-
 # For simple math functions
 import math
 
@@ -61,8 +58,8 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
 def generate_block(genome, config, corner, args, block_options, scaled_point, change): 
     """
-    Returns whether or not there is a block at a specific position and None
-    if there isn't
+    Returns a block to generate if it is present at a specific position and None
+    if it isn't
 
     Parameters:
     genome (DefaultGenome): A CPPN or a class that extends CPPNs
@@ -74,7 +71,8 @@ def generate_block(genome, config, corner, args, block_options, scaled_point, ch
     change (int, int, int): three-tuple used to scale the position of the point
 
     Returns:
-    (Block): If a block is present it will 
+    (Block): If a block is present it will return the block at the position
+             and None otherwise
     """
     # Create CPPN out of genome
     net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -110,9 +108,10 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     else:
         block_options = genome.block_list
     
-    xi = int(interactive_cppn_evolution.position_information["xrange"]/2)
-    yi = int(interactive_cppn_evolution.position_information["yrange"]/2)
-    zi = int(interactive_cppn_evolution.position_information["zrange"]/2)
+    # Used to scale the point
+    xi = int(position_information["xrange"]/2)
+    yi = int(position_information["yrange"]/2)
+    zi = int(position_information["zrange"]/2)
     change = (xi, yi, zi)
 
     snake = []
@@ -120,14 +119,15 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         x = util.scale_and_center(xi,position_information["xrange"])
         y = util.scale_and_center(yi,position_information["yrange"])
         z = util.scale_and_center(zi,position_information["zrange"])
-
-        if 
         scaled_point = (x, y, z)
 
         block = generate_block(genome, config, corner, args, block_options, scaled_point, change)
         if block is not None:
+            print("block is not None")
             snake.append(block)
 
         # Once it has reach the maximum length, it should stop
         if(len(snake) == args.MAX_SNAKE_LENGTH):
             done = True
+
+    return snake
