@@ -192,9 +192,12 @@ class MinecraftBreeder(object):
 
                     for n, (_, genome) in enumerate(genomes):
                         if(not genome.block_list==read_current_blocks[n]):
+                            print(genome.key)
+                            print("CHANGES:",genome.block_list)
                             for i in range(len(genome.block_list)):
-                                if(not genome.block_list[i]==read_current_blocks[n][i]):
+                                if(not genome.block_list[i]==read_current_blocks[n][i] and (not read_current_blocks[n][i]==5)):
                                     genome.block_list[i]=read_current_blocks[n][i]
+                                    
 
  
                 #print(selected)
