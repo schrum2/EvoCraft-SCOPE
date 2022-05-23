@@ -4,6 +4,7 @@ that comes with NEAT-Python. Just wanted a starting point for evolving CPPNs.
 Modifying the code to apply to Minecraft.
 """
 # Are these still needed?
+from asyncio.windows_events import NULL
 from http import client
 import math
 import os
@@ -191,13 +192,16 @@ class MinecraftBreeder(object):
                     read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
 
                     for n, (_, genome) in enumerate(genomes):
-                        if(not genome.block_list==read_current_blocks[n]):
-                            print(genome.key)
-                            print("CHANGES:",genome.block_list)
+                        if(genome.block_list != read_current_blocks[n]):
+                            #print(genome.key)
+                            #print(genome.block_list)
                             for i in range(len(genome.block_list)):
-                                if(not genome.block_list[i]==read_current_blocks[n][i] and (not read_current_blocks[n][i]==5)):
+                                if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
+                                    print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
                                     genome.block_list[i]=read_current_blocks[n][i]
-                                    
+
+                            #print("---------------------------------------------")
+                                                     
 
  
                 #print(selected)
