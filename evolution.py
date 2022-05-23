@@ -47,8 +47,9 @@ def run(args):
         config.fitness_threshold = 1000
 
     config.pop_size = args.POPULATION_SIZE
-    # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = block_list_length+1
+    # Changing the number of CPPN outputs after initialization. 
+    # Evolved snakes have 7 additional outputs.
+    config.genome_config.num_outputs = block_list_length + 1 + (7 if args.EVOLVE_SNAKE else 0)
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     pop = neat.Population(config)
