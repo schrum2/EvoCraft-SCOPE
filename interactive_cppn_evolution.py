@@ -185,6 +185,7 @@ class MinecraftBreeder(object):
                     player_select_done = done_button.blocks[0].type == PISTON_HEAD
                     j += 1
                     
+                # This is causing problems where the blocks in new shapes do not match what they originally were
                 if self.args.BLOCK_LIST_EVOLVES:
                     # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
                     read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
