@@ -82,10 +82,15 @@ class MinecraftBreeder(object):
             # Initially, none are selected
             selected.append(False)
             if self.args.BLOCK_LIST_EVOLVES:
-                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n])
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            # If EVOLVE_SNAKE is true, it will generate a snake,
+            # otherwise it will create the normal structures
+            if self.args.EVOLVE_SNAKE:
+                shape = cppn_generation.query_cppn_for_snake_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            else:
+                shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
             # Place the fences where the shape will appear
@@ -122,15 +127,22 @@ class MinecraftBreeder(object):
                     player_select_done = done_button.blocks[0].type == PISTON_HEAD
                     j += 1
                     
+                # This is causing problems where the blocks in new shapes do not match what they originally were
                 if self.args.BLOCK_LIST_EVOLVES:
                     # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
                     read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
 
                     for n, (_, genome) in enumerate(genomes):
-                        if(not genome.block_list==read_current_blocks[n]):
+                        if(genome.block_list != read_current_blocks[n]):
+                            #print(genome.key)
+                            #print(genome.block_list)
                             for i in range(len(genome.block_list)):
-                                if(not genome.block_list[i]==read_current_blocks[n][i]):
+                                if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
+                                    print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
                                     genome.block_list[i]=read_current_blocks[n][i]
+
+                            #print("---------------------------------------------")
+                                                     
 
  
                 #print(selected)
