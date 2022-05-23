@@ -116,8 +116,13 @@ class MinecraftBreeder(object):
                         block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
                         shape.append(block)
         
-        #print("options: {}, generated: {}".format(block_options,len(shape)))
-        
+        if(len(shape) == 0):
+            print("Genome at corner {} is empty".format(corner))
+        else:
+            #print(list(BlockType.items()))
+            #print(list(BlockType.keys()))
+            print("Genome at corner {} generated {} blocks of these types: {}".format(corner,len(shape),set(map(lambda x: BlockType.keys()[x.type], shape))))
+
         return shape
 
     def eval_fitness(self, genomes, config):
