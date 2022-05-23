@@ -53,6 +53,10 @@ def main(argv):
                         help='The space between the fences of each shape.')
     parser.add_argument('--KEEP_WORLD_ON_EXIT', type = boolean_string, default = False, metavar='',
                         help='Whether or not the world is reset whenever the program exits.')
+    parser.add_argument('--EVOLVE_SNAKE', type=boolean_string, default=False, metavar='',
+                        help='Changes the CPPN to generate snake-like structures.')
+    parser.add_argument('--MAX_SNAKE_LENGTH', type=int, default=100, metavar='',
+                        help='The maximum length a snake-like structure can be when EVOLVE_SNAKE is true.')
 
     args = parser.parse_args()
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
