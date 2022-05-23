@@ -5,6 +5,7 @@ import neat
 
 # for Minecraft
 import minecraft_pb2 as mc
+import block_sets
 
 # Must be set in evolve_CPPN.py
 BLOCK_CHANGE_PROBABILITY = 0.0
