@@ -260,7 +260,7 @@ def place_blocks_in_block_list(block_list,client,corners,position_information,ge
 
     # Positions relative to each of the shape's corners
     x=0 
-    z=-8
+    z=-8 # need to change to go in line with  size of shape
     index=0
 
     # Working on new code here
@@ -276,8 +276,8 @@ def place_blocks_in_block_list(block_list,client,corners,position_information,ge
             blocks_in_list.append(Block(position=Point(x=corners[0]+x-1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
 
         index=index+1
-        x=x+2
-        if(x>8):
+        x=x+2 # x increase by two for a one block gap
+        if(x>8): # Once it getsto the end (5 blocks), goes to the next row
             z=z+2
 
 
@@ -411,14 +411,16 @@ def read_current_block_options(client,placements,position_information):
     for corner in placements:
         # Change these coordinates to be an appropriate offset based on start x/y/z and x/y/z range
         blocks = client.readCube(Cube(
-                    min=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-9),
-                    max=Point(x=corner[0]+position_information["xrange"]-2, y=position_information["starty"]-1, z=position_information["startz"]-9)
+                    min=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-8),
+                    max=Point(x=corner[0]+position_information["xrange"]-2, y=position_information["starty"]-1, z=position_information["startz"]-8)
                  ))
         
         block_list = []
         index = 0
+        client.spawnBlocks(Block(position=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-8), type=GLOWSTONE, orientation=NORTH))
         while index < len(blocks.blocks):
             block_list.append(blocks.blocks[index].type)
             index += 2 # Skip over spaces between blocks 
+        print(block_list)
         blocks_for_shape.append(block_list)
     return blocks_for_shape
