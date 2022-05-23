@@ -19,7 +19,6 @@ import cppn_generation
 # For fitness functions
 import fitness_functions as ff
 
-### TODO: Change name of class
 class FitnessEvolutionMinecraftBreeder(object):
     def __init__(self, args, block_list):
         """
@@ -80,7 +79,7 @@ class FitnessEvolutionMinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shape))
 
             # REDSTONE_BLOCK is hard coded for now, but need to change/generalize later
-            genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], REDSTONE_BLOCK)
+            genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], SLIME)
 
             print("{}. {}: {}".format(n,genome_id,genome.fitness))
 

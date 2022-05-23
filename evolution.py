@@ -13,17 +13,15 @@ def run(args):
         # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
         block_list = [REDSTONE_BLOCK,PISTON,STONE, SLIME] # TODO: Make this a command line parameter somehow?
         genome_type = neat.DefaultGenome
-        config_file = 'cppn_minecraft_fitness_config'
+        config_file = 'cppn_minecraft_config' if args.INTERACTIVE_EVOLUTION else 'cppn_minecraft_fitness_config'
         block_list_length = len(block_list)
     else:
         block_list = [] # Won't be used, but parameter is still needed
         genome_type = cg.CustomBlocksGenome
-        config_file = 'cppn_minecraft_fitness_custom_blocks_config'
+        config_file = 'cppn_minecraft_custom_blocks_config' if args.INTERACTIVE_EVOLUTION else 'cppn_minecraft_fitness_custom_blocks_config'
         block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
         cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
         #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
-
-    # TODO: need new config file, maybe?
 
     if args.INTERACTIVE_EVOLUTION:
         mc = ice.MinecraftBreeder(args,block_list)
@@ -41,6 +39,13 @@ def run(args):
                          neat.DefaultSpeciesSet, stagnation,
                          config_path)
 
+    if args.INTERACTIVE_EVOLUTION:
+        # Selected items have a fitness of 1, but there is no final/best option
+        config.fitness_threshold = 1.01
+    else:
+        # TODO: Change this so it is set depending on the specific fitness function used.
+        config.fitness_threshold = 1000
+
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. Could cause problems.
     config.genome_config.num_outputs = block_list_length+1
@@ -55,9 +60,15 @@ def run(args):
 
     # Evolve forever: TODO: Add use means of stopping
     try:
-        while True:
-            mc.generation = pop.generation + 1
-            pop.run(mc.eval_fitness, 1)
+        if args.INTERACTIVE_EVOLUTION:
+            while True:
+                mc.generation = pop.generation + 1
+                pop.run(mc.eval_fitness, 1)
+        else: # Fitness-based evolution
+            # TODO: Change 100 to a command line parameter NUM_GENERATIONS
+            generations = 1000
+            print("Evolve for {} generations".format(generations))
+            pop.run(mc.eval_fitness, generations)
     finally:
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
