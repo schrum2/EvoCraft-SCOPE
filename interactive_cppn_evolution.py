@@ -24,6 +24,9 @@ import util
 # For minecraft structures
 import minecraft_structures
 
+# For CPPN generations
+import cppn_generation
+
 # For InteractiveStagnation class
 import neat_stagnation
 
@@ -70,60 +73,6 @@ class MinecraftBreeder(object):
         # Don't try any multithreading yet, but consider for later
         self.num_workers = 1
 
-    def query_cppn_for_shape(self, genome, config, corner):
-        """
-        Query CPPN at all voxel coordinates to generate the list of
-        blocks that will eventually be rendered in the Minecraft server.
-
-        Parameters:
-        genome (DefaultGenome): A CPPN or some class that extends CPPNs
-        config (Config): NEAT configurations
-        corner (int,int,int): three-tuple of initial/minimal x,y,z coordinates for shape
-
-        Returns:
-        [Block]:List of Blocks to generate in Minecraft
-        """
-        # If not evolving block list, use the static one specified lower in the code. Otherwise, use the genome's list
-        if not self.args.BLOCK_LIST_EVOLVES:
-            block_options = self.block_list
-        else:
-            block_options = genome.block_list
-
-        net = neat.nn.FeedForwardNetwork.create(genome, config) # Create CPPN out of genome
-        shape = []
-        for xi in range(self.position_information["xrange"]):
-            x = util.scale_and_center(xi,self.position_information["xrange"])
-            for yi in range(self.position_information["yrange"]):
-                y = util.scale_and_center(yi,self.position_information["yrange"])
-                for zi in range(self.position_information["zrange"]):
-                    z = util.scale_and_center(zi,self.position_information["zrange"])
-                    # math.sqrt(2) is the usual scaling for radial distances in CPPNs
-                    center_dist = util.distance((x,y,z),(0,0,0))
-                    output = net.activate([x, y, z, center_dist * math.sqrt(2), 1.0])
-                    
-                    # First output determines whether there is a block at all.
-                    # If there is a block, argmax determines the max value and places the specified block 
-                    # from the list of possible blocks
-                    presence_threshold = self.args.PRESENCE_THRESHOLD 
-                    
-                    if self.args.DISTANCE_PRESENCE_THRESHOLD == True:
-                        presence_threshold = self.args.DISTANCE_PRESENCE_MULTIPLIER * center_dist                            
-
-                    # Only generate non-air blocks
-                    if output[0] >= presence_threshold: 
-                        output_val = util.argmax(output[1:])
-                        assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
-                        block = Block(position=Point(x=corner[0]+xi, y=corner[1]+yi, z=corner[2]+zi), type=block_options[output_val], orientation=NORTH)
-                        shape.append(block)
-        
-        if(len(shape) == 0):
-            print("Genome at corner {} is empty".format(corner))
-        else:
-            #print(list(BlockType.items()))
-            #print(list(BlockType.keys()))
-            print("Genome at corner {} generated {} blocks of these types: {}".format(corner,len(shape),set(map(lambda x: BlockType.keys()[x.type], shape))))
-
-        return shape
 
     def eval_fitness(self, genomes, config):
         """
@@ -148,7 +97,7 @@ class MinecraftBreeder(object):
                 minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = self.query_cppn_for_shape(genome, config, self.corners[n])
+            shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
             # Place the fences where the shape will appear
