@@ -1,4 +1,5 @@
 import interactive_cppn_evolution as ice
+import fitness_cppn_evolution as fce
 import neat
 from minecraft_pb2 import *
 import neat_stagnation
@@ -12,17 +13,24 @@ def run(args):
         # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
         block_list = [REDSTONE_BLOCK,PISTON,STONE, SLIME] # TODO: Make this a command line parameter somehow?
         genome_type = neat.DefaultGenome
-        config_file = 'cppn_minecraft_config'
+        config_file = 'cppn_minecraft_fitness_config'
         block_list_length = len(block_list)
     else:
         block_list = [] # Won't be used, but parameter is still needed
         genome_type = cg.CustomBlocksGenome
-        config_file = 'cppn_minecraft_custom_blocks_config'
+        config_file = 'cppn_minecraft_fitness_custom_blocks_config'
         block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
         cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
         #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
-    mc = ice.MinecraftBreeder(args,block_list)
+    # TODO: need new config file, maybe?
+
+    if args.INTERACTIVE_EVOLUTION:
+        mc = ice.MinecraftBreeder(args,block_list)
+        stagnation = neat_stagnation.InteractiveStagnation
+    else: 
+        mc = fce.FitnessEvolutionMinecraftBreeder(args, block_list)
+        stagnation = neat.DefaultStagnation
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
@@ -30,7 +38,7 @@ def run(args):
 
     # Note that we provide the custom stagnation class to the Config constructor.
     config = neat.Config(genome_type, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat_stagnation.InteractiveStagnation,
+                         neat.DefaultSpeciesSet, stagnation,
                          config_path)
 
     config.pop_size = args.POPULATION_SIZE
