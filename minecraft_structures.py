@@ -263,14 +263,16 @@ def place_blocks_in_block_list(block_list,client,corners,position_information):
     block_list(list of ints): holds all of the block types to be placed 
     client (MinecraftServiceStub): Minecraft server stub being used
     corners(tuple(int,int,int)): holds the points to be used for placing the blocks
+    position_information(dict): contains all the information regarding the start positions and ranges 
     """
     blocks_in_list = []
-    # Positions relative to each of the shape's corners
+    # Start positions relative to each of the shape's corners
     x=0 
-    z=-8 # need to change to go in line with size of shape
+    z=-8
     index=0
 
     while(index<len(block_list)):
+        # Generates blovk at the specified index, places emerald block underneath it
         generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
         blocks_in_list.append(generated_block)
         blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=EMERALD_BLOCK, orientation=NORTH))
@@ -284,9 +286,9 @@ def place_blocks_in_block_list(block_list,client,corners,position_information):
 
         index=index+1
         x=x+2 # x increase by two for a one block gap
-        if(x>=position_information["xrange"]): # Once it gets to the end (5 blocks), goes to the next row
+        if(x>=position_information["xrange"]): # Once it gets to the end of the range, goes to the next row
             z=z+2
-
+    # Spawns in all the blocks
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
     
 def player_selection_switches(client, position_information, corners):
@@ -389,12 +391,17 @@ def read_current_block_options(client,placements,position_information):
     list will indicate all block types currently specified (on display) for each shape.
 
     Parameters:
-    client ():
+    client (MinecraftServiceStub): Interface to Minecraft
+    placements(list of tuples(int,int,int)): list of all of the corner coordinates for the shapes
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
 
+    Returns:
+    blocks_for_shape(list of lists of ints): returns what was read in from the minecraft world for each shape
     """
     blocks_for_shape = []
+    # Loops through all corners for each shape
     for corner in placements:
-        # Change these coordinates to be an appropriate offset based on start x/y/z and x/y/z range
+        # Reads in all blocks on the x range
         blocks = client.readCube(Cube(
                     min=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-8),
                     max=Point(x=corner[0]+position_information["xrange"]-2, y=position_information["starty"]-1, z=position_information["startz"]-8)
@@ -402,9 +409,9 @@ def read_current_block_options(client,placements,position_information):
         
         block_list = []
         index = 0
-        client.spawnBlocks(Block(position=Point(x=corner[0], y=position_information["starty"]-1, z=position_information["startz"]-8), type=GLOWSTONE, orientation=NORTH))
+        # loops through every other block, getting its block type
         while index < len(blocks.blocks):
             block_list.append(blocks.blocks[index].type)
             index += 2 # Skip over spaces between blocks 
-        blocks_for_shape.append(block_list)
-    return blocks_for_shape
+        blocks_for_shape.append(block_list) # Adds the list to a list
+    return blocks_for_shape # Returns all blocks for all shapes

@@ -122,27 +122,22 @@ class MinecraftBreeder(object):
                     player_select_done = done_button.blocks[0].type == PISTON_HEAD
                     j += 1
                     
-                # This is causing problems where the blocks in new shapes do not match what they originally were
                 if self.args.BLOCK_LIST_EVOLVES:
                     # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
+
+                    # Reads in the blocks and stores them
                     read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
 
+                    # Compares each index of the block lists of the genome to what was read in.
                     for n, (_, genome) in enumerate(genomes):
                         if(genome.block_list != read_current_blocks[n]):
-                            #print(genome.key)
-                            #print(genome.block_list)
                             for i in range(len(genome.block_list)):
+                                # If there was a difference, and it wasn't air, it replaces the blocks in the block_list and regenerates the structure 
                                 if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
                                     # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
                                     genome.block_list[i]=read_current_blocks[n][i]
                                     shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
                                     self.client.spawnBlocks(Blocks(blocks=shape))
-
-                            #print("---------------------------------------------")
-                                                     
-
- 
-                #print(selected)
 
         else:
             # Controlled externally by keyboard
