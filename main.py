@@ -1,9 +1,13 @@
 import argparse
+import string
 import sys
+from typing import AnyStr
 import evolution
 import random
 from os.path import exists
 from os import mkdir
+from minecraft_pb2 import *
+
 
 def boolean_string(s):
     """
@@ -59,8 +63,17 @@ def main(argv):
                         help='The maximum length a snake-like structure can be when EVOLVE_SNAKE is true.')
     parser.add_argument('--INTERACTIVE_EVOLUTION', type=boolean_string, default=True, metavar='',
                         help='Whether or not interactive evolution will be used.')
+    parser.add_argument('--MINIMUM_REQUIRED_BLOCKS', type=int, default=sys.maxsize, metavar='',
+                        help='The number of minimum required blocks to be used.')
+    parser.add_argument('--USE_MIN_BLOCK_REQUIREMENT', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to use the minimum required block requirement.')
+    parser.add_argument('--MIN_BLOCK_PRESENCE_INCREMENT', type=float, default=0.1, metavar='',
+                        help='How big the step size is for the minimum block presence.')
+    #parser.add_argument('--DESIRED_BLOCK', type=string, default=AnyStr, metavar='',
+     #                   help='The desired block.')
 
     args = parser.parse_args()
+
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
         raise ValueError("BLOCK_CHANGE_PROBABILITY must be in range [0,1].")
 
@@ -86,7 +99,10 @@ def main(argv):
         raise ValueError("Block list size must at least two.")
 
     random.seed(args.RANDOM_SEED)
+        
     
+    #block.type.args.DESIRED_BLOCK
+
     evolution.run(args)
 
 if __name__ == '__main__':
