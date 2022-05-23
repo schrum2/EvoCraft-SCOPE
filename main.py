@@ -1,6 +1,6 @@
 import argparse
 import sys
-import interactive_cppn_evolution as ice
+import evolution
 import random
 from os.path import exists
 from os import mkdir
@@ -85,7 +85,7 @@ def main(argv):
 
     random.seed(args.RANDOM_SEED)
     
-    ice.run(args)
+    evolution.run(args)
 
 if __name__ == '__main__':
     main(sys.argv)

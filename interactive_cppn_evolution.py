@@ -3,12 +3,6 @@ Code originally taken from the offline simplified version of Picbreeder
 that comes with NEAT-Python. Just wanted a starting point for evolving CPPNs.
 Modifying the code to apply to Minecraft.
 """
-# Are these still needed?
-from http import client
-import math
-import os
-import pickle
-
 # For CPPNs and NEAT
 import neat
 import custom_genomes as cg
@@ -18,17 +12,11 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-# For utility functions
-import util
-
 # For minecraft structures
 import minecraft_structures
 
 # For CPPN generations
 import cppn_generation
-
-# For InteractiveStagnation class
-import neat_stagnation
 
 class MinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -176,62 +164,7 @@ class MinecraftBreeder(object):
             print("{} elite survivors".format(elite_count))
             config.reproduction_config.elitism = elite_count
 
-    # End of MinecraftBreeder
-
-# Various functions
-
-def run(args):
-    # If the block list evolves, customGenome is used. Otherwise it's the Default 
-    if not args.BLOCK_LIST_EVOLVES:
-        # Contains all possible blocks that could be placed, if the block list does not evolve, can be edited to have any blocks here
-        block_list = [REDSTONE_BLOCK,PISTON,STONE, SLIME] # TODO: Make this a command line parameter somehow?
-        genome_type = neat.DefaultGenome
-        config_file = 'cppn_minecraft_config'
-        block_list_length = len(block_list)
-    else:
-        block_list = [] # Won't be used, but parameter is still needed
-        genome_type = cg.CustomBlocksGenome
-        config_file = 'cppn_minecraft_custom_blocks_config'
-        block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
-        cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
-        #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
-
-    mc = MinecraftBreeder(args,block_list)
-
-    # Determine path to configuration file.
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, config_file)
-
-    # Note that we provide the custom stagnation class to the Config constructor.
-    config = neat.Config(genome_type, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat_stagnation.InteractiveStagnation,
-                         config_path)
-
-    config.pop_size = args.POPULATION_SIZE
-    # Changing the number of CPPN outputs after initialization. Could cause problems.
-    config.genome_config.num_outputs = block_list_length+1
-    config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
-
-    pop = neat.Population(config)
-
-    # Add a stdout reporter to show progress in the terminal.
-    pop.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    pop.add_reporter(stats)
-
-    # Evolve forever: TODO: Add use means of stopping
-    try:
-        while True:
-            mc.generation = pop.generation + 1
-            pop.run(mc.eval_fitness, 1)
-    finally:
-        # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
-        if not args.KEEP_WORLD_ON_EXIT:
-            minecraft_structures.restore_ground(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)
-            minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)                                                                                                               
-            # Clear space in the air to get rid of numbers
-            mc.position_information["starty"] = mc.position_information["starty"]+mc.position_information["yrange"]
-            minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)                                                                                                               
+    # End of MinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")
