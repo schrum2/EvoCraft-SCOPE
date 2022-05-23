@@ -254,15 +254,18 @@ def place_number(client,position_information,corner,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client,position_information,genome_id):
+def place_blocks_in_block_list(block_list,client,corners,position_information,genome_id):
     blocks_in_list = []
     block_list_to_compare = []
     # for i  in range(pop_size):
+    print(corners)
     x=0
     z=-9
     index=0
 
-    
+    # Working on new code here
+    # generated_block=(Block(position=Point(x=corners[0], y=corners[1],z=corners[2]+z), type=GLOWSTONE, orientation=NORTH))
+
     while(index<len(block_list)):
         generated_block=(Block(position=Point(x=position_information["startx"]+11*genome_id+x, y=position_information["starty"]-1,z=position_information["startz"]+z), type=block_list[index], orientation=NORTH))
         blocks_in_list.append(generated_block)
@@ -282,7 +285,7 @@ def place_blocks_in_block_list(block_list,client,position_information,genome_id)
         if(x>8):
             z=z+2
         index=index+1
-    # print(block_list_to_compare)
+    #print(block_list_to_compare)
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
     
 def player_selection_switches(client, position_information, corners):

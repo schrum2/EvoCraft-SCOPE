@@ -145,7 +145,7 @@ class MinecraftBreeder(object):
             # Initially, none are selected
             selected.append(False)
             if self.args.BLOCK_LIST_EVOLVES:
-                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client, self.position_information,n)
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n], self.position_information,n)
             # See how CPPN fills out the shape
             shape = self.query_cppn_for_shape(genome, config, self.corners[n])
             # fill the empty space with the evolved shape
