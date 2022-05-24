@@ -35,3 +35,26 @@ def type_count(client, position_information, corner, block_type):
     return block_count        
 
 #def eval_fitness(genomes, config, fitness):
+
+def occupied_count(client, position_information, corner):
+    # Counts the number of blocks
+    number_of_blocks = 0
+
+    endx= corner[0] + position_information["xrange"]
+    endy= corner[1] + position_information["yrange"]
+    endz= corner[2] + position_information["zrange"]
+
+    # Read in all the blocks within the x, y, and z range
+    all_the_blocks = client.readCube(Cube(
+        min=Point(x=corner[0], y=corner[1], z=corner[2]),
+        max=Point(x=endx, y=endy, z=endz)
+    ))
+
+    for filled in all_the_blocks:
+        if filled.type is not AIR
+            number_of_blocks += 1
+
+    return number_of_blocks
+
+
+
