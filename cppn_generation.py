@@ -41,9 +41,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
         shape = []
         presence_threshold = args.PRESENCE_THRESHOLD
         done = False
-        #print(args.MINIMUM_REQUIRED_BLOCKS)
         while not done:
-            #print(done)
             for xi in range(position_information["xrange"]):
                 x = util.scale_and_center(xi,position_information["xrange"])
                 for yi in range(position_information["yrange"]):
@@ -57,17 +55,12 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
                         if block is not None:
                             shape.append(block)
             
-            if args.USE_MIN_BLOCK_REQUIREMENT: 
-                #print('the size of the shape is: {}'.format(len(shape)))
-                done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS
-                #print('the minimum required blocks is: {}'.format(args.MINIMUM_REQUIRED_BLOCKS))
-                #print('reached the inside if statement')
-            else: 
-                done = True
-                #print(done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS)   
-                #print('you might be stuck here, something here could be off')
-                #print(done)
+            # If USE_MIN_BLOCK_REQUIREMENT is true, then we stop the while loop if the size of the shape meets the min number of required blocks
+            if args.USE_MIN_BLOCK_REQUIREMENT: done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS
+            # At this point we are done regardless of the if statement above.
+            else: done = True
             
+            # Decrease presence_thresold to decrease number of empty shapes
             if not done: presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT 
 
         if(len(shape) == 0):
