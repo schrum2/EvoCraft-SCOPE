@@ -80,7 +80,7 @@ def main(argv):
                         help='How big the step size is for the minimum block presence.')
     parser.add_argument('--DESIRED_BLOCK', type=block_int, default=None, metavar='',
                         help='The desired block.')
-    parser.add_argument('--SHOW_ONLY_PLACED', type=boolean_string, default=True, metavar='',
+    parser.add_argument('--ONLY_SHOW_PLACED', type=boolean_string, default=True, metavar='',
                         help='Shows only the blocks that were placed in the shape in front of the shape')
 
 

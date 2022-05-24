@@ -95,17 +95,10 @@ class MinecraftBreeder(object):
                 shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
 
             shape_set = (list(set(map(lambda x: BlockType.values()[x.type], shape))))
-            # sorted_block_list = []
-            # for i in range(len(shape_set)):
-            #     sorted_block_list.append(shape_set[i])
-            # for i in range(len(genome.block_list)):
-            #     if(not genome.block_list[i] in shape_set):
-            #         sorted_block_list.append(genome.block_list[i])
-            # genome.block_list = sorted_block_list
             print(genome.block_list)
 
             if self.args.BLOCK_LIST_EVOLVES:
-                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set)
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set,self.args.ONLY_SHOW_PLACED)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
             # Place the fences where the shape will appear
