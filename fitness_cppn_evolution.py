@@ -86,7 +86,7 @@ class FitnessEvolutionMinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shape))
 
             # SLIME is hard coded for now, but need to change/generalize later
-            genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], SLIME)
+            genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
 
             print("{}. {}: {}".format(n,genome_id,genome.fitness))
 

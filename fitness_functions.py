@@ -1,6 +1,6 @@
 from minecraft_pb2 import *
 
-def type_count(client, position_information, corner, block_type):
+def type_count(client, position_information, corner, args):
     """
     This function takes a starting corner as a parameter and goes 
     through all of the voxels in the space and counts the number of 
@@ -29,7 +29,7 @@ def type_count(client, position_information, corner, block_type):
     # The number of blocks is equal to the number of blocks in each coordinate times each other (x * y * z)
     block_count = 0
     for block in block_collection.blocks:
-        if block.type == block_type:
+        if block.type == args.DESIRED_BLOCK:
             block_count += 1
 
     return block_count        
