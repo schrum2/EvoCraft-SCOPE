@@ -38,13 +38,12 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
         else:
             block_options = genome.block_list
 
-        
         shape = []
         presence_threshold = args.PRESENCE_THRESHOLD
         done = False
-        print(args.MINIMUM_REQUIRED_BLOCKS)
+        #print(args.MINIMUM_REQUIRED_BLOCKS)
         while not done:
-            print(done)
+            #print(done)
             for xi in range(position_information["xrange"]):
                 x = util.scale_and_center(xi,position_information["xrange"])
                 for yi in range(position_information["yrange"]):
@@ -54,14 +53,14 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
                         scaled_point = (x, y, z)
                         change = (xi, yi, zi)
                         # Ignores direction and stop results from 3-tuple result
-                        (block, _, _) = generate_block(net, corner, args, block_options, scaled_point, change)
+                        (block, _, _) = generate_block(net, corner, args, block_options, scaled_point, change, presence_threshold)
                         if block is not None:
                             shape.append(block)
             
             if args.USE_MIN_BLOCK_REQUIREMENT: 
-                print('the size of the shape is: {}'.format(len(shape)))
+                #print('the size of the shape is: {}'.format(len(shape)))
                 done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS
-                print('the minimum required blocks is: {}'.format(args.MINIMUM_REQUIRED_BLOCKS))
+                #print('the minimum required blocks is: {}'.format(args.MINIMUM_REQUIRED_BLOCKS))
                 #print('reached the inside if statement')
             else: 
                 done = True
@@ -70,9 +69,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
                 #print(done)
             
             if not done: presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT 
-            
 
-            
         if(len(shape) == 0):
             print("Genome at corner {} is empty".format(corner))
         else:
@@ -82,7 +79,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         return shape
 
-def generate_block(net, corner, args, block_options, scaled_point, change): 
+def generate_block(net, corner, args, block_options, scaled_point, change, presence_threshold): 
     """
     Returns a block to generate if it is present at a specific position and None
     if it isn't
@@ -94,6 +91,7 @@ def generate_block(net, corner, args, block_options, scaled_point, change):
     block_options ([Block]): List of blocks that can be spawned in 
     scaled_point (int, int, int): three-tuple of the position being looked at
     change (int, int, int): three-tuple used to scale the position of the point
+    presence_threshold (float): CPPN presence output must exceed this to generate a block at any location
 
     Returns:
     ((Block), (int,int,int), (bool)): Returns a tuple, including a block if it is present, None otherwise;
@@ -103,18 +101,16 @@ def generate_block(net, corner, args, block_options, scaled_point, change):
     # math.sqrt(2) is the usual scaling for radial distances in CPPNs
     center_dist = util.distance((scaled_point[0],scaled_point[1],scaled_point[2]),(0,0,0))
     output = net.activate([scaled_point[0], scaled_point[1], scaled_point[2], center_dist * math.sqrt(2), 1.0])
-                    
-    # First output determines whether there is a block at all.
-    # If there is a block, argmax determines the max value and places the specified block 
-    # from the list of possible blocks
-    presence_threshold = args.PRESENCE_THRESHOLD 
-                    
+
     if args.DISTANCE_PRESENCE_THRESHOLD:
         presence_threshold = args.DISTANCE_PRESENCE_MULTIPLIER * center_dist                            
 
     #print("block_options {}".format(block_options))
     #print("Outputs: {}".format(output))
 
+    # First output determines whether there is a block at all.
+    # If there is a block, argmax determines the max value and places the specified block 
+    # from the list of possible blocks
     # Only generate non-air blocks by returning the block. If there is no
     # block, return None
     if output[0] >= presence_threshold: 
@@ -148,7 +144,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     
     # Create CPPN out of genome
     net = neat.nn.FeedForwardNetwork.create(genome, config)
-        
+    presence_threshold = args.PRESENCE_THRESHOLD
     done = False
 
     number_of_iterations = 0
@@ -174,7 +170,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         scaled_point = (x, y, z)
         change = (xi, yi, zi)
 
-        (block, direction, stop) = generate_block(net, corner, args, block_options, scaled_point, change)
+        (block, direction, stop) = generate_block(net, corner, args, block_options, scaled_point, change, presence_threshold)
 
         #print("Returned direction: {}".format(direction))
 
