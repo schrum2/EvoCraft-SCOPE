@@ -34,6 +34,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
         """
         super().configure_new(config)
         # The number of blocks in the list is one less than the number of outputs (since the first determines presence)
+        # POTENTIAL_BLOCK_TYPE_LIST contains all types of blocks that can be generated and is influenced by the command line parameter
         self.block_list = random.sample(POTENTIAL_BLOCK_TYPE_LIST, BLOCK_LIST_LENGTH)
         # print("genome_id=",self.key)
         # print("newly configured block list: ",self.block_list)
@@ -80,7 +81,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
         r = random.uniform(0.0,1.0) 
         if(r<BLOCK_CHANGE_PROBABILITY):
             random_int = random.randint(0,len(self.block_list)-1) 
-            self.block_list[random_int] = random.choice(list(mc.BlockType.values()))
+            self.block_list[random_int] = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
         # print("Block_list after mutation:",self.block_list)
         # print("--------------------------------------------")
 
