@@ -85,9 +85,9 @@ class FitnessEvolutionMinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
 
-            # SLIME is hard coded for now, but need to change/generalize later
-            genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
-
+            #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
+            genome.fitness = ff.type_target(self.client, self.position_information, self.corners[n], self.args)
+            
             print("{}. {}: {}".format(n,genome_id,genome.fitness))
 
     # End of FitnessEvolutionMinecraftBreeder                                                                                                            

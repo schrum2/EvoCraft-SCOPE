@@ -10,7 +10,7 @@ def type_count(client, position_information, corner, args):
     client (MinecraftServiceStub): Minecraft server stub being used.
     position_information (dict): Dictionary containing location related information.
     corner ((int, int, int)): Starting coordinates for search area.
-    block_type (Block): Block being searched for.
+    args (argparse.Namespace): A collection of argument values collected at the command line.
 
     Returns:
     int: The number of occurences of the specified block.
@@ -34,4 +34,23 @@ def type_count(client, position_information, corner, args):
 
     return block_count        
 
-#def eval_fitness(genomes, config, fitness):
+def type_target(client, position_information, corner, args):
+    """
+    This function function awards shapes that generate a specific number 
+    of occurrences of a particular block.
+
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): Dictionary containing location related information.
+    corner ((int, int, int)): Starting coordinates for search area.
+    args (argparse.Namespace): A collection of argument values collected at the command line.
+
+    Returns:
+    int: The absolute value of the desired block count minus the absolute value of the difference between the desired block count and the actual count.
+    """
+
+    # Get the number of desired blocks
+    current_block_count = type_count(client, position_information, corner, args)
+
+    # Calculate the fitness
+    return args.DESIRED_BLOCK_COUNT - abs((args.DESIRED_BLOCK_COUNT - current_block_count))
