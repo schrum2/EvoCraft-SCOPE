@@ -49,9 +49,9 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
                 for zi in range(position_information["zrange"]):
                     z = util.scale_and_center(zi,position_information["zrange"])
                     scaled_point = (x, y, z)
-                    change = (xi, yi, zi)
+                    intial_position = (xi, yi, zi)
                     # Ignores direction and stop results from 3-tuple result
-                    (block, _, _) = generate_block(net, position_information, corner, args, block_options, scaled_point, change)
+                    (block, _, _) = generate_block(net, position_information, corner, args, block_options, scaled_point, intial_position)
                     if block is not None:
                         shape.append(block)
         
@@ -64,7 +64,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         return shape
 
-def generate_block(net, position_information, corner, args, block_options, scaled_point, change): 
+def generate_block(net, position_information, corner, args, block_options, scaled_point, intial_position): 
     """
     Returns a block to generate if it is present at a specific position and None
     if it isn't
@@ -75,7 +75,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
     args (argparse.Namespace): a collection of argument values collected at the command line 
     block_options ([Block]): List of blocks that can be spawned in 
     scaled_point (int, int, int): three-tuple of the position being looked at
-    change (int, int, int): three-tuple used to scale the position of the point
+    intial_position (int, int, int): three-tuple used to scale the position of the point
 
     Returns:
     ((Block), (int,int,int), (bool)): Returns a tuple, including a block if it is present, None otherwise;
@@ -104,7 +104,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
         #print("Block prefs {}".format(block_preferences))
         output_val = util.argmax(block_preferences)
         assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
-        block = Block(position=Point(x=corner[0]+change[0], y=corner[1]+change[1], z=corner[2]+change[2]), type=block_options[output_val], orientation=NORTH)
+        block = Block(position=Point(x=corner[0]+intial_position[0], y=corner[1]+intial_position[1], z=corner[2]+intial_position[2]), type=block_options[output_val], orientation=NORTH)
     else:
         block = None
 
@@ -113,33 +113,53 @@ def generate_block(net, position_information, corner, args, block_options, scale
 
     if args.EVOLVE_SNAKE:
         direction_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
+        if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES:
+            for i in range(NUM_DIRECTIONS):
+                possible_direction = next_direction(i)
+                # intial_positions the value to any direction that is out of bounds to float('-inf')
+                if check_out_of_bounds(intial_position, possible_direction, position_information):
+                    direction_preferences[i] = float('-inf')
+
+        if args.CONFINE_SNAKES and args.STOP_CONFINED_SNAKES:
+            # intial_positions stop to true when the snake goes out of bounds
+            # MOVE ABOVE!
+            if check_out_of_bounds(intial_position, possible_direction, position_information):
+                stop = True
+    else:
+        stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
         direction_index = util.argmax(direction_preferences)
-        print("Dir prefs before {}".format(direction_preferences))
+        direction = next_direction(direction_index)
 
-        for i in range(NUM_DIRECTIONS):
-            direction = next_direction(i)
-            if args.CONFINE_SNAKES:
-                if args.REDIRECT_CONFINED_SNAKES:
-                    # changes the value to any direction that is out of bounds to float('-inf')
-                    if (change[0] + direction[0] >= position_information["xrange"] or change[0] + direction[0] < 0) or (change[2] + direction[2] >= position_information["zrange"] or change[2] + direction[2] < 0):
-                        direction_preferences[i] = float('-inf')
-                        print("Dir prefs after {}".format(direction_preferences))
-                if args.STOP_CONFINED_SNAKES:
-                    # changes stop to true when the snake goes out of bounds
-                    if (change[0] + direction[0] >= position_information["xrange"] or change[0] + direction[0] < 0) or (change[1] + direction[1] >= position_information["yrange"] or change[1] + direction[1] < 0) or (change[2] + direction[2] >= position_information["zrange"] or change[2] + direction[2] < 0):
-                        stop = True
-                    else:
-                        stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
-        #print("DIRECTION! {}, {}, {}".format(direction,direction_preferences,direction_index))
         
-
-         
+        
 
     return (block, direction, stop)
 
+def check_out_of_bounds(intial_position, possible_direction, position_information):
+    """
+    Checks to see if the new possible position relative to the initial position is still
+    in bounds
+
+    Parameters:
+    initial_position (int, int, int): Three-tuple that represents initial position
+    possible_direction (int, int, int): Three-tuple that represents the change in from current position
+    position_information (dict): Dictionary that stores the x, y, and z starting points and ranges
+
+    Returns:
+    (bool): True if it is out of bounds, false otherwise
+    """
+    out_of_bounds = False
+    if intial_position[0] + possible_direction[0] >= position_information["xrange"] or intial_position[0] + possible_direction[0] < 0:
+        out_of_bounds = True
+    if intial_position[1] + possible_direction[1] >= position_information["yrange"] or intial_position[1] + possible_direction[1] < 0:
+        out_of_bounds = True
+    if intial_position[2] + possible_direction[2] >= position_information["zrange"] or intial_position[2] + possible_direction[2] < 0:
+        out_of_bounds = True
+
+    return out_of_bounds
 def next_direction(direction_index):
     """
-    Returns a tuple that represents the change in direction the next block
+    Returns a tuple that represents the intial_position in direction the next block
     will be placed
 
     Parameters:
@@ -198,9 +218,9 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         y = util.scale_and_center(yi,position_information["yrange"])
         z = util.scale_and_center(zi,position_information["zrange"])
         scaled_point = (x, y, z)
-        change = (xi, yi, zi)
+        intial_position = (xi, yi, zi)
 
-        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, change)
+        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, intial_position)
 
         #print("Returned direction: {}".format(direction))
 
