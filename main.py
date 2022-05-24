@@ -68,7 +68,7 @@ def main(argv):
                         help='The maximum length a snake-like structure can be when EVOLVE_SNAKE is true.')
     parser.add_argument('--CONFINE_SNAKES', type=boolean_string, default=True, metavar='',
                         help='Confines the snake generations so that they do not cross with other snakes.')
-    parser.add_argument('--REDIRECT_CONFINED_SNAKES', type=boolean_string, default=True, metavar='',
+    parser.add_argument('--REDIRECT_CONFINED_SNAKES', type=boolean_string, default=False, metavar='',
                         help='If the snake goes out of bounds, the direction will change so that it stays within bounds.')
     parser.add_argument('--STOP_CONFINED_SNAKES', type=boolean_string, default=False, metavar='',
                         help='If the snake goes out of bounds, the snake will stop rendering.')      

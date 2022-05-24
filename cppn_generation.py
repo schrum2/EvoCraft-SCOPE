@@ -94,14 +94,10 @@ def generate_block(net, position_information, corner, args, block_options, scale
     if args.DISTANCE_PRESENCE_THRESHOLD:
         presence_threshold = args.DISTANCE_PRESENCE_MULTIPLIER * center_dist                            
 
-    #print("block_options {}".format(block_options))
-    #print("Outputs: {}".format(output))
-
     # Only generate non-air blocks by returning the block. If there is no
     # block, return None
     if output[0] >= presence_threshold: 
         block_preferences = output[1:len(block_options)+1]
-        #print("Block prefs {}".format(block_preferences))
         output_val = util.argmax(block_preferences)
         assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
         block = Block(position=Point(x=corner[0]+initial_position[0], y=corner[1]+initial_position[1], z=corner[2]+initial_position[2]), type=block_options[output_val], orientation=NORTH)
@@ -127,7 +123,12 @@ def generate_block(net, position_information, corner, args, block_options, scale
                 if check_out_of_bounds(initial_position, possible_direction, position_information):
                     stop = True
         else:
-            stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
+            for i in range(NUM_DIRECTIONS):
+                possible_direction = next_direction(i)
+                if initial_position[1] + possible_direction[1] < 0 :
+                    stop = True
+                else:
+                    stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
 
     direction_index = util.argmax(direction_preferences)
     direction = next_direction(direction_index)
@@ -156,6 +157,7 @@ def check_out_of_bounds(initial_position, possible_direction, position_informati
         out_of_bounds = True
 
     return out_of_bounds
+
 def next_direction(direction_index):
     """
     Returns a tuple that represents the initial_position in direction the next block
@@ -212,7 +214,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     snake = []
     while not done:
         number_of_iterations += 1
-        print(number_of_iterations)
         x = util.scale_and_center(xi,position_information["xrange"])
         y = util.scale_and_center(yi,position_information["yrange"])
         z = util.scale_and_center(zi,position_information["zrange"])
@@ -226,9 +227,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
 
         # Once it has reach the maximum length, it should stop
         if(stop or number_of_iterations == args.MAX_SNAKE_LENGTH):
-            #print("Stoped")
             done = True
-            #print(done)
         else:
             xi += direction[0]
             yi += direction[1]
