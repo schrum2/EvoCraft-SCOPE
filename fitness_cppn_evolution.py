@@ -88,9 +88,13 @@ class FitnessEvolutionMinecraftBreeder(object):
             #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
             fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
             genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
-            
             print("{}. {}: {}".format(n,genome_id,genome.fitness))
 
+            # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
+            # also the program will stop executing after this loop ends since the threshold was met. 
+            if genome.fitness == config.fitness_threshold:
+                minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n], self.args)
+    
     # End of FitnessEvolutionMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':

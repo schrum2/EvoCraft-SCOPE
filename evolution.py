@@ -66,6 +66,9 @@ def run(args):
     pop.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
+    
+    #neat.save_genome_fitness(self, delimeter=' ', filename = 'fitness_history.csv')
+    #neat.save_genome_fitness()
 
     # Evolve forever: TODO: Add use means of stopping
     try:
