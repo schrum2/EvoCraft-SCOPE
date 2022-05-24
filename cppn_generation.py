@@ -12,6 +12,7 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
+# Number of total directions the snake can move in
 NUM_DIRECTIONS = 6
 
 def query_cppn_for_shape(genome, config, corner, position_information, args, block_list):
@@ -50,7 +51,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
                     scaled_point = (x, y, z)
                     change = (xi, yi, zi)
                     # Ignores direction and stop results from 3-tuple result
-                    (block, _, _) = generate_block(net, corner, args, block_options, scaled_point, change)
+                    (block, _, _) = generate_block(net, position_information, corner, args, block_options, scaled_point, change)
                     if block is not None:
                         shape.append(block)
         
@@ -63,7 +64,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         return shape
 
-def generate_block(net, corner, args, block_options, scaled_point, change): 
+def generate_block(net, position_information, corner, args, block_options, scaled_point, change): 
     """
     Returns a block to generate if it is present at a specific position and None
     if it isn't
@@ -112,15 +113,46 @@ def generate_block(net, corner, args, block_options, scaled_point, change):
 
     if args.EVOLVE_SNAKE:
         direction_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
-        #print("Dir prefs {}".format(direction_preferences))
         direction_index = util.argmax(direction_preferences)
-        direction = [0,0,0] # One for x,y,z, but starts as list because tuples are immutable
-        direction[direction_index % 3] = -1 if direction_index < 3 else 1
-        direction = tuple(direction)
+        print("Dir prefs before {}".format(direction_preferences))
+
+        for i in range(NUM_DIRECTIONS):
+            direction = next_direction(i)
+            if args.CONFINE_SNAKES:
+                if args.REDIRECT_CONFINED_SNAKES:
+                    # changes the value to any direction that is out of bounds to float('-inf')
+                    if (change[0] + direction[0] >= position_information["xrange"] or change[0] + direction[0] < 0) or (change[2] + direction[2] >= position_information["zrange"] or change[2] + direction[2] < 0):
+                        direction_preferences[i] = float('-inf')
+                        print("Dir prefs after {}".format(direction_preferences))
+                if args.STOP_CONFINED_SNAKES:
+                    # changes stop to true when the snake goes out of bounds
+                    if (change[0] + direction[0] >= position_information["xrange"] or change[0] + direction[0] < 0) or (change[1] + direction[1] >= position_information["yrange"] or change[1] + direction[1] < 0) or (change[2] + direction[2] >= position_information["zrange"] or change[2] + direction[2] < 0):
+                        stop = True
+                    else:
+                        stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
         #print("DIRECTION! {}, {}, {}".format(direction,direction_preferences,direction_index))
-        stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
+        
+
+         
 
     return (block, direction, stop)
+
+def next_direction(direction_index):
+    """
+    Returns a tuple that represents the change in direction the next block
+    will be placed
+
+    Parameters:
+    direction_index (int): The index in the direction preferences list
+
+    Returns:
+    (int, int, int): Three-Tuple that represents the next direction the next block
+                     should be placed
+    """
+    direction = [0,0,0] # One for x,y,z, but starts as list because tuples are immutable
+    direction[direction_index % 3] = -1 if direction_index < 3 else 1
+    direction = tuple(direction)
+    return direction
 
 def query_cppn_for_snake_shape(genome, config, corner, position_information, args, block_list):
     """
@@ -168,7 +200,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         scaled_point = (x, y, z)
         change = (xi, yi, zi)
 
-        (block, direction, stop) = generate_block(net, corner, args, block_options, scaled_point, change)
+        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, change)
 
         #print("Returned direction: {}".format(direction))
 
