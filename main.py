@@ -114,6 +114,7 @@ def main(argv):
     if args.NUM_EVOLVED_BLOCK_LIST_TYPES < 2:
         raise ValueError("Block list size must at least two.")
     
+    
     if not args.INTERACTIVE_EVOLUTION:
         is_function = getattr(ff, args.FITNESS_FUNCTION)
    

@@ -60,11 +60,34 @@ class CustomBlocksGenome(neat.DefaultGenome):
         index = 0
         while(index<len(genome1.block_list)):
             rand_choice = random.uniform(0.0,1.0)
-            if(rand_choice<.5):
-                self.block_list.append(genome1.block_list[index])
+            if(PREVENT_DUPLICATES):
+                if(rand_choice<.5):
+                    if(not genome1.block_list[index] in self.block_list):
+                        self.block_list.append(genome1.block_list[index])
+                    elif(not genome2.block_list[index] in self.block_list):
+                        self.block_list.append(genome2.block_list[index])
+                    else:
+                        random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+                        while(random_block in self.block_list):
+                            random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+                        self.block_list.append(random_block)
+                else:
+                    if(not genome2.block_list[index] in self.block_list):
+                        self.block_list.append(genome2.block_list[index])
+                    elif(not genome1.block_list[index] in self.block_list):
+                        self.block_list.append(genome1.block_list[index])
+                    else:
+                        random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+                        while(random_block in self.block_list):
+                            random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+                        self.block_list.append(random_block)
             else:
-                self.block_list.append(genome2.block_list[index])
+                if(rand_choice<.5):
+                    self.block_list.append(genome1.block_list[index])
+                else:
+                    self.block_list.append(genome2.block_list[index])
             index = index + 1
+
         # print("New block list: ",self.block_list)
         # print("--------------------------------------------")
                
@@ -81,8 +104,14 @@ class CustomBlocksGenome(neat.DefaultGenome):
         super().mutate(config)
         global BLOCK_CHANGE_PROBABILITY
         r = random.uniform(0.0,1.0) 
-        if(r<BLOCK_CHANGE_PROBABILITY):
-            random_int = random.randint(0,len(self.block_list)-1) 
+        random_int = random.randint(0,len(self.block_list)-1) 
+        if(r<BLOCK_CHANGE_PROBABILITY and PREVENT_DUPLICATES and len(self.block_list)<len(POTENTIAL_BLOCK_TYPE_LIST)):
+            random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+            while(random_block in self.block_list):
+                print(random_block)
+                random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+            self.block_list[random_int] = random_block
+        elif(r<BLOCK_CHANGE_PROBABILITY):
             self.block_list[random_int] = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
         # print("Block_list after mutation:",self.block_list)
         # print("--------------------------------------------")
