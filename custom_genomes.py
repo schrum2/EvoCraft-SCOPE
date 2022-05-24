@@ -43,7 +43,10 @@ class CustomBlocksGenome(neat.DefaultGenome):
     def configure_crossover(self, genome1, genome2, config):
         """
         Randomly selects one block list from the two genomes using multi-point crossover,
-        also configues the rest of the default genome
+        also configues the rest of the default genome. If PREVENT_DUPLICATES is on, it ensures
+        no duplicates are added by comparing anything that could be added to the block_list to
+        itself to ensure nothing else is added. If both blocks from both genome 1 dn 2 are in 
+        the block_list, it generates a new random block until a non-duplicate is added.
 
         Parameters:
         genome1 (custom_genomes.CustomBlocksGenome): the first genome to take blocks from
@@ -62,25 +65,9 @@ class CustomBlocksGenome(neat.DefaultGenome):
             rand_choice = random.uniform(0.0,1.0)
             if(PREVENT_DUPLICATES):
                 if(rand_choice<.5):
-                    if(not genome1.block_list[index] in self.block_list):
-                        self.block_list.append(genome1.block_list[index])
-                    elif(not genome2.block_list[index] in self.block_list):
-                        self.block_list.append(genome2.block_list[index])
-                    else:
-                        random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
-                        while(random_block in self.block_list):
-                            random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
-                        self.block_list.append(random_block)
+                    self.append_block_no_duplicates(genome1, genome2, index)
                 else:
-                    if(not genome2.block_list[index] in self.block_list):
-                        self.block_list.append(genome2.block_list[index])
-                    elif(not genome1.block_list[index] in self.block_list):
-                        self.block_list.append(genome1.block_list[index])
-                    else:
-                        random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
-                        while(random_block in self.block_list):
-                            random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
-                        self.block_list.append(random_block)
+                    self.append_block_no_duplicates(genome2, genome1, index)
             else:
                 if(rand_choice<.5):
                     self.block_list.append(genome1.block_list[index])
@@ -88,13 +75,37 @@ class CustomBlocksGenome(neat.DefaultGenome):
                     self.block_list.append(genome2.block_list[index])
             index = index + 1
 
+    def append_block_no_duplicates(self, genome_a, genome_b, index):
+        """
+        Helper method extracted from configure_crossover. Checks if genome a isn't a duplicate
+        if it is, then checks genome b. If it also is, then appends a random block that isn't 
+        already in the list
+
+        Parameters:
+        genome_a (custom_genomes.CustomBlocksGenome): the first genome to take blocks from
+        genome_b (custom_genomes.CustomBlocksGenome): the second genome to take blocks from
+        index (int): index to take block from 
+        """
+        if(not genome_a.block_list[index] in self.block_list):
+            self.block_list.append(genome_a.block_list[index])
+        elif(not genome_b.block_list[index] in self.block_list):
+            self.block_list.append(genome_b.block_list[index])
+        else:
+            random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+            while(random_block in self.block_list):
+                random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
+            self.block_list.append(random_block)
+
         # print("New block list: ",self.block_list)
         # print("--------------------------------------------")
                
     def mutate(self, config):
         """
         Based on BLOCK_CHANGE_PROBABILITY, if the random condition is satisfied, selects a random index 
-        and replaces it with a new random block. Also mutates the rest of the default genome
+        and replaces it with a new random block. Also mutates the rest of the default genome. If 
+        PREVENT_DUPLICATES is on, it first checks that the block list is short enough to allow for 
+        duplicates. If it is, it generates a new block, then checks to make sure that block type isn't
+        already in the list. Once a lock type is found, it is added to the list
 
         Parameters:
         config (neat.genome.DefaultGenomeConfig): Configuration for the default genome
