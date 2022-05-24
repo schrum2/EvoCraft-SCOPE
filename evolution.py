@@ -21,6 +21,7 @@ def run(args):
         config_file = 'cppn_minecraft_custom_blocks_config' if args.INTERACTIVE_EVOLUTION else 'cppn_minecraft_fitness_custom_blocks_config'
         block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
         cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
+        cg.BLOCK_LIST_LENGTH = block_list_length
         #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
     if args.INTERACTIVE_EVOLUTION:
@@ -51,6 +52,8 @@ def run(args):
     # Evolved snakes have 7 additional outputs.
     config.genome_config.num_outputs = block_list_length + 1 + (7 if args.EVOLVE_SNAKE else 0)
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
+
+    print("CPPNs will have {} output neurons".format(config.genome_config.num_outputs))
 
     pop = neat.Population(config)
 
