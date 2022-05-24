@@ -7,6 +7,7 @@ from os.path import exists
 from os import mkdir
 from minecraft_pb2 import *
 import fitness_functions as ff
+import block_sets
 def boolean_string(s):
     """
     Checks a string that should only be either True or False and converts to associated boolean.
@@ -119,7 +120,9 @@ def main(argv):
 
     if args.NUM_EVOLVED_BLOCK_LIST_TYPES < 2:
         raise ValueError("Block list size must at least two.")
-    
+
+    if args.PREVENT_DUPLICATE_BLOCK_TYPES and args.NUM_EVOLVED_BLOCK_LIST_TYPES<len(block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)):
+        raise ValueError("Block list size is too small to not have duplicates.")
     
     if not args.INTERACTIVE_EVOLUTION:
         try: is_function = getattr(ff, args.FITNESS_FUNCTION)
