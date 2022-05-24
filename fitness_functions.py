@@ -16,15 +16,14 @@ def type_count(client, position_information, corner, args):
     int: The number of occurences of the specified block.
     """
     # return the max value fitness threshold if client is none
-
+    # XRANGE * YRANGE * ZRANGE gives the max threshold since that would be the volume of the shape if all the blocks were non air blocks.
+    if client is None: return args.XRANGE * args.YRANGE * args.ZRANGE
+    
+    # get the ending coordinates for x, y, and z
     endx= corner[0] + position_information["xrange"]
     endy= corner[1] + position_information["yrange"]
     endz= corner[2] + position_information["zrange"]
     
-    if client is None: 
-        max_fitness_threshold = endx * endy * endz
-        return max_fitness_threshold
-
     # read all the blocks at once as one big block
     block_collection = client.readCube(Cube(
         min=Point(x=corner[0], y=corner[1], z=corner[2]),
@@ -54,8 +53,9 @@ def type_target(client, position_information, corner, args):
     int: The absolute value of the desired block count minus the absolute value of the difference between the desired block count and the actual count.
     """
     # return the max value if client is none
-    #if client is None: return 
-
+    # args.DESIRED_BLOCK_COUNT would be the max threshold since that is the exact value of blocks that the shapes are measured against. 
+    if client is None: return args.DESIRED_BLOCK_COUNT
+    
     # Get the number of desired blocks
     current_block_count = type_count(client, position_information, corner, args)
 

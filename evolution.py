@@ -48,8 +48,10 @@ def run(args):
         config.fitness_threshold = 1.01
     else:
         # TODO: Change this so it is set depending on the specific fitness function used.
-        config.fitness_threshold = ff.args.FITNESS_FUNCTION(None, position_information, corner, args)
-
+        # At this point, any invalid fitness function name would have been caught in main.
+        fit_function = getattr(ff, args.FITNESS_FUNCTION)
+        config.fitness_threshold = fit_function(None, mc.position_information, None, args)
+        #config.fitness_threshold = 1000
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. 
     # Evolved snakes have 7 additional outputs.

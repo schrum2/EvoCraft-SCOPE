@@ -86,7 +86,8 @@ class FitnessEvolutionMinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shape))
 
             #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
-            genome.fitness = ff.type_target(self.client, self.position_information, self.corners[n], self.args)
+            fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
+            genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
             
             print("{}. {}: {}".format(n,genome_id,genome.fitness))
 
