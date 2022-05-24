@@ -254,7 +254,7 @@ def place_number(client,position_information,corner,num):
 
     client.spawnBlocks(Blocks(blocks=number))
 
-def place_blocks_in_block_list(block_list,client,corners,position_information):
+def place_blocks_in_block_list(block_list,client,corners,position_information,shape_set):
     """
     Takes in the block list from a genome and places instances of each of the blocks
     in front of the generated shape.
@@ -273,16 +273,19 @@ def place_blocks_in_block_list(block_list,client,corners,position_information):
 
     while(index<len(block_list)):
         # Generates blovk at the specified index, places emerald block underneath it
-        generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
-        blocks_in_list.append(generated_block)
-        blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=EMERALD_BLOCK, orientation=NORTH))
+        print(block_list)
+        print(shape_set)
+        if(block_list[index] in shape_set):
+            generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
+            blocks_in_list.append(generated_block)
+            blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=EMERALD_BLOCK, orientation=NORTH))
 
-        # If the block is lava or water, places a box around it
-        if(generated_block.type==LAVA or generated_block.type==WATER or generated_block.type==FLOWING_LAVA or generated_block.type==FLOWING_WATER):
-            blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
-            blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
-            blocks_in_list.append(Block(position=Point(x=corners[0]+x+1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
-            blocks_in_list.append(Block(position=Point(x=corners[0]+x-1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
+            # If the block is lava or water, places a box around it
+            if(generated_block.type==LAVA or generated_block.type==WATER or generated_block.type==FLOWING_LAVA or generated_block.type==FLOWING_WATER):
+                blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
+                blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
+                blocks_in_list.append(Block(position=Point(x=corners[0]+x+1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
+                blocks_in_list.append(Block(position=Point(x=corners[0]+x-1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
 
         index=index+1
         x=x+2 # x increase by two for a one block gap
