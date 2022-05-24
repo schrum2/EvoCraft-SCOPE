@@ -24,7 +24,7 @@ def run(args):
         block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
         cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
         cg.BLOCK_LIST_LENGTH = block_list_length
-        cg.POTENTIAL_BLOCK_TYPE_LIST = block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)
+        cg.POTENTIAL_BLOCK_TYPE_LIST = block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET) # for sending specified block set to custom genome
         #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
     if args.INTERACTIVE_EVOLUTION:

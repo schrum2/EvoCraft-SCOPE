@@ -34,15 +34,12 @@ class CustomBlocksGenome(neat.DefaultGenome):
         """
         super().configure_new(config)
         # The number of blocks in the list is one less than the number of outputs (since the first determines presence)
+        # POTENTIAL_BLOCK_TYPE_LIST contains all types of blocks that can be generated and is influenced by the command line parameter
         self.block_list = random.sample(POTENTIAL_BLOCK_TYPE_LIST, BLOCK_LIST_LENGTH)
         # print("genome_id=",self.key)
         # print("newly configured block list: ",self.block_list)
         
     def configure_crossover(self, genome1, genome2, config):
-        # print("genome_id=",self.key)
-        # print("genome_block_list 1: ",genome1.block_list)
-        # print("genome_block_list 2: ",genome2.block_list)
-        # print()
         """
         Randomly selects one block list from the two genomes using multi-point crossover,
         also configues the rest of the default genome
@@ -53,6 +50,11 @@ class CustomBlocksGenome(neat.DefaultGenome):
         config (neat.genome.DefaultGenomeConfig): Configuration for the default genome
 
         """
+        # print("genome_id=",self.key)
+        # print("genome_block_list 1: ",genome1.block_list)
+        # print("genome_block_list 2: ",genome2.block_list)
+        # print()
+
         super().configure_crossover(genome1, genome2, config)
         index = 0
         while(index<len(genome1.block_list)):
@@ -66,8 +68,6 @@ class CustomBlocksGenome(neat.DefaultGenome):
         # print("--------------------------------------------")
                
     def mutate(self, config):
-        # print("genome_id=",self.key)
-        # print("Block_list before mutation:",self.block_list)
         """
         Based on BLOCK_CHANGE_PROBABILITY, if the random condition is satisfied, selects a random index 
         and replaces it with a new random block. Also mutates the rest of the default genome
@@ -75,12 +75,14 @@ class CustomBlocksGenome(neat.DefaultGenome):
         Parameters:
         config (neat.genome.DefaultGenomeConfig): Configuration for the default genome
         """
+        # print("genome_id=",self.key)
+        # print("Block_list before mutation:",self.block_list)
         super().mutate(config)
         global BLOCK_CHANGE_PROBABILITY
         r = random.uniform(0.0,1.0) 
         if(r<BLOCK_CHANGE_PROBABILITY):
             random_int = random.randint(0,len(self.block_list)-1) 
-            self.block_list[random_int] = random.choice(list(mc.BlockType.values()))
+            self.block_list[random_int] = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
         # print("Block_list after mutation:",self.block_list)
         # print("--------------------------------------------")
 
