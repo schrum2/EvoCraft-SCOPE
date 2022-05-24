@@ -81,7 +81,11 @@ def run(args):
             generations = 1000
             print("Evolve for {} generations".format(generations))
             pop.run(mc.eval_fitness, generations)
+
     finally:
+        stats.save()
+        stats.save_genome_fitness(with_cross_validation=False)
+    
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
             minecraft_structures.restore_ground(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)
