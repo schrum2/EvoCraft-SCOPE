@@ -5,10 +5,12 @@ import neat
 
 # for Minecraft
 import minecraft_pb2 as mc
+import block_sets
 
-# Must be set in evolve_CPPN.py
+# Must be set in evolution.py
 BLOCK_CHANGE_PROBABILITY = 0.0
 BLOCK_LIST_LENGTH = 0
+POTENTIAL_BLOCK_TYPE_LIST = []
 
 class CustomBlocksGenome(neat.DefaultGenome):
     def __init__(self, key):
@@ -32,7 +34,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
         """
         super().configure_new(config)
         # The number of blocks in the list is one less than the number of outputs (since the first determines presence)
-        self.block_list = random.sample(list(mc.BlockType.values()), BLOCK_LIST_LENGTH)
+        self.block_list = random.sample(POTENTIAL_BLOCK_TYPE_LIST, BLOCK_LIST_LENGTH)
         # print("genome_id=",self.key)
         # print("newly configured block list: ",self.block_list)
         
