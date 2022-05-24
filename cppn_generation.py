@@ -136,6 +136,7 @@ def generate_block(net, corner, args, block_options, scaled_point, change):
         direction = [0,0,0] # One for x,y,z, but starts as list because tuples are immutable
         direction[direction_index % 3] = -1 if direction_index < 3 else 1
         direction = tuple(direction)
+        #print("DIRECTION! {}, {}, {}".format(direction,direction_preferences,direction_index))
         stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
 
     return (block, direction, stop)
@@ -150,6 +151,8 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         
     done = False
 
+    number_of_iterations = 0
+
     # If not evolving block list, use the static one specified earlier. Otherwise, use the genome's list
     if not args.BLOCK_LIST_EVOLVES:
         block_options = block_list
@@ -160,26 +163,46 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     xi = int(position_information["xrange"]/2)
     yi = int(position_information["yrange"]/2)
     zi = int(position_information["zrange"]/2)
-    change = (xi, yi, zi)
 
     snake = []
     while not done:
+        number_of_iterations += 1
+        print(number_of_iterations)
         x = util.scale_and_center(xi,position_information["xrange"])
         y = util.scale_and_center(yi,position_information["yrange"])
         z = util.scale_and_center(zi,position_information["zrange"])
         scaled_point = (x, y, z)
+        change = (xi, yi, zi)
 
         (block, direction, stop) = generate_block(net, corner, args, block_options, scaled_point, change)
+
+        #print("Returned direction: {}".format(direction))
+
         if block is not None:
-            print("block is not None")
+            #print("block is not None")
             snake.append(block)
 
+
+        #print("Stop? : {}".format(stop))
+        #print("Length of snake: {}".format(len(snake)))
+        #print("Snake contains {} blocks".format(snake))
+
+
+        #print("Before: ({},{},{})".format(xi,yi,zi))
+
         # Once it has reach the maximum length, it should stop
-        if(stop or len(snake) == args.MAX_SNAKE_LENGTH):
+        if(stop or number_of_iterations == args.MAX_SNAKE_LENGTH):
+            #print("Stoped")
             done = True
+            #print(done)
         else:
-            xi = direction[0]
-            yi = direction[1]
-            zi = direction[2]
+            xi += direction[0]
+            yi += direction[1]
+            zi += direction[2]
+
+        
+
+    
+        #print("After : ({},{},{})".format(xi,yi,zi))
 
     return snake
