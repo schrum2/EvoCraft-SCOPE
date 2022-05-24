@@ -1,13 +1,12 @@
 import argparse
-import string
 import sys
+from tokenize import String
 import evolution
 import random
 from os.path import exists
 from os import mkdir
 from minecraft_pb2 import *
-
-
+import fitness_functions as ff
 def boolean_string(s):
     """
     Checks a string that should only be either True or False and converts to associated boolean.
@@ -82,10 +81,11 @@ def main(argv):
                         help='The desired block.')
     parser.add_argument('--DESIRED_BLOCK_COUNT', type=int, metavar='',
                         help='The desired block count of a specific block.')
-
+    parser.add_argument('--FITNESS_FUNCTION', type=str, metavar='',
+                        help='The desired block count of a specific block.')
 
     args = parser.parse_args()
-
+   
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
         raise ValueError("BLOCK_CHANGE_PROBABILITY must be in range [0,1].")
 
@@ -109,9 +109,17 @@ def main(argv):
 
     if args.NUM_EVOLVED_BLOCK_LIST_TYPES < 2:
         raise ValueError("Block list size must at least two.")
+    
+    if not args.INTERACTIVE_EVOLUTION:
+        is_function = getattr(ff, args.FITNESS_FUNCTION)
+   
 
     random.seed(args.RANDOM_SEED)
-        
+    
+    
+    #if not args.FITNESS_FUNCTION in dir(ff): 
+     #   print('The fitness function name you have given does not exist.')
+    
     evolution.run(args)
 
 if __name__ == '__main__':
