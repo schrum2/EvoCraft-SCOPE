@@ -73,7 +73,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         return shape
 
-def generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position): 
+def generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold): 
     """
     Returns a block to generate if it is present at a specific position and None
     if it isn't
@@ -94,11 +94,6 @@ def generate_block(net, position_information, corner, args, block_options, scale
     # math.sqrt(2) is the usual scaling for radial distances in CPPNs
     center_dist = util.distance((scaled_point[0],scaled_point[1],scaled_point[2]),(0,0,0))
     output = net.activate([scaled_point[0], scaled_point[1], scaled_point[2], center_dist * math.sqrt(2), 1.0])
-                    
-    # First output determines whether there is a block at all.
-    # If there is a block, argmax determines the max value and places the specified block 
-    # from the list of possible blocks
-    presence_threshold = args.PRESENCE_THRESHOLD 
                     
     if args.DISTANCE_PRESENCE_THRESHOLD:
         presence_threshold = args.DISTANCE_PRESENCE_MULTIPLIER * center_dist                            
@@ -139,8 +134,8 @@ def generate_block(net, position_information, corner, args, block_options, scale
                 else:
                     stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
 
-    direction_index = util.argmax(direction_preferences)
-    direction = next_direction(direction_index)
+        direction_index = util.argmax(direction_preferences)
+        direction = next_direction(direction_index)
 
     return (block, direction, stop)
 
@@ -215,6 +210,11 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     else:
         block_options = genome.block_list
     
+    # Why is this separated out when args is already passed as a parameter?
+    # For regular shape generation, this is required to make USE_MIN_BLOCK_REQUIREMENT
+    # work. Such an option may also be used here eventually.
+    presence_threshold = args.PRESENCE_THRESHOLD
+
     # Used to scale the point
     xi = int(position_information["xrange"]/2)
     yi = int(position_information["yrange"]/2)
@@ -229,7 +229,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         scaled_point = (x, y, z)
         initial_position = (xi, yi, zi)
 
-        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position)
+        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold)
 
         if block is not None:
             snake.append(block)
