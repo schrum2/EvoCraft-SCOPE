@@ -273,8 +273,6 @@ def place_blocks_in_block_list(block_list,client,corners,position_information,sh
 
     while(index<len(block_list)):
         # Generates blovk at the specified index, places emerald block underneath it
-        print(block_list)
-        print(shape_set)
         if(block_list[index] in shape_set):
             generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
             blocks_in_list.append(generated_block)
