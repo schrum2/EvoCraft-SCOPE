@@ -65,6 +65,12 @@ def main(argv):
                         help='Changes the CPPN to generate snake-like structures.')
     parser.add_argument('--MAX_SNAKE_LENGTH', type=int, default=100, metavar='',
                         help='The maximum length a snake-like structure can be when EVOLVE_SNAKE is true.')
+    parser.add_argument('--CONFINE_SNAKES', type=boolean_string, default=True, metavar='',
+                        help='Confines the snake generations so that they do not cross with other snakes.')
+    parser.add_argument('--REDIRECT_CONFINED_SNAKES', type=boolean_string, default=False, metavar='',
+                        help='If the snake goes out of bounds, the direction will change so that it stays within bounds.')
+    parser.add_argument('--STOP_CONFINED_SNAKES', type=boolean_string, default=False, metavar='',
+                        help='If the snake goes out of bounds, the snake will stop rendering.')      
     parser.add_argument('--CONTINUATION_THRESHOLD', type=float, default=0.5, metavar='',
                         help='The maximum length a snake-like structure can be when EVOLVE_SNAKE is true.')
     parser.add_argument('--INTERACTIVE_EVOLUTION', type=boolean_string, default=True, metavar='',
