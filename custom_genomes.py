@@ -11,6 +11,7 @@ import block_sets
 BLOCK_CHANGE_PROBABILITY = 0.0
 BLOCK_LIST_LENGTH = 0
 POTENTIAL_BLOCK_TYPE_LIST = []
+PREVENT_DUPLICATES = False
 
 class CustomBlocksGenome(neat.DefaultGenome):
     def __init__(self, key):
