@@ -77,6 +77,7 @@ class MinecraftBreeder(object):
         """            
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
         selected = []
+        all_blocks = []
         
         #print(block_sets.select_possible_block_sets(self.args.POTENTIAL_BLOCK_SET))
         # This loop could be parallelized
@@ -101,6 +102,8 @@ class MinecraftBreeder(object):
                 minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set,self.args.ONLY_SHOW_PLACED)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
+            # Remember block locations in order to clear them out later
+            all_blocks.extend(shape) # Blocks from all shapes in one flat list
             # Place the fences where the shape will appear
             minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
 
@@ -150,8 +153,8 @@ class MinecraftBreeder(object):
                                     print(genome.block_list)
                                     # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
                                     genome.block_list[i]=read_current_blocks[n][i]
-                                    shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
-                                    self.client.spawnBlocks(Blocks(blocks=shape))
+                                    new_shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+                                    self.client.spawnBlocks(Blocks(blocks=new_shape))
 
         else:
             # Controlled externally by keyboard
@@ -181,6 +184,14 @@ class MinecraftBreeder(object):
             elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
             print("{} elite survivors".format(elite_count))
             config.reproduction_config.elitism = elite_count
+
+        # Take the originally generated shape and replace each block with AIR,
+        # then spawn the blocks to clear the previous shape, even if parts were
+        # out of bounds (mainly an issue for snakes)
+        for s in all_blocks:
+            s.type = AIR
+
+        self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
     # End of MinecraftBreeder                                                                                                            
 
