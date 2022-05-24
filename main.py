@@ -79,7 +79,7 @@ def main(argv):
                         help='How big the step size is for the minimum block presence.')
     parser.add_argument('--DESIRED_BLOCK', type=block_int, default=None, metavar='',
                         help='The desired block.')
-    parser.add_argument('--DESIRED_BLOCK_COUNT', type=int, metavar='',
+    parser.add_argument('--DESIRED_BLOCK_COUNT', type=int, default=0, metavar='',
                         help='The desired block count of a specific block.')
     parser.add_argument('--FITNESS_FUNCTION', type=str, metavar='',
                         help='The desired block count of a specific block.')
