@@ -94,6 +94,8 @@ def main(argv):
                         help='Shows only the blocks that were placed in the shape in front of the shape')
     parser.add_argument('--PREVENT_DUPLICATE_BLOCK_TYPES', type=boolean_string, default=True, metavar='',
                         help='Shows only the blocks that were placed in the shape in front of the shape')
+    parser.add_argument('--EVOLVE_ORIENTATION', type=boolean_string, default=False, metavar='',
+                        help='Evloves the orientation of the blocks')
 
     args = parser.parse_args()
    
@@ -121,7 +123,7 @@ def main(argv):
     if args.NUM_EVOLVED_BLOCK_LIST_TYPES < 2:
         raise ValueError("Block list size must at least two.")
 
-    if args.PREVENT_DUPLICATE_BLOCK_TYPES and args.NUM_EVOLVED_BLOCK_LIST_TYPES<len(block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)):
+    if args.PREVENT_DUPLICATE_BLOCK_TYPES and args.NUM_EVOLVED_BLOCK_LIST_TYPES>len(block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)):
         raise ValueError("Block list size is too small to not have duplicates.")
     
     if not args.INTERACTIVE_EVOLUTION:
