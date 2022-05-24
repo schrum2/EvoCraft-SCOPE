@@ -73,8 +73,8 @@ def main(argv):
                         help='Whether or not to use the minimum required block requirement.')
     parser.add_argument('--MIN_BLOCK_PRESENCE_INCREMENT', type=float, default=0.1, metavar='',
                         help='How big the step size is for the minimum block presence.')
-    #parser.add_argument('--DESIRED_BLOCK', type=string, default=AnyStr, metavar='',
-     #                   help='The desired block.')
+    parser.add_argument('--DESIRED_BLOCK', type=string, default=AnyStr, metavar='',
+                        help='The desired block.')
 
 
     args = parser.parse_args()
@@ -106,8 +106,8 @@ def main(argv):
     random.seed(args.RANDOM_SEED)
         
     
-    #block.type.args.DESIRED_BLOCK
-
+    args.DESIRED_BLOCK = Blocks.BlockType
+    print(args.DESIRED_BLOCK)
     evolution.run(args)
 
 if __name__ == '__main__':

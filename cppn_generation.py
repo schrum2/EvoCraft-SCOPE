@@ -40,19 +40,39 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         
         shape = []
-        for xi in range(position_information["xrange"]):
-            x = util.scale_and_center(xi,position_information["xrange"])
-            for yi in range(position_information["yrange"]):
-                y = util.scale_and_center(yi,position_information["yrange"])
-                for zi in range(position_information["zrange"]):
-                    z = util.scale_and_center(zi,position_information["zrange"])
-                    scaled_point = (x, y, z)
-                    change = (xi, yi, zi)
-                    # Ignores direction and stop results from 3-tuple result
-                    (block, _, _) = generate_block(net, corner, args, block_options, scaled_point, change)
-                    if block is not None:
-                        shape.append(block)
-        
+        presence_threshold = args.PRESENCE_THRESHOLD
+        done = False
+        print(args.MINIMUM_REQUIRED_BLOCKS)
+        while not done:
+            print(done)
+            for xi in range(position_information["xrange"]):
+                x = util.scale_and_center(xi,position_information["xrange"])
+                for yi in range(position_information["yrange"]):
+                    y = util.scale_and_center(yi,position_information["yrange"])
+                    for zi in range(position_information["zrange"]):
+                        z = util.scale_and_center(zi,position_information["zrange"])
+                        scaled_point = (x, y, z)
+                        change = (xi, yi, zi)
+                        # Ignores direction and stop results from 3-tuple result
+                        (block, _, _) = generate_block(net, corner, args, block_options, scaled_point, change)
+                        if block is not None:
+                            shape.append(block)
+            
+            if args.USE_MIN_BLOCK_REQUIREMENT: 
+                print('the size of the shape is: {}'.format(len(shape)))
+                done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS
+                print('the minimum required blocks is: {}'.format(args.MINIMUM_REQUIRED_BLOCKS))
+                #print('reached the inside if statement')
+            else: 
+                done = True
+                #print(done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS)   
+                #print('you might be stuck here, something here could be off')
+                #print(done)
+            
+            if not done: presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT 
+            
+
+            
         if(len(shape) == 0):
             print("Genome at corner {} is empty".format(corner))
         else:
