@@ -66,8 +66,6 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
         if(len(shape) == 0):
             print("Genome at corner {} is empty".format(corner))
         else:
-            #print(list(BlockType.items()))
-            #print(list(BlockType.keys()))
             print("Genome at corner {} generated {} blocks of these types: {}".format(corner,len(shape),set(map(lambda x: BlockType.keys()[x.type], shape))))
 
         return shape

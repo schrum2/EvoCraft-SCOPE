@@ -69,7 +69,7 @@ def main(argv):
                         help='The maximum length a snake-like structure can be when EVOLVE_SNAKE is true.')
     parser.add_argument('--INTERACTIVE_EVOLUTION', type=boolean_string, default=True, metavar='',
                         help='Whether or not interactive evolution will be used.')
-    parser.add_argument('--POTENTIAL_BLOCK_SET', help='Choose which block set is used for generation',
+    parser.add_argument('--POTENTIAL_BLOCK_SET', help='Choose which block set is used for generation', # Can add additional 
                         action='store', choices=['all', 'undroppable','machine'], default='all', required=False)
     parser.add_argument('--MINIMUM_REQUIRED_BLOCKS', type=int, default=10, metavar='',
                         help='The number of minimum required blocks to be used.')
@@ -83,6 +83,8 @@ def main(argv):
                         help='The desired block count of a specific block.')
     parser.add_argument('--FITNESS_FUNCTION', type=str, metavar='',
                         help='The desired block count of a specific block.')
+    parser.add_argument('--ONLY_SHOW_PLACED', type=boolean_string, default=True, metavar='',
+                        help='Shows only the blocks that were placed in the shape in front of the shape')
 
     args = parser.parse_args()
    
