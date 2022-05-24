@@ -56,6 +56,8 @@ class FitnessEvolutionMinecraftBreeder(object):
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+2+self.args.SPACE_BETWEEN), self.position_information["starty"], self.position_information["startz"])
             self.corners.append(corner)
 
+        self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
+
         self.generation = 0
         
         # Don't try any multithreading yet, but consider for later
