@@ -1,7 +1,6 @@
 import argparse
 import string
 import sys
-from typing import AnyStr
 import evolution
 import random
 from os.path import exists
@@ -23,6 +22,12 @@ def boolean_string(s):
     if s not in {'False', 'True'}:
         raise ValueError('Not a valid boolean string')
     return s == 'True'
+
+def block_int(name):
+    """
+    Converts the name of a block into its corresponding int value.
+    """
+    return BlockType.Value(name)
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -73,7 +78,7 @@ def main(argv):
                         help='Whether or not to use the minimum required block requirement.')
     parser.add_argument('--MIN_BLOCK_PRESENCE_INCREMENT', type=float, default=0.1, metavar='',
                         help='How big the step size is for the minimum block presence.')
-    parser.add_argument('--DESIRED_BLOCK', type=string, default=AnyStr, metavar='',
+    parser.add_argument('--DESIRED_BLOCK', type=block_int, default=None, metavar='',
                         help='The desired block.')
 
 
@@ -105,9 +110,6 @@ def main(argv):
 
     random.seed(args.RANDOM_SEED)
         
-    
-    args.DESIRED_BLOCK = Blocks.BlockType
-    print(args.DESIRED_BLOCK)
     evolution.run(args)
 
 if __name__ == '__main__':
