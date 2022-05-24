@@ -82,6 +82,8 @@ def main(argv):
                         help='The desired block.')
     parser.add_argument('--ONLY_SHOW_PLACED', type=boolean_string, default=True, metavar='',
                         help='Shows only the blocks that were placed in the shape in front of the shape')
+    parser.add_argument('--PREVENT_DUPLICATE_BLOCK_TYPES', type=boolean_string, default=True, metavar='',
+                        help='Shows only the blocks that were placed in the shape in front of the shape')
 
 
     args = parser.parse_args()
