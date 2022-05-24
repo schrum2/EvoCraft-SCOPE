@@ -15,11 +15,16 @@ def type_count(client, position_information, corner, args):
     Returns:
     int: The number of occurences of the specified block.
     """
+    # return the max value fitness threshold if client is none
 
     endx= corner[0] + position_information["xrange"]
     endy= corner[1] + position_information["yrange"]
     endz= corner[2] + position_information["zrange"]
     
+    if client is None: 
+        max_fitness_threshold = endx * endy * endz
+        return max_fitness_threshold
+
     # read all the blocks at once as one big block
     block_collection = client.readCube(Cube(
         min=Point(x=corner[0], y=corner[1], z=corner[2]),
@@ -48,6 +53,8 @@ def type_target(client, position_information, corner, args):
     Returns:
     int: The absolute value of the desired block count minus the absolute value of the difference between the desired block count and the actual count.
     """
+    # return the max value if client is none
+    #if client is None: return 
 
     # Get the number of desired blocks
     current_block_count = type_count(client, position_information, corner, args)

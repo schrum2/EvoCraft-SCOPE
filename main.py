@@ -111,8 +111,8 @@ def main(argv):
         raise ValueError("Block list size must at least two.")
     
     if not args.INTERACTIVE_EVOLUTION:
-        is_function = getattr(ff, args.FITNESS_FUNCTION)
-   
+        try: is_function = getattr(ff, args.FITNESS_FUNCTION)
+        except: print('{} is not a valid fitness function name.'.format(args.FITNESS_FUNCTION))
 
     random.seed(args.RANDOM_SEED)
     
