@@ -83,8 +83,11 @@ def run(args):
             pop.run(mc.eval_fitness, generations)
 
     finally:
-        stats.save()
-        stats.save_genome_fitness(with_cross_validation=False)
+        # only save to csv for fitness based evolution
+        if not args.INTERACTIVE_EVOLUTION:
+            stats.save()
+            # cross_validation has to be false, true produces an error, also the git thing said
+            stats.save_genome_fitness(with_cross_validation=False)
     
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
