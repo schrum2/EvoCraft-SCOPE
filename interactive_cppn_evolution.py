@@ -57,8 +57,12 @@ class MinecraftBreeder(object):
             # Place the numbers just once. Only works for 0-9
             minecraft_structures.place_number(self.client,self.position_information,corner,n)
 
+        # If EVOLVE_SNAKE is true, it will generate a snake,
+        # otherwise it will create the normal structures
+        self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
+
         self.generation = 0
-        
+
         # Don't try any multithreading yet, but consider for later
         self.num_workers = 1
 
@@ -88,15 +92,9 @@ class MinecraftBreeder(object):
             
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            # If EVOLVE_SNAKE is true, it will generate a snake,
-            # otherwise it will create the normal structures
-            if self.args.EVOLVE_SNAKE:
-                shape = cppn_generation.query_cppn_for_snake_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
-            else:
-                shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
-
+            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             shape_set = (list(set(map(lambda x: BlockType.values()[x.type], shape))))
-            print(genome.block_list)
+            #print(genome.block_list)
 
             if self.args.BLOCK_LIST_EVOLVES:
                 minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set,self.args.ONLY_SHOW_PLACED)
@@ -153,7 +151,7 @@ class MinecraftBreeder(object):
                                     print(genome.block_list)
                                     # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
                                     genome.block_list[i]=read_current_blocks[n][i]
-                                    new_shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+                                    new_shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
                                     self.client.spawnBlocks(Blocks(blocks=new_shape))
 
         else:

@@ -107,7 +107,10 @@ def generate_block(net, position_information, corner, args, block_options, scale
 
         block_orientation = NORTH
         if args.EVOLVE_ORIENTATION:
-            orientation_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
+            if args.EVOLVE_SNAKE:
+                orientation_preferences = output[len(block_options)+7:len(block_options)+7+NUM_DIRECTIONS]
+            else: 
+               orientation_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS] 
             block_orientation = util.argmax(orientation_preferences)
         block = Block(position=Point(x=corner[0]+initial_position[0], y=corner[1]+initial_position[1], z=corner[2]+initial_position[2]), type=block_options[output_val], orientation=block_orientation)
     else:
