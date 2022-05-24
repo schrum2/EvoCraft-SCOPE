@@ -72,9 +72,9 @@ def main(argv):
                         help='Whether or not interactive evolution will be used.')
     parser.add_argument('--POTENTIAL_BLOCK_SET', help='Choose which block set is used for generation',
                         action='store', choices=['all', 'undroppable','machine'], default='all', required=False)
-    parser.add_argument('--MINIMUM_REQUIRED_BLOCKS', type=int, default=sys.maxsize, metavar='',
+    parser.add_argument('--MINIMUM_REQUIRED_BLOCKS', type=int, default=10, metavar='',
                         help='The number of minimum required blocks to be used.')
-    parser.add_argument('--USE_MIN_BLOCK_REQUIREMENT', type=boolean_string, default=False, metavar='',
+    parser.add_argument('--USE_MIN_BLOCK_REQUIREMENT', type=boolean_string, default=True, metavar='',
                         help='Whether or not to use the minimum required block requirement.')
     parser.add_argument('--MIN_BLOCK_PRESENCE_INCREMENT', type=float, default=0.1, metavar='',
                         help='How big the step size is for the minimum block presence.')
