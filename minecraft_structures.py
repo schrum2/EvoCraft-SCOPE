@@ -275,29 +275,11 @@ def place_blocks_in_block_list(block_list,client,corners,position_information,sh
         # Generates blovk at the specified index, places emerald block underneath it
         if(only_show_placed):
             if(block_list[index] in shape_set):
-                generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
-                blocks_in_list.append(generated_block)
-                blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=EMERALD_BLOCK, orientation=NORTH))
-
-                # If the block is lava or water, places a box around it
-                if(generated_block.type==LAVA or generated_block.type==WATER or generated_block.type==FLOWING_LAVA or generated_block.type==FLOWING_WATER):
-                    blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
-                    blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
-                    blocks_in_list.append(Block(position=Point(x=corners[0]+x+1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
-                    blocks_in_list.append(Block(position=Point(x=corners[0]+x-1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
+                place_spawned_blocks(block_list, corners, blocks_in_list, x, z, index)
             else:
                 blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=RED_SANDSTONE, orientation=NORTH))
         else:
-            generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
-            blocks_in_list.append(generated_block)
-            blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=EMERALD_BLOCK, orientation=NORTH))
-
-            # If the block is lava or water, places a box around it
-            if(generated_block.type==LAVA or generated_block.type==WATER or generated_block.type==FLOWING_LAVA or generated_block.type==FLOWING_WATER):
-                blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
-                blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
-                blocks_in_list.append(Block(position=Point(x=corners[0]+x+1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
-                blocks_in_list.append(Block(position=Point(x=corners[0]+x-1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
+            place_spawned_blocks(block_list, corners, blocks_in_list, x, z, index)
 
         index=index+1
         x=x+2 # x increase by two for a one block gap
@@ -305,6 +287,29 @@ def place_blocks_in_block_list(block_list,client,corners,position_information,sh
             z=z+2
     # Spawns in all the blocks
     client.spawnBlocks(Blocks(blocks=blocks_in_list))
+
+def place_spawned_blocks(block_list, corners, blocks_in_list, x, z, index):
+    """
+    Helper method refactored from place_blocks_in_block_list. Places the blocks specified, adding an emerald block
+    underneath all generated blocks
+
+    Parameters:
+    block_list(list of ints): holds all of the block types to be placed 
+    corners(tuple(int,int,int)): holds the points to be used for placing the blocks
+    x(int): used to palce blocks at correct x cooridnate based on corners
+    z(int): used to palce blocks at correct z cooridnate based on corners
+    index(int): USed to get correct index from the block_list
+    """
+    generated_block=(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z), type=block_list[index], orientation=NORTH))
+    blocks_in_list.append(generated_block)
+    blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-2,z=corners[2]+z), type=EMERALD_BLOCK, orientation=NORTH))
+
+    # If the block is lava or water, places a box around it
+    if(generated_block.type==LAVA or generated_block.type==WATER or generated_block.type==FLOWING_LAVA or generated_block.type==FLOWING_WATER):
+        blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z+1), type=STONE_BRICK_STAIRS, orientation=NORTH))
+        blocks_in_list.append(Block(position=Point(x=corners[0]+x, y=corners[1]-1,z=corners[2]+z-1), type=STONE_BRICK_STAIRS, orientation=SOUTH))
+        blocks_in_list.append(Block(position=Point(x=corners[0]+x+1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=WEST))
+        blocks_in_list.append(Block(position=Point(x=corners[0]+x-1, y=corners[1]-1,z=corners[2]+z), type=STONE_BRICK_STAIRS, orientation=EAST))
     
 def player_selection_switches(client, position_information, corners):
     """
