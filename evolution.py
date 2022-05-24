@@ -54,8 +54,9 @@ def run(args):
         config.fitness_threshold = fit_function(None, mc.position_information, None, args)
         #config.fitness_threshold = 1000
     config.pop_size = args.POPULATION_SIZE
+    
     # Changing the number of CPPN outputs after initialization. 
-    # Evolved snakes have 7 additional outputs.
+    # Evolved snakes have 7 additional outputs. Evolved orientation will have 6
     config.genome_config.num_outputs = block_list_length + 1 + (7 if args.EVOLVE_SNAKE else 0) + (6 if args.EVOLVE_ORIENTATION else 0)
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
