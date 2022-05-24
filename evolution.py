@@ -7,6 +7,7 @@ import minecraft_structures
 import os
 import custom_genomes as cg
 import block_sets
+import fitness_functions as ff
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -48,8 +49,10 @@ def run(args):
         config.fitness_threshold = 1.01
     else:
         # TODO: Change this so it is set depending on the specific fitness function used.
-        config.fitness_threshold = 1000
-
+        # At this point, any invalid fitness function name would have been caught in main.
+        fit_function = getattr(ff, args.FITNESS_FUNCTION)
+        config.fitness_threshold = fit_function(None, mc.position_information, None, args)
+        #config.fitness_threshold = 1000
     config.pop_size = args.POPULATION_SIZE
     # Changing the number of CPPN outputs after initialization. 
     # Evolved snakes have 7 additional outputs.
@@ -72,7 +75,7 @@ def run(args):
                 mc.generation = pop.generation + 1
                 pop.run(mc.eval_fitness, 1)
         else: # Fitness-based evolution
-            # TODO: Change 100 to a command line parameter NUM_GENERATIONS
+            # TODO: Change 1000 to a command line parameter NUM_GENERATIONS
             generations = 1000
             print("Evolve for {} generations".format(generations))
             pop.run(mc.eval_fitness, generations)
