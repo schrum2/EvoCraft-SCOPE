@@ -85,7 +85,7 @@ class FitnessEvolutionMinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
 
-            # REDSTONE_BLOCK is hard coded for now, but need to change/generalize later
+            # SLIME is hard coded for now, but need to change/generalize later
             genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], SLIME)
 
             print("{}. {}: {}".format(n,genome_id,genome.fitness))
