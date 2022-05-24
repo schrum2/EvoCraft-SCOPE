@@ -12,8 +12,9 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
-# For minecraft structures
+# For minecraft generation
 import minecraft_structures
+import block_sets
 
 # For CPPN generations
 import cppn_generation
@@ -77,6 +78,7 @@ class MinecraftBreeder(object):
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
         selected = []
         
+        #print(block_sets.select_possible_block_sets(self.args.POTENTIAL_BLOCK_SET))
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # Initially, none are selected
