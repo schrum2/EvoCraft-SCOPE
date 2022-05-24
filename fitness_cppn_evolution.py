@@ -88,7 +88,7 @@ class FitnessEvolutionMinecraftBreeder(object):
             #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
             genome.fitness = ff.type_target(self.client, self.position_information, self.corners[n], self.args)
             
-            print("{}. {}: {}".format(n,genome_id,genome.fitness))
+            print("{}. {}: Fitness = {}".format(n,genome_id,genome.fitness))
 
     # End of FitnessEvolutionMinecraftBreeder                                                                                                            
 
