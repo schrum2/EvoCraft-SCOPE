@@ -86,6 +86,8 @@ def main(argv):
                         help='How big the step size is for the minimum block presence.')
     parser.add_argument('--DESIRED_BLOCK', type=block_int, default=None, metavar='',
                         help='The desired block.')
+    parser.add_argument('--SAVE_POPULATION', type=boolean_string, default=False, metavar='',
+                        help='Save CPPN population.')
 
 
     args = parser.parse_args()
