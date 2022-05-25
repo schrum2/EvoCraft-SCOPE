@@ -201,10 +201,10 @@ class MinecraftBreeder(object):
             while not player_select_done and j < config.pop_size:
                 pressed = next_block_positions[j]
                 done_button = self.client.readCube(Cube(
-                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
-                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
+                        min=Point(x=pressed[0], y=pressed[1]-1, z=pressed[2]),
+                        max=Point(x=pressed[0], y=pressed[1]-1, z=pressed[2])
                     ))
-                player_select_done = done_button.blocks[0].type == PISTON_HEAD
+                player_select_done = done_button.blocks[0].type == DIAMOND_BLOCK
                 j += 1
                     
             if self.args.BLOCK_LIST_EVOLVES:
