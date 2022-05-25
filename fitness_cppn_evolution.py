@@ -83,7 +83,7 @@ class FitnessEvolutionMinecraftBreeder(object):
         for n, (genome_id, genome) in enumerate(genomes):
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
 
