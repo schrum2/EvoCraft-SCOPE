@@ -8,8 +8,6 @@ import util
 import math
 
 # For minecraft
-import grpc
-import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 # Number of total directions the snake can move in

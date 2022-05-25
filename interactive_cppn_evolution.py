@@ -14,11 +14,12 @@ from minecraft_pb2 import *
 
 # For minecraft generation
 import minecraft_structures
-import block_sets
+import threading
+import os
+
 
 # For CPPN generations
 import cppn_generation
-
 class MinecraftBreeder(object):
     def __init__(self, args, block_list):
         """
@@ -46,6 +47,25 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
+        if(self.args.IN_GAME_CONTROL):
+            t = threading.Thread(target=self.console_reset,args=())
+            t.start()
+
+        self.reset_ground_and_numbers()
+
+        # If EVOLVE_SNAKE is true, it will generate a snake,
+        # otherwise it will create the normal structures
+        self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
+
+        self.generation = 0
+
+        # Don't try any multithreading yet, but consider for later
+        self.num_workers = 2
+
+    def reset_ground_and_numbers(self):
+        """
+        Resets the ground and numbers above the shapes. Extracted from __init__
+        """
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
@@ -56,15 +76,6 @@ class MinecraftBreeder(object):
             self.corners.append(corner)
             # Place the numbers just once. Only works for 0-9
             minecraft_structures.place_number(self.client,self.position_information,corner,n)
-
-        # If EVOLVE_SNAKE is true, it will generate a snake,
-        # otherwise it will create the normal structures
-        self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
-
-        self.generation = 0
-
-        # Don't try any multithreading yet, but consider for later
-        self.num_workers = 1
 
 
     def eval_fitness(self, genomes, config):
@@ -78,82 +89,13 @@ class MinecraftBreeder(object):
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """            
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
-        selected = []
-        all_blocks = []
-        
-        #print(block_sets.select_possible_block_sets(self.args.POTENTIAL_BLOCK_SET))
-        # This loop could be parallelized
-        for n, (genome_id, genome) in enumerate(genomes):
-            # Initially, none are selected
-            selected.append(False)
-            
-            
-            # See how CPPN fills out the shape
-            print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
-            shape_set = (list(set(map(lambda x: BlockType.values()[x.type], shape))))
-            #print(genome.block_list)
+        """                                                                                                                     
+        self.current_genomes = genomes
+        self.current_config = config
 
-            if self.args.BLOCK_LIST_EVOLVES:
-                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set,self.args.ONLY_SHOW_PLACED)
-            # fill the empty space with the evolved shape
-            self.client.spawnBlocks(Blocks(blocks=shape))
-            # Remember block locations in order to clear them out later
-            all_blocks.extend(shape) # Blocks from all shapes in one flat list
-            # Place the fences where the shape will appear
-            minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
-
+        all_blocks = self.clear_area_and_generate_shapes(genomes, config)  
         if self.args.IN_GAME_CONTROL:
-            (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
-
-            selected = [False for _ in range(config.pop_size)]
-            player_select_done = False
-            
-            while not player_select_done: #player is still selecting
-               
-                # constantly reads the position right below the redstone lamp
-                # to see if the player has switched on a lever
-                for i in range(config.pop_size):
-                    first = on_block_positions[i]
-                    blocks = self.client.readCube(Cube(
-                        min=Point(x=first[0], y=first[1], z=first[2]),
-                        max=Point(x=first[0], y=first[1], z=first[2])
-                    ))
-                    selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
-
-                player_select_done = False
-                j = 0
-                # Checks the hidden Piston Heads associated with each next generation switch. 
-                # If any one is sensed, then player selection is done 
-                while not player_select_done and j < config.pop_size:
-                    pressed = next_block_positions[j]
-                    done_button = self.client.readCube(Cube(
-                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
-                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
-                    ))
-                    player_select_done = done_button.blocks[0].type == PISTON_HEAD
-                    j += 1
-                    
-                if self.args.BLOCK_LIST_EVOLVES:
-                    # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
-
-                    # Reads in the blocks and stores them
-                    read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
-
-                    # Compares each index of the block lists of the genome to what was read in.
-                    for n, (_, genome) in enumerate(genomes):
-                        if(genome.block_list != read_current_blocks[n]):
-                            for i in range(len(genome.block_list)):
-                                # If there was a difference, and it wasn't air, it replaces the blocks in the block_list and regenerates the structure 
-                                if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
-                                    print(genome.block_list)
-                                    # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
-                                    genome.block_list[i]=read_current_blocks[n][i]
-                                    new_shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
-                                    self.client.spawnBlocks(Blocks(blocks=new_shape))
-
+            selected = self.in_game_control_options(genomes, config)
         else:
             # Controlled externally by keyboard
 
@@ -169,7 +111,6 @@ class MinecraftBreeder(object):
                 selected[ind] = True
         
         print("Selected: {}".format(selected))
-
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
                 genome.fitness = 1.0
@@ -191,7 +132,117 @@ class MinecraftBreeder(object):
 
         self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
-    # End of MinecraftBreeder                                                                                                            
+    def clear_area_and_generate_shapes(self, genomes, config):
+        """
+        Clears the area and generates the shapes based on genomes. Then also places the fences.
+        Extracted from eval_fitness
 
+        Parameters:
+        genomes([DefaultGenome]): list of CPPN genomes
+        config(Config): NEAT configurations
+
+        Return:
+
+        all_blocks(list of Blocks): Dtores info as to where blocks were placed for deleting snakes
+        """
+        all_blocks = []
+        #clears area for structures
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN) 
+        # This loop could be parallelized
+        for n, (genome_id, genome) in enumerate(genomes):
+            # See how CPPN fills out the shape
+            print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
+            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            shape_set = (list(set(map(lambda x: BlockType.values()[x.type], shape))))
+
+            if self.args.BLOCK_LIST_EVOLVES:
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set,self.args.ONLY_SHOW_PLACED)
+            # fill the empty space with the evolved shape
+            self.client.spawnBlocks(Blocks(blocks=shape))
+            # Remember block locations in order to clear them out later
+            all_blocks.extend(shape) # Blocks from all shapes in one flat list
+            # Place the fences where the shape will appear
+            minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
+        return all_blocks
+
+    def in_game_control_options(self, genomes, config):
+        """
+        Has the loop that allows for in game controls. Loops until a selection has been made. Extracted
+        from eval_fitness
+
+        Parameters:
+        genomes([DefaultGenome]): list of CPPN genomes
+        config(Config): NEAT configurations
+
+        Return:
+        selected (list of booleans): List that determines which shapes the user selected
+        """
+        #generates switches and gets locations to read for
+        (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
+
+        selected = [False for _ in range(config.pop_size)] #initializes selected as a list of False's
+        player_select_done = False
+            
+        while not player_select_done: #player is still selecting
+                # constantly reads the position right below the redstone lamp
+                # to see if the player has switched on a lever
+            for i in range(config.pop_size):
+                first = on_block_positions[i]
+                blocks = self.client.readCube(Cube(
+                        min=Point(x=first[0], y=first[1], z=first[2]),
+                        max=Point(x=first[0], y=first[1], z=first[2])
+                    ))
+                selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
+
+            player_select_done = False
+            j = 0
+                # Checks the hidden Piston Heads associated with each next generation switch. 
+                # If any one is sensed, then player selection is done 
+            while not player_select_done and j < config.pop_size:
+                pressed = next_block_positions[j]
+                done_button = self.client.readCube(Cube(
+                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
+                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
+                    ))
+                player_select_done = done_button.blocks[0].type == PISTON_HEAD
+                j += 1
+                    
+            if self.args.BLOCK_LIST_EVOLVES:
+                    # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
+
+                # Reads in the blocks and stores them
+                read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
+
+                # Compares each index of the block lists of the genome to what was read in.
+                for n, (_, genome) in enumerate(genomes):
+                    if(genome.block_list != read_current_blocks[n]):
+                        for i in range(len(genome.block_list)):
+                                # If there was a difference, and it wasn't air, it replaces the blocks in the block_list and regenerates the structure 
+                            if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
+                                print(genome.block_list)
+                                    # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
+                                genome.block_list[i]=read_current_blocks[n][i]
+                                new_shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+                                self.client.spawnBlocks(Blocks(blocks=new_shape))
+    
+        return selected
+
+    def console_reset(self):
+        """
+        Continusouly prompts the user for a letter. r resets everything that was generate and q quits the program. Any
+        other letter asks for the user to try again. This is multithreaded so that it runs in the background while 
+        the rest of the code does its thing. If anything gets destroyed, reset ensures its still usuable
+        """
+        while 1:
+            val = input("Press r to reset the world, or q to quit\n")
+            if(val=='r'):
+                self.reset_ground_and_numbers() #resets ground and numbers
+                self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
+                minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
+            elif(val=='q'):
+                os._exit(0)
+            else:
+                print("This command was not recognized. Please try again")
+                
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")

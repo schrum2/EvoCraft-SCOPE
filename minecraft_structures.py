@@ -6,7 +6,6 @@ kept in this module.
 # for Minecraft
 #import grpc
 from re import S
-import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 # Extra space around the populated area to clear and reset
@@ -84,7 +83,7 @@ def restore_ground(client, position_information, pop_size, space_between):
     client.fillCube(FillCubeRequest(  
         cube=Cube(
             min=Point(x=position_information["startx"]-BUFFER_ZONE, y=GROUND_LEVEL-3, z=zplacement-BUFFER_ZONE),
-            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=GROUND_LEVEL-1, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE+10, y=GROUND_LEVEL-1, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
         ),
         type=GRASS
     ))
