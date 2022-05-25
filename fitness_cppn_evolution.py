@@ -77,7 +77,8 @@ class FitnessEvolutionMinecraftBreeder(object):
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
         """            
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+        all_blocks = []                                                                                                             
         
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
@@ -86,7 +87,7 @@ class FitnessEvolutionMinecraftBreeder(object):
             shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
-
+            all_blocks.extend(shape)
             #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
             fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
             genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
@@ -97,6 +98,11 @@ class FitnessEvolutionMinecraftBreeder(object):
             # also the program will stop executing after this loop ends since the threshold was met. 
             if genome.fitness == config.fitness_threshold:
                 minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n], self.args)
+
+        for s in all_blocks:
+            s.type = AIR
+
+        self.client.spawnBlocks(Blocks(blocks=all_blocks))
     
     # End of FitnessEvolutionMinecraftBreeder                                                                                                            
 
