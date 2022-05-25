@@ -100,9 +100,23 @@ class MinecraftBreeder(object):
             # Controlled externally by keyboard
 
             # Creates a string that is the user's input, and the converts it to a list
-            vals = input("Select the ones you like:")
-            split_vals = vals.split(' ')
-            selected_vals = list(map(int,split_vals))
+            vals_selected = False
+            while(not vals_selected):
+                vals = input("Select the shapes you like, or type r to reset, or q to quit:")
+                if(vals=='r'):
+                    self.reset_ground_and_numbers() #resets ground and numbers
+                    self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
+                    minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
+                elif vals== 'q':
+                    quit()
+                else:
+                    try:
+                        split_vals = vals.split(' ')
+                        selected_vals = list(map(int,split_vals))
+                        vals_selected = True
+                    except ValueError:
+                        print("That wasn't quite right. Look at what you typed and try again!")
+                        vals_selected = False
 
             # Initialize to all False
             selected = [False for i in range(config.pop_size)]
