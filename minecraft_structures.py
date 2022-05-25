@@ -60,7 +60,7 @@ def clear_area(client, position_information, pop_size, space_between):
     # clear out a big area rather than individual cubes
     client.fillCube(FillCubeRequest(  
         cube=Cube(
-            min=Point(x=position_information["startx"]-BUFFER_ZONE, y=GROUND_LEVEL+1, z=zplacement-BUFFER_ZONE),
+            min=Point(x=position_information["startx"]-BUFFER_ZONE, y=GROUND_LEVEL, z=zplacement-BUFFER_ZONE),
             max=Point(x=position_information["startx"]-1 + (pop_size+1)*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=position_information["starty"]+BUFFER_ZONE, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
         ),
         type=AIR
@@ -83,7 +83,7 @@ def restore_ground(client, position_information, pop_size, space_between):
     client.fillCube(FillCubeRequest(  
         cube=Cube(
             min=Point(x=position_information["startx"]-BUFFER_ZONE, y=GROUND_LEVEL-3, z=zplacement-BUFFER_ZONE),
-            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE+10, y=GROUND_LEVEL-1, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
+            max=Point(x=position_information["startx"]-1 + pop_size*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=GROUND_LEVEL-1, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
         ),
         type=GRASS
     ))

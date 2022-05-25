@@ -15,7 +15,7 @@ from minecraft_pb2 import *
 # For minecraft generation
 import minecraft_structures
 import threading
-import os
+import sys
 
 
 # For CPPN generations
@@ -47,13 +47,6 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        self.corners = []
-        for n in range(self.args.POPULATION_SIZE):
-            corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+2+self.args.SPACE_BETWEEN), self.position_information["starty"], self.position_information["startz"])
-            self.corners.append(corner)
-            # Place the numbers just once. Only works for 0-9
-            minecraft_structures.place_number(self.client,self.position_information,corner,n)
-
         if(self.args.IN_GAME_CONTROL):
             t = threading.Thread(target=self.console_reset,args=())
             t.start()
@@ -75,11 +68,14 @@ class MinecraftBreeder(object):
         """
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-        if(self.args.IN_GAME_CONTROL):
-            (self.on_block_positions,self.next_block_positions) =minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
 
         # Figure out the lower corner of each shape in advance
-        
+        self.corners = []
+        for n in range(self.args.POPULATION_SIZE):
+            corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+2+self.args.SPACE_BETWEEN), self.position_information["starty"], self.position_information["startz"])
+            self.corners.append(corner)
+            # Place the numbers just once. Only works for 0-9
+            minecraft_structures.place_number(self.client,self.position_information,corner,n)
 
 
     def eval_fitness(self, genomes, config):
@@ -182,6 +178,7 @@ class MinecraftBreeder(object):
         selected (list of booleans): List that determines which shapes the user selected
         """
         #generates switches and gets locations to read for
+        (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
 
         selected = [False for _ in range(config.pop_size)] #initializes selected as a list of False's
         player_select_done = False
@@ -190,7 +187,7 @@ class MinecraftBreeder(object):
                 # constantly reads the position right below the redstone lamp
                 # to see if the player has switched on a lever
             for i in range(config.pop_size):
-                first = self.on_block_positions[i]
+                first = on_block_positions[i]
                 blocks = self.client.readCube(Cube(
                         min=Point(x=first[0], y=first[1], z=first[2]),
                         max=Point(x=first[0], y=first[1], z=first[2])
@@ -202,7 +199,7 @@ class MinecraftBreeder(object):
                 # Checks the hidden Piston Heads associated with each next generation switch. 
                 # If any one is sensed, then player selection is done 
             while not player_select_done and j < config.pop_size:
-                pressed = self.next_block_positions[j]
+                pressed = next_block_positions[j]
                 done_button = self.client.readCube(Cube(
                         min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
                         max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
@@ -239,12 +236,11 @@ class MinecraftBreeder(object):
         while 1:
             val = input("Press r to reset the world, or q to quit\n")
             if(val=='r'):
-                self.reset_ground_and_numbers() #resets ground and numbers and switches
+                self.reset_ground_and_numbers() #resets ground and numbers
                 self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
+                minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
             elif(val=='q'):
-                minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-                minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-                os._exit(0)
+                exit()
             else:
                 print("This command was not recognized. Please try again")
                 
