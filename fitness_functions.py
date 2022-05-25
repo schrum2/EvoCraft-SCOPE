@@ -63,7 +63,12 @@ def type_target(client, position_information, corner, args):
     return args.DESIRED_BLOCK_COUNT - abs((args.DESIRED_BLOCK_COUNT - current_block_count))
 #def eval_fitness(genomes, config, fitness):
 
-def occupied_count(client, position_information, corner):
+def occupied_count(client, position_information, corner, args):
+
+    # return the max value fitness threshold if client is none
+    # XRANGE * YRANGE * ZRANGE gives the max threshold since that would be the volume of the shape if all the blocks were non air blocks.
+    if client is None: return args.XRANGE * args.YRANGE * args.ZRANGE
+
     # Counts the number of blocks
     number_of_blocks = 0
 
@@ -78,7 +83,7 @@ def occupied_count(client, position_information, corner):
     ))
 
     for filled in all_the_blocks:
-        if filled.type is not AIR
+        if filled.type != AIR:
             number_of_blocks += 1
 
     return number_of_blocks
