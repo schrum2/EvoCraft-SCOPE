@@ -52,12 +52,10 @@ def run(args):
     else:
         # TODO: Change this so it is set depending on the specific fitness function used.
         # At this point, any invalid fitness function name would have been caught in main.
-        
-        #start of fitness evolution, clear previous world of 'champion arrows'
-
+        # start of fitness evolution, clear previous world of 'champion arrows'
         fit_function = getattr(ff, args.FITNESS_FUNCTION)
         config.fitness_threshold = fit_function(None, mc.position_information, None, args)
-        #config.fitness_threshold = 1000
+
     config.pop_size = args.POPULATION_SIZE
     
     # Changing the number of CPPN outputs after initialization. 
@@ -73,26 +71,25 @@ def run(args):
     pop.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
-    base_path = 'C:/Scope2022/EvoCraft-SCOPE/{}'.format(args.BASE_DIR)
+    base_path = '{}'.format(args.BASE_DIR)
     dir_exists = os.path.isdir(base_path)
     if not dir_exists:
         os.mkdir(base_path)
-    #make this dir too
-    sub_path = 'C:/Scope2022/EvoCraft-SCOPE/{}/{}{}'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
+    
+    # make sub dir too
+    sub_path = '{}/{}{}'.format(base_path,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
     dir_exists = os.path.isdir(sub_path)
     if not dir_exists:
         os.mkdir(sub_path)
     
-    pop_path = 'C:/Scope2022/EvoCraft-SCOPE/{}/{}{}/gen/'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
+    pop_path = '{}/gen/'.format(sub_path)
     dir_exists = os.path.isdir(pop_path)
     if not dir_exists:
         os.mkdir(pop_path)
 
     checkpointer = neat.Checkpointer(args.CHECKPOINT_FREQUENCY, args.TIME_INTERVAL, "{}gen".format(pop_path))
-    pop.add_reporter(checkpointer)
     
-    #neat.save_genome_fitness(self, delimeter=' ', filename = 'fitness_history.csv')
-    #neat.save_genome_fitness()
+    pop.add_reporter(checkpointer)
 
     # Evolve forever: TODO: Add use means of stopping
     try:
@@ -104,15 +101,20 @@ def run(args):
             # TODO: Change 1000 to a command line parameter NUM_GENERATIONS
             generations = 1000
             print("Evolve for {} generations".format(generations))
+            
+            if not args.SAVE_POPULATION and args.LOAD_SAVED_POPULATION:
+                pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
+            
             pop.run(mc.eval_fitness, generations)
 
     finally:
         # only save to csv for fitness based evolution
         if not args.INTERACTIVE_EVOLUTION:
-            #stats.save()
-            # cross_validation has to be false, true produces an error, also the git thing said
-            #stats.save_genome_fitness(filename='fitness_hist.csv',with_cross_validation=False)
-            checkpointer.save_checkpoint(config, pop,neat.DefaultSpeciesSet ,pop.generation)
+            if not args.LOAD_SAVED_POPULATION and args.SAVE_POPULATION:
+                checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
+                stats.save()
+                # cross_validation has to be false, true produces an error, also the git thing said
+                stats.save_genome_fitness(filename='fitness_hist.csv',with_cross_validation=False)
 
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:

@@ -106,6 +106,12 @@ def main(argv):
                         help='How often in relation to generation number a checkpointer saves the population.')
     parser.add_argument('--TIME_INTERVAL', type=int, default=10000, metavar='',
                         help='How often in relation to time a checkpointer saves the population.')
+    parser.add_argument('--LOAD_SAVED_POPULATION', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to load a previously saved experiment.')
+    parser.add_argument('--LOAD_GENERATION', type=int, default=None, metavar='',
+                        help='Generation to load.')
+    parser.add_argument('--LOAD_SAVED_SEED', type=int, default=None, metavar='',
+                        help='Generation seed to load.')
 
 
     args = parser.parse_args()
