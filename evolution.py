@@ -7,6 +7,7 @@ import minecraft_structures
 import os
 import custom_genomes as cg
 import block_sets
+import fitness_functions as ff
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -23,7 +24,8 @@ def run(args):
         block_list_length = args.NUM_EVOLVED_BLOCK_LIST_TYPES
         cg.BLOCK_CHANGE_PROBABILITY = args.BLOCK_CHANGE_PROBABILITY
         cg.BLOCK_LIST_LENGTH = block_list_length
-        cg.POTENTIAL_BLOCK_TYPE_LIST = block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)
+        cg.POTENTIAL_BLOCK_TYPE_LIST = block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET) # for sending specified block set to custom genome
+        cg.PREVENT_DUPLICATES = args.PREVENT_DUPLICATE_BLOCK_TYPES
         #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
     if args.INTERACTIVE_EVOLUTION:
@@ -47,12 +49,15 @@ def run(args):
         config.fitness_threshold = 1.01
     else:
         # TODO: Change this so it is set depending on the specific fitness function used.
-        config.fitness_threshold = 1000
-
+        # At this point, any invalid fitness function name would have been caught in main.
+        fit_function = getattr(ff, args.FITNESS_FUNCTION)
+        config.fitness_threshold = fit_function(None, mc.position_information, None, args)
+        #config.fitness_threshold = 1000
     config.pop_size = args.POPULATION_SIZE
+    
     # Changing the number of CPPN outputs after initialization. 
-    # Evolved snakes have 7 additional outputs.
-    config.genome_config.num_outputs = block_list_length + 1 + (7 if args.EVOLVE_SNAKE else 0)
+    # Evolved snakes have 7 additional outputs. Evolved orientation will have 6
+    config.genome_config.num_outputs = block_list_length + 1 + (7 if args.EVOLVE_SNAKE else 0) + (6 if args.EVOLVE_ORIENTATION else 0)
     config.genome_config.output_keys = [i for i in range(config.genome_config.num_outputs)]
 
     print("CPPNs will have {} output neurons".format(config.genome_config.num_outputs))
@@ -63,6 +68,9 @@ def run(args):
     pop.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     pop.add_reporter(stats)
+    
+    #neat.save_genome_fitness(self, delimeter=' ', filename = 'fitness_history.csv')
+    #neat.save_genome_fitness()
 
     # Evolve forever: TODO: Add use means of stopping
     try:
@@ -71,11 +79,18 @@ def run(args):
                 mc.generation = pop.generation + 1
                 pop.run(mc.eval_fitness, 1)
         else: # Fitness-based evolution
-            # TODO: Change 100 to a command line parameter NUM_GENERATIONS
+            # TODO: Change 1000 to a command line parameter NUM_GENERATIONS
             generations = 1000
             print("Evolve for {} generations".format(generations))
             pop.run(mc.eval_fitness, generations)
+
     finally:
+        # only save to csv for fitness based evolution
+        #if not args.INTERACTIVE_EVOLUTION:
+        #    stats.save()
+        #    # cross_validation has to be false, true produces an error, also the git thing said
+        #    stats.save_genome_fitness(with_cross_validation=False)
+    
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
             minecraft_structures.restore_ground(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)

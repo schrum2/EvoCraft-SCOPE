@@ -83,15 +83,21 @@ class FitnessEvolutionMinecraftBreeder(object):
         for n, (genome_id, genome) in enumerate(genomes):
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
 
-            # SLIME is hard coded for now, but need to change/generalize later
-            genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], SLIME)
+            #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
+            fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
+            genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
+            
+            print("{}. {}: Fitness = {}".format(n,genome_id,genome.fitness))
 
-            print("{}. {}: {}".format(n,genome_id,genome.fitness))
-
+            # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
+            # also the program will stop executing after this loop ends since the threshold was met. 
+            if genome.fitness == config.fitness_threshold:
+                minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n], self.args)
+    
     # End of FitnessEvolutionMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':

@@ -42,29 +42,38 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         
         shape = []
-        for xi in range(position_information["xrange"]):
-            x = util.scale_and_center(xi,position_information["xrange"])
-            for yi in range(position_information["yrange"]):
-                y = util.scale_and_center(yi,position_information["yrange"])
-                for zi in range(position_information["zrange"]):
-                    z = util.scale_and_center(zi,position_information["zrange"])
-                    scaled_point = (x, y, z)
-                    initial_position = (xi, yi, zi)
-                    # Ignores direction and stop results from 3-tuple result
-                    (block, _, _) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position)
-                    if block is not None:
-                        shape.append(block)
-        
+        presence_threshold = args.PRESENCE_THRESHOLD
+        done = False
+        while not done:
+            for xi in range(position_information["xrange"]):
+                x = util.scale_and_center(xi,position_information["xrange"])
+                for yi in range(position_information["yrange"]):
+                    y = util.scale_and_center(yi,position_information["yrange"])
+                    for zi in range(position_information["zrange"]):
+                        z = util.scale_and_center(zi,position_information["zrange"])
+                        scaled_point = (x, y, z)
+                        change = (xi, yi, zi)
+                        # Ignores direction and stop results from 3-tuple result
+                        (block, _, _) = generate_block(net, position_information, corner, args, block_options, scaled_point, change, presence_threshold)
+                        if block is not None:
+                            shape.append(block)
+            
+            # If USE_MIN_BLOCK_REQUIREMENT is true, then we stop the while loop if the size of the shape meets the min number of required blocks
+            if args.USE_MIN_BLOCK_REQUIREMENT: done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS
+            # At this point we are done regardless of the if statement above.
+            else: done = True
+            
+            # Decrease presence_thresold to decrease number of empty shapes
+            if not done: presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT 
+
         if(len(shape) == 0):
             print("Genome at corner {} is empty".format(corner))
         else:
-            #print(list(BlockType.items()))
-            #print(list(BlockType.keys()))
             print("Genome at corner {} generated {} blocks of these types: {}".format(corner,len(shape),set(map(lambda x: BlockType.keys()[x.type], shape))))
 
         return shape
 
-def generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position): 
+def generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold): 
     """
     Returns a block to generate if it is present at a specific position and None
     if it isn't
@@ -86,11 +95,6 @@ def generate_block(net, position_information, corner, args, block_options, scale
     center_dist = util.distance((scaled_point[0],scaled_point[1],scaled_point[2]),(0,0,0))
     output = net.activate([scaled_point[0], scaled_point[1], scaled_point[2], center_dist * math.sqrt(2), 1.0])
                     
-    # First output determines whether there is a block at all.
-    # If there is a block, argmax determines the max value and places the specified block 
-    # from the list of possible blocks
-    presence_threshold = args.PRESENCE_THRESHOLD 
-                    
     if args.DISTANCE_PRESENCE_THRESHOLD:
         presence_threshold = args.DISTANCE_PRESENCE_MULTIPLIER * center_dist                            
 
@@ -100,7 +104,17 @@ def generate_block(net, position_information, corner, args, block_options, scale
         block_preferences = output[1:len(block_options)+1]
         output_val = util.argmax(block_preferences)
         assert (output_val >= 0 and output_val < len(block_options)),"{} out of bounds: {}".format(output_val,block_options)
-        block = Block(position=Point(x=corner[0]+initial_position[0], y=corner[1]+initial_position[1], z=corner[2]+initial_position[2]), type=block_options[output_val], orientation=NORTH)
+
+        # By default, block orientation is NORTH. can be altered by evolving orientation. If also
+        # evolving snakes, sets parameters accordingly
+        block_orientation = NORTH
+        if args.EVOLVE_ORIENTATION:
+            if args.EVOLVE_SNAKE:
+                orientation_preferences = output[len(block_options)+7:len(block_options)+7+NUM_DIRECTIONS]
+            else: 
+               orientation_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS] 
+            block_orientation = util.argmax(orientation_preferences) # Argmax from 0-5 to get orienation of block
+        block = Block(position=Point(x=corner[0]+initial_position[0], y=corner[1]+initial_position[1], z=corner[2]+initial_position[2]), type=block_options[output_val], orientation=block_orientation)
     else:
         block = None
 
@@ -108,13 +122,13 @@ def generate_block(net, position_information, corner, args, block_options, scale
     stop = False
 
     if args.EVOLVE_SNAKE:
-        direction_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
+        orientation_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
         if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES:
             for i in range(NUM_DIRECTIONS):
                 possible_direction = next_direction(i)
                 # intial_positions the value to any direction that is out of bounds to float('-inf')
                 if check_out_of_bounds(initial_position, possible_direction, position_information):
-                    direction_preferences[i] = float('-inf')
+                    orientation_preferences[i] = float('-inf')
         if args.CONFINE_SNAKES and args.STOP_CONFINED_SNAKES:
             # intial_positions stop to true when the snake goes out of bounds
             # MOVE ABOVE!
@@ -130,8 +144,8 @@ def generate_block(net, position_information, corner, args, block_options, scale
                 else:
                     stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
 
-    direction_index = util.argmax(direction_preferences)
-    direction = next_direction(direction_index)
+        direction_index = util.argmax(orientation_preferences)
+        direction = next_direction(direction_index)
 
     return (block, direction, stop)
 
@@ -206,6 +220,11 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     else:
         block_options = genome.block_list
     
+    # Why is this separated out when args is already passed as a parameter?
+    # For regular shape generation, this is required to make USE_MIN_BLOCK_REQUIREMENT
+    # work. Such an option may also be used here eventually.
+    presence_threshold = args.PRESENCE_THRESHOLD
+
     # Used to scale the point
     xi = int(position_information["xrange"]/2)
     yi = int(position_information["yrange"]/2)
@@ -220,7 +239,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         scaled_point = (x, y, z)
         initial_position = (xi, yi, zi)
 
-        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position)
+        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold)
 
         if block is not None:
             snake.append(block)
