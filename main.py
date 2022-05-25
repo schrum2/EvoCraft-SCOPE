@@ -96,6 +96,8 @@ def main(argv):
                         help='Shows only the blocks that were placed in the shape in front of the shape')
     parser.add_argument('--EVOLVE_ORIENTATION', type=boolean_string, default=False, metavar='',
                         help='Evloves the orientation of the blocks')
+    parser.add_argument('--SAVE_POPULATION', type=boolean_string, default=False, metavar='',
+                        help='Save CPPN population.')
 
     args = parser.parse_args()
    
