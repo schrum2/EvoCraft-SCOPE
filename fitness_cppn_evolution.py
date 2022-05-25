@@ -56,6 +56,8 @@ class FitnessEvolutionMinecraftBreeder(object):
             corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+2+self.args.SPACE_BETWEEN), self.position_information["starty"], self.position_information["startz"])
             self.corners.append(corner)
 
+        self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
+
         self.generation = 0
         
         # Don't try any multithreading yet, but consider for later
@@ -81,14 +83,15 @@ class FitnessEvolutionMinecraftBreeder(object):
         for n, (genome_id, genome) in enumerate(genomes):
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = cppn_generation.query_cppn_for_shape(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
 
             #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
             fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
             genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
-            print("{}. {}: {}".format(n,genome_id,genome.fitness))
+            
+            print("{}. {}: Fitness = {}".format(n,genome_id,genome.fitness))
 
             # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
             # also the program will stop executing after this loop ends since the threshold was met. 
