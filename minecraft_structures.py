@@ -6,7 +6,6 @@ kept in this module.
 # for Minecraft
 #import grpc
 from re import S
-import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
 # Extra space around the populated area to clear and reset

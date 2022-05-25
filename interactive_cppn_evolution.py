@@ -14,7 +14,7 @@ from minecraft_pb2 import *
 
 # For minecraft generation
 import minecraft_structures
-import block_sets
+import threading
 
 # For CPPN generations
 import cppn_generation
@@ -64,7 +64,7 @@ class MinecraftBreeder(object):
         self.generation = 0
 
         # Don't try any multithreading yet, but consider for later
-        self.num_workers = 1
+        self.num_workers = 2
 
 
     def eval_fitness(self, genomes, config):
@@ -104,56 +104,17 @@ class MinecraftBreeder(object):
             all_blocks.extend(shape) # Blocks from all shapes in one flat list
             # Place the fences where the shape will appear
             minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
-
         if self.args.IN_GAME_CONTROL:
-            (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
+            self.in_game_control_options(genomes, config)
 
-            selected = [False for _ in range(config.pop_size)]
-            player_select_done = False
-            
-            while not player_select_done: #player is still selecting
-               
-                # constantly reads the position right below the redstone lamp
-                # to see if the player has switched on a lever
-                for i in range(config.pop_size):
-                    first = on_block_positions[i]
-                    blocks = self.client.readCube(Cube(
-                        min=Point(x=first[0], y=first[1], z=first[2]),
-                        max=Point(x=first[0], y=first[1], z=first[2])
-                    ))
-                    selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
+            # t1 = threading.Thread(target=self.in_game_control_options, args=(genomes, config))
+            # t2 = threading.Thread(target=self.console_reset, args=())
 
-                player_select_done = False
-                j = 0
-                # Checks the hidden Piston Heads associated with each next generation switch. 
-                # If any one is sensed, then player selection is done 
-                while not player_select_done and j < config.pop_size:
-                    pressed = next_block_positions[j]
-                    done_button = self.client.readCube(Cube(
-                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
-                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
-                    ))
-                    player_select_done = done_button.blocks[0].type == PISTON_HEAD
-                    j += 1
-                    
-                if self.args.BLOCK_LIST_EVOLVES:
-                    # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
+            # t1.start()
+            # t2.start()
 
-                    # Reads in the blocks and stores them
-                    read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
-
-                    # Compares each index of the block lists of the genome to what was read in.
-                    for n, (_, genome) in enumerate(genomes):
-                        if(genome.block_list != read_current_blocks[n]):
-                            for i in range(len(genome.block_list)):
-                                # If there was a difference, and it wasn't air, it replaces the blocks in the block_list and regenerates the structure 
-                                if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
-                                    print(genome.block_list)
-                                    # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
-                                    genome.block_list[i]=read_current_blocks[n][i]
-                                    new_shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
-                                    self.client.spawnBlocks(Blocks(blocks=new_shape))
-
+            # t1.join()
+            # t2.join()
         else:
             # Controlled externally by keyboard
 
@@ -191,7 +152,58 @@ class MinecraftBreeder(object):
 
         self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
-    # End of MinecraftBreeder                                                                                                            
+    def in_game_control_options(self, genomes, config):
+        (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
+
+        selected = [False for _ in range(config.pop_size)]
+        player_select_done = False
+            
+        while not player_select_done: #player is still selecting
+                # constantly reads the position right below the redstone lamp
+                # to see if the player has switched on a lever
+            print("happening")
+            for i in range(config.pop_size):
+                first = on_block_positions[i]
+                blocks = self.client.readCube(Cube(
+                        min=Point(x=first[0], y=first[1], z=first[2]),
+                        max=Point(x=first[0], y=first[1], z=first[2])
+                    ))
+                selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
+
+            player_select_done = False
+            j = 0
+                # Checks the hidden Piston Heads associated with each next generation switch. 
+                # If any one is sensed, then player selection is done 
+            while not player_select_done and j < config.pop_size:
+                pressed = next_block_positions[j]
+                done_button = self.client.readCube(Cube(
+                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
+                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
+                    ))
+                player_select_done = done_button.blocks[0].type == PISTON_HEAD
+                j += 1
+                    
+            if self.args.BLOCK_LIST_EVOLVES:
+                    # TODO: This will currently only work with in-game selection, but not with console-based selection. Need to fix.
+                    # Reads in the blocks and stores them
+                read_current_blocks=minecraft_structures.read_current_block_options(self.client,self.corners,self.position_information)
+
+                    # Compares each index of the block lists of the genome to what was read in.
+                for n, (_, genome) in enumerate(genomes):
+                    if(genome.block_list != read_current_blocks[n]):
+                        for i in range(len(genome.block_list)):
+                                # If there was a difference, and it wasn't air, it replaces the blocks in the block_list and regenerates the structure 
+                            if genome.block_list[i] != read_current_blocks[n][i] and read_current_blocks[n][i] != AIR:
+                                print(genome.block_list)
+                                    # print("Genome {} swaps {} for {}".format(genome.key, BlockType.keys()[genome.block_list[i]], BlockType.keys()[read_current_blocks[n][i]]))
+                                genome.block_list[i]=read_current_blocks[n][i]
+                                new_shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+                                self.client.spawnBlocks(Blocks(blocks=new_shape))
+    
+    def console_reset(self):
+        input("Press enter to reset the world")
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+                                                                                                           
 
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")
