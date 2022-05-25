@@ -15,7 +15,7 @@ from minecraft_pb2 import *
 # For minecraft generation
 import minecraft_structures
 import threading
-import sys
+import os
 
 
 # For CPPN generations
@@ -240,7 +240,7 @@ class MinecraftBreeder(object):
                 self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
                 minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
             elif(val=='q'):
-                exit()
+                os._exit(0)
             else:
                 print("This command was not recognized. Please try again")
                 
