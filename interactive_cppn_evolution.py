@@ -19,7 +19,6 @@ import threading
 
 # For CPPN generations
 import cppn_generation
-
 class MinecraftBreeder(object):
     def __init__(self, args, block_list):
         """
@@ -47,8 +46,9 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        t2 = threading.Thread(target=self.console_reset,args=())
-        t2.start()
+        if(self.args.IN_GAME_CONTROL):
+            t = threading.Thread(target=self.console_reset,args=())
+            t.start()
 
         self.reset_ground_and_numbers()
 
@@ -85,24 +85,14 @@ class MinecraftBreeder(object):
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """            
-                                                                                                                      
-        selected = []
-        all_blocks = []
+        """                                                                                                                     
+        self.current_genomes = genomes
+        self.current_config = config
 
-        self.clear_area_and_generate_shapes(genomes, config, selected, all_blocks)
-            
+        all_blocks = self.clear_area_and_generate_shapes(genomes, config)
+        CURRENT_GENOMES = genomes   
         if self.args.IN_GAME_CONTROL:
-            self.in_game_control_options(genomes, config)
-
-            # t1 = threading.Thread(target=self.in_game_control_options, args=(genomes, config))
-            # t2 = threading.Thread(target=self.console_reset, args=())
-
-            # t1.start()
-            # t2.start()
-
-            # t1.join()
-            # t2.join()
+            selected = self.in_game_control_options(genomes, config)
         else:
             # Controlled externally by keyboard
 
@@ -139,15 +129,12 @@ class MinecraftBreeder(object):
 
         self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
-    def clear_area_and_generate_shapes(self, genomes, config, selected, all_blocks):
+    def clear_area_and_generate_shapes(self, genomes, config):
+        all_blocks = []
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN) 
         #print(block_sets.select_possible_block_sets(self.args.POTENTIAL_BLOCK_SET))
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
-            # Initially, none are selected
-            selected.append(False)
-            
-            
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
             shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
@@ -162,6 +149,8 @@ class MinecraftBreeder(object):
             all_blocks.extend(shape) # Blocks from all shapes in one flat list
             # Place the fences where the shape will appear
             minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
+
+        return all_blocks
 
     def in_game_control_options(self, genomes, config):
         (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
@@ -211,13 +200,15 @@ class MinecraftBreeder(object):
                                 new_shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
                                 self.client.spawnBlocks(Blocks(blocks=new_shape))
     
+        return selected
+
     def console_reset(self):
         while 1:
             val = input("Press r to reset the world, or q to quit")
             if(val=='r'):
                 self.reset_ground_and_numbers()
+                self.clear_area_and_generate_shapes(self.current_genomes, self.current_config)
                 minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
-                # self.clear_area_and_generate_shapes(self.genomes, self.config, self.selected, self.all_blocks)
             elif(val=='q'):
                 break
             else:
