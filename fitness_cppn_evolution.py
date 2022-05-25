@@ -47,8 +47,9 @@ class FitnessEvolutionMinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        # Restore ground at the start of evolution
+        # Restore ground & clear previous floating champion arrows at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN)                                                                                                               
 
         # Figure out the lower corner of each shape in advance
         self.corners = []
@@ -77,7 +78,7 @@ class FitnessEvolutionMinecraftBreeder(object):
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
         """            
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN)                                                                                                               
         
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
