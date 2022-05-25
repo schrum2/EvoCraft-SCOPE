@@ -98,6 +98,21 @@ def main(argv):
                         help='Evloves the orientation of the blocks')
     parser.add_argument('--SAVE_POPULATION', type=boolean_string, default=False, metavar='',
                         help='Save CPPN population.')
+    parser.add_argument('--BASE_DIR', type=str, default=None, metavar='',
+                        help='Directory where results from several experiments can be stored.')
+    parser.add_argument('--EXPERIMENT_PREFIX', type=str, default=None, metavar='',
+                        help='Subdir in the BASE_DIR where directories from different runs are stored.')
+    parser.add_argument('--CHECKPOINT_FREQUENCY', type=int, default=10, metavar='',
+                        help='How often in relation to generation number a checkpointer saves the population.')
+    parser.add_argument('--TIME_INTERVAL', type=int, default=10000, metavar='',
+                        help='How often in relation to time a checkpointer saves the population.')
+    parser.add_argument('--LOAD_SAVED_POPULATION', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to load a previously saved experiment.')
+    parser.add_argument('--LOAD_GENERATION', type=int, default=None, metavar='',
+                        help='Generation to load.')
+    parser.add_argument('--LOAD_SAVED_SEED', type=int, default=None, metavar='',
+                        help='Generation seed to load.')
+
 
     args = parser.parse_args()
    
