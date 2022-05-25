@@ -16,6 +16,7 @@ from minecraft_pb2 import *
 import minecraft_structures
 import threading
 
+
 # For CPPN generations
 import cppn_generation
 
@@ -46,6 +47,21 @@ class MinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
+        t2 = threading.Thread(target=self.console_reset,args=())
+        t2.start()
+
+        self.reset_ground_and_numbers()
+
+        # If EVOLVE_SNAKE is true, it will generate a snake,
+        # otherwise it will create the normal structures
+        self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
+
+        self.generation = 0
+
+        # Don't try any multithreading yet, but consider for later
+        self.num_workers = 2
+
+    def reset_ground_and_numbers(self):
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
@@ -56,15 +72,6 @@ class MinecraftBreeder(object):
             self.corners.append(corner)
             # Place the numbers just once. Only works for 0-9
             minecraft_structures.place_number(self.client,self.position_information,corner,n)
-
-        # If EVOLVE_SNAKE is true, it will generate a snake,
-        # otherwise it will create the normal structures
-        self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
-
-        self.generation = 0
-
-        # Don't try any multithreading yet, but consider for later
-        self.num_workers = 2
 
 
     def eval_fitness(self, genomes, config):
@@ -79,31 +86,12 @@ class MinecraftBreeder(object):
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
         """            
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)                                                                                                               
+                                                                                                                      
         selected = []
         all_blocks = []
-        
-        #print(block_sets.select_possible_block_sets(self.args.POTENTIAL_BLOCK_SET))
-        # This loop could be parallelized
-        for n, (genome_id, genome) in enumerate(genomes):
-            # Initially, none are selected
-            selected.append(False)
-            
-            
-            # See how CPPN fills out the shape
-            print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
-            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
-            shape_set = (list(set(map(lambda x: BlockType.values()[x.type], shape))))
-            #print(genome.block_list)
 
-            if self.args.BLOCK_LIST_EVOLVES:
-                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set,self.args.ONLY_SHOW_PLACED)
-            # fill the empty space with the evolved shape
-            self.client.spawnBlocks(Blocks(blocks=shape))
-            # Remember block locations in order to clear them out later
-            all_blocks.extend(shape) # Blocks from all shapes in one flat list
-            # Place the fences where the shape will appear
-            minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
+        self.clear_area_and_generate_shapes(genomes, config, selected, all_blocks)
+            
         if self.args.IN_GAME_CONTROL:
             self.in_game_control_options(genomes, config)
 
@@ -151,6 +139,30 @@ class MinecraftBreeder(object):
             s.type = AIR
 
         self.client.spawnBlocks(Blocks(blocks=all_blocks))
+
+    def clear_area_and_generate_shapes(self, genomes, config, selected, all_blocks):
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN) 
+        #print(block_sets.select_possible_block_sets(self.args.POTENTIAL_BLOCK_SET))
+        # This loop could be parallelized
+        for n, (genome_id, genome) in enumerate(genomes):
+            # Initially, none are selected
+            selected.append(False)
+            
+            
+            # See how CPPN fills out the shape
+            print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
+            shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
+            shape_set = (list(set(map(lambda x: BlockType.values()[x.type], shape))))
+            #print(genome.block_list)
+
+            if self.args.BLOCK_LIST_EVOLVES:
+                minecraft_structures.place_blocks_in_block_list(genome.block_list,self.client,self.corners[n],self.position_information,shape_set,self.args.ONLY_SHOW_PLACED)
+            # fill the empty space with the evolved shape
+            self.client.spawnBlocks(Blocks(blocks=shape))
+            # Remember block locations in order to clear them out later
+            all_blocks.extend(shape) # Blocks from all shapes in one flat list
+            # Place the fences where the shape will appear
+            minecraft_structures.place_fences(self.client, self.position_information, self.corners[n])
 
     def in_game_control_options(self, genomes, config):
         (on_block_positions,next_block_positions) = minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
@@ -201,9 +213,14 @@ class MinecraftBreeder(object):
                                 self.client.spawnBlocks(Blocks(blocks=new_shape))
     
     def console_reset(self):
-        input("Press enter to reset the world")
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-                                                                                                           
+        while 1:
+            val = input("Press r to reset the world, or q to quit")
+            if(val=='r'):
+                minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+            elif(val=='q'):
+                break
+            else:
+                print("This command was not recognized. Please try again")
 
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")
