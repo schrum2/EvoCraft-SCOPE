@@ -47,9 +47,8 @@ class FitnessEvolutionMinecraftBreeder(object):
         channel = grpc.insecure_channel('localhost:5001')
         self.client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
-        # Restore ground & clear previous floating champion arrows at the start of evolution
+        # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN)                                                                                                               
 
         # Figure out the lower corner of each shape in advance
         self.corners = []
@@ -77,9 +76,11 @@ class FitnessEvolutionMinecraftBreeder(object):
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """            
+        """        
+        # clear previous floating arrows
+        self.position_information["starty"] = self.position_information["starty"]+self.position_information["yrange"]
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN)                                                                                                               
-        
+    
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # See how CPPN fills out the shape
@@ -97,8 +98,8 @@ class FitnessEvolutionMinecraftBreeder(object):
             # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
             # also the program will stop executing after this loop ends since the threshold was met. 
             if genome.fitness == config.fitness_threshold:
-                minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n], self.args)
-    
+                minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n])
+        
     # End of FitnessEvolutionMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':

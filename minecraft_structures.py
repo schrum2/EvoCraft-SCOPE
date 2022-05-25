@@ -436,7 +436,7 @@ def read_current_block_options(client,placements,position_information):
         blocks_for_shape.append(block_list) # Adds the list to a list
     return blocks_for_shape # Returns all blocks for all shapes
 
-def declare_champion(client,position_information,corner,args):
+def declare_champion(client,position_information,corner):
     """
     Places a glowstone-generated arrow pointing down on the shape that met the fitness
     threshold value. 
