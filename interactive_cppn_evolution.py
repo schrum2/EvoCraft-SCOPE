@@ -118,7 +118,6 @@ class MinecraftBreeder(object):
                 selected[ind] = True
         
         print("Selected: {}".format(selected))
-
         for n, (genome_id, genome) in enumerate(genomes):
             if selected[n]:
                 genome.fitness = 1.0
@@ -216,11 +215,13 @@ class MinecraftBreeder(object):
         while 1:
             val = input("Press r to reset the world, or q to quit")
             if(val=='r'):
-                minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+                self.reset_ground_and_numbers()
+                minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners)
+                # self.clear_area_and_generate_shapes(self.genomes, self.config, self.selected, self.all_blocks)
             elif(val=='q'):
                 break
             else:
                 print("This command was not recognized. Please try again")
-
+                
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")
