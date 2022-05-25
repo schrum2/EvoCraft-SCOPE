@@ -82,7 +82,7 @@ def occupied_count(client, position_information, corner, args):
         max=Point(x=endx, y=endy, z=endz)
     ))
 
-    for filled in all_the_blocks:
+    for filled in all_the_blocks.blocks:
         if filled.type != AIR:
             number_of_blocks += 1
 
