@@ -66,8 +66,12 @@ def type_target(client, position_information, corner, args):
 def occupied_count(client, position_information, corner, args):
 
     # return the max value fitness threshold if client is none
-    # XRANGE * YRANGE * ZRANGE gives the max threshold since that would be the volume of the shape if all the blocks were non air blocks.
-    if client is None: return args.XRANGE * args.YRANGE * args.ZRANGE
+    if client is None: 
+        volume = args.XRANGE * args.YRANGE * args.ZRANGE
+        # Cannot have more blocks filled than the snake length if snakes are being evolved
+        if args.EVOLVE_SNAKE: return min(volume,args.MAX_SNAKE_LENGTH)
+        # XRANGE * YRANGE * ZRANGE gives the max threshold since that would be the volume of the shape if all the blocks were non air blocks.
+        else: return volume
 
     # Counts the number of blocks
     number_of_blocks = 0
