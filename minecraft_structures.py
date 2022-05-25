@@ -435,3 +435,43 @@ def read_current_block_options(client,placements,position_information):
             index += 2 # Skip over spaces between blocks 
         blocks_for_shape.append(block_list) # Adds the list to a list
     return blocks_for_shape # Returns all blocks for all shapes
+
+def declare_champion(client,position_information,corner,args):
+    """
+    Places a glowstone-generated arrow pointing down on the shape that met the fitness
+    threshold value. 
+
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
+    corner (int,int,int): 3-tuple defining minimal coordinates of generated object
+    args (argparse.Namespace): A collection of argument values collected at the command line
+    """
+
+    # Coordinates for bottom of number shape
+    x = corner[0] + int(position_information["xrange"]/2) - 2
+    y = corner[1] + position_information["yrange"] + HEADROOM - 1
+    z = corner[2]
+
+    # make arrow out of glowstone
+    arrow = [            
+            Block(position=Point(x=x+1,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,   y=y+5,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,   y=y+5,  z=z), type=GLOWSTONE, orientation=NORTH),            
+            Block(position=Point(x=x+3, y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x, y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+4, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x, y=y+2,    z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x-1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH)]
+    
+    client.spawnBlocks(Blocks(blocks=arrow))
