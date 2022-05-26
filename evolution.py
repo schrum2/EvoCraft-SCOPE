@@ -96,6 +96,8 @@ def run(args):
         if args.INTERACTIVE_EVOLUTION:
             while True:
                 mc.generation = pop.generation + 1
+                if(args.LOAD_SAVED_POPULATION_NO_EVOLUTION):
+                    pop = checkpointer.restore_checkpoint('None/None1/gen/gen0')
                 pop.run(mc.eval_fitness, 1)
         else: # Fitness-based evolution
             # TODO: Change 1000 to a command line parameter NUM_GENERATIONS

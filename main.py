@@ -112,6 +112,8 @@ def main(argv):
                         help='Generation to load.')
     parser.add_argument('--LOAD_SAVED_SEED', type=int, default=None, metavar='',
                         help='Generation seed to load.')
+    parser.add_argument('--LOAD_SAVED_POPULATION_NO_EVOLUTION', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to load a previously saved set of shapes that will not evolve')
 
     args = parser.parse_args()
    
