@@ -112,7 +112,7 @@ def main(argv):
                         help='Generation to load.')
     parser.add_argument('--LOAD_SAVED_SEED', type=int, default=None, metavar='',
                         help='Generation seed to load.')
-    parser.add_argument('--NUM_FITNESS_ELITES', type=int, default=None, metavar='',
+    parser.add_argument('--NUM_FITNESS_ELITES', type=int, default=2, metavar='',
                         help='Generation seed to load.')
 
     args = parser.parse_args()
