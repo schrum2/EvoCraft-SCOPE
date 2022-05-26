@@ -101,7 +101,7 @@ class MinecraftBreeder(object):
             else:
                 # Controlled externally by keyboard
 
-                # Creates a string that is the user's input, then either resets or quits the program, or converts it into a list of selected shapes
+                # Creates a string that is the user's input, then either resets or quits the program, saves it, or converts it into a list of selected shapes
                 vals_selected = False
                 selected_vals = []
                 while(not vals_selected):
@@ -111,7 +111,7 @@ class MinecraftBreeder(object):
                         self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
                     elif vals== 'q': # Quits the program
                         quit()
-                    elif vals== 's' or vals== 'l':   
+                    elif vals== 's':   
                         pop = neat.Population(config)
 
                         # Add a stdout reporter to show progress in the terminal.
@@ -128,24 +128,19 @@ class MinecraftBreeder(object):
                         dir_exists = os.path.isdir(sub_path)
                         if not dir_exists:
                             os.mkdir(sub_path)
-    
+                        
+                        #makes one more method
                         pop_path = '{}/gen/'.format(sub_path)
                         dir_exists = os.path.isdir(pop_path)
                         if not dir_exists:
                             os.mkdir(pop_path)
 
                         checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
-                        if(vals == 's'):
-                            if not self.args.LOAD_SAVED_POPULATION and self.args.SAVE_POPULATION:
-                                # pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
-                                checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
-                            else:
-                                print("SAVE_FITNESS_LOG must be True in order to save. Also, LOAD_SAVED_POPULATION must be false.")
-                        # Load seems to only work for not interactive evolution. Commenting out, but will probably delete 
-                        # else: #vals is l
-                        #     if not self.args.SAVE_POPULATION and self.args.LOAD_SAVED_POPULATION:
-                        #         pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
-                        #     pop.run(mc.eval_fitness, generations)
+                        if not self.args.LOAD_SAVED_POPULATION and self.args.SAVE_POPULATION:
+                            # pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
+                            checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
+                        else:
+                            print("SAVE_FITNESS_LOG must be True in order to save. Also, LOAD_SAVED_POPULATION must be false.")
                     else:
                         try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
                             split_vals = vals.split(' ')
