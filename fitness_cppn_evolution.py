@@ -110,6 +110,11 @@ class FitnessEvolutionMinecraftBreeder(object):
                 minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n])
                 champion_found = True
       
+        if self.args.USE_ELITISM:
+            elite_count = self.args.NUM_FITNESS_ELITES
+            print("{} elite survivors".format(elite_count))
+            config.reproduction_config.elitism = elite_count
+
         if not champion_found and not self.args.KEEP_WORLD_ON_EXIT:      
             for s in all_blocks:
                 s.type = AIR

@@ -104,7 +104,7 @@ def run(args):
                 pop.run(mc.eval_fitness, 1)
         else: # Fitness-based evolution
             # TODO: Change 1000 to a command line parameter NUM_GENERATIONS
-            generations = 1000
+            generations = args.MAX_NUM_GENERATIONS
             print("Evolve for {} generations".format(generations))
             
             if not args.SAVE_FITNESS_LOG and args.LOAD_SAVED_POPULATION:
