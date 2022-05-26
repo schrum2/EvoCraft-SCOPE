@@ -183,6 +183,7 @@ class MinecraftBreeder(object):
             os.mkdir(pop_path)
 
         checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
+        print(self.generation)
         checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.generation)
 
     def clear_area_and_generate_shapes(self, genomes, config):
@@ -196,7 +197,7 @@ class MinecraftBreeder(object):
 
         Return:
 
-        all_blocks(list of Blocks): Dtores info as to where blocks were placed for deleting snakes
+        all_blocks(list of Blocks): Stores info as to where blocks were placed for deleting snakes
         """
         all_blocks = []
         #clears area for structures
