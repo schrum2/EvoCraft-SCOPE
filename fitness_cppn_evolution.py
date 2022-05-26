@@ -82,7 +82,9 @@ class FitnessEvolutionMinecraftBreeder(object):
         position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
         minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN)                                                                                                               
         all_blocks = []                                                                                                             
-        
+
+        champion_found = False 
+
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # See how CPPN fills out the shape
@@ -99,13 +101,16 @@ class FitnessEvolutionMinecraftBreeder(object):
 
             # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
             # also the program will stop executing after this loop ends since the threshold was met. 
-            if genome.fitness == config.fitness_threshold:
+            if genome.fitness >= config.fitness_threshold:
                 minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n], self.args)
+                champion_found = True
+      
+        if not champion_found:      
+            for s in all_blocks:
+                s.type = AIR
+            self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
-        for s in all_blocks:
-            s.type = AIR
-
-        self.client.spawnBlocks(Blocks(blocks=all_blocks))
+        
     
     # End of FitnessEvolutionMinecraftBreeder                                                                                                            
 
