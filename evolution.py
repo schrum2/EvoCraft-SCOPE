@@ -67,10 +67,10 @@ def run(args):
 
     pop = neat.Population(config)
 
-    # do not save unless SAVE_POPULATION is true and names for BASE_DIR and EXPERIMENT_PREFIX other than None are given 
+    # do not save unless SAVE_FITNESS_LOG is true and names for BASE_DIR and EXPERIMENT_PREFIX other than None are given 
     invalid_dir_names = args.BASE_DIR is None or args.EXPERIMENT_PREFIX is None
     print(invalid_dir_names)
-    if args.SAVE_POPULATION and not invalid_dir_names:
+    if args.SAVE_FITNESS_LOG and not invalid_dir_names:
         # Add a stdout reporter to show progress in the terminal.
         pop.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
@@ -106,7 +106,7 @@ def run(args):
             generations = 1000
             print("Evolve for {} generations".format(generations))
             
-            if not args.SAVE_POPULATION and args.LOAD_SAVED_POPULATION:
+            if not args.SAVE_FITNESS_LOG and args.LOAD_SAVED_POPULATION:
                 pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
             
             pop.run(mc.eval_fitness, generations)
@@ -114,11 +114,12 @@ def run(args):
     finally:
         # only save to csv for fitness based evolution
         if not args.INTERACTIVE_EVOLUTION:
-            if not args.LOAD_SAVED_POPULATION and args.SAVE_POPULATION and not invalid_dir_names:
+            if not args.LOAD_SAVED_POPULATION and args.SAVE_FITNESS_LOG and not invalid_dir_names:
                 checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
                 stats.save()
                 # cross_validation has to be false, true produces an error, also the git thing said
                 stats.save_genome_fitness(filename='{}/{}{}/results.csv'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.RANDOM_SEED),with_cross_validation=False)
+
 
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
