@@ -105,20 +105,50 @@ class MinecraftBreeder(object):
                 vals_selected = False
                 selected_vals = []
                 while(not vals_selected):
-                    vals = input("Select the shapes you like, or type r to reset, or q to quit:")
-                    if(vals=='r'): # Resets structures and shape, potential for refactoring
+                    vals = input("Select the shapes you like, or type r to reset,q to quit, or s to save:")
+                    if(vals=='r'): # Resets structures and shapes
                         self.reset_ground_and_numbers() #resets ground and numbers
                         self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
-                        minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
                     elif vals== 'q': # Quits the program
                         quit()
+                    elif not self.args.LOAD_SAVED_POPULATION and self.args.SAVE_POPULATION:
+                        pop = neat.Population(config)
+
+                        # Add a stdout reporter to show progress in the terminal.
+                        pop.add_reporter(neat.StdOutReporter(True))
+                        stats = neat.StatisticsReporter()
+                        pop.add_reporter(stats)
+                        base_path = '{}'.format(self.args.BASE_DIR)
+                        dir_exists = os.path.isdir(base_path)
+                        if not dir_exists:
+                            os.mkdir(base_path)
+    
+                        # make sub dir too
+                        sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+                        dir_exists = os.path.isdir(sub_path)
+                        if not dir_exists:
+                            os.mkdir(sub_path)
+    
+                        pop_path = '{}/gen/'.format(sub_path)
+                        dir_exists = os.path.isdir(pop_path)
+                        if not dir_exists:
+                            os.mkdir(pop_path)
+
+                        checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
+
+                        # pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
+
+                        checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
+                        # stats.save()
+                        # cross_validation has to be false, true produces an error, also the git thing said
+                        # stats.save_genome_fitness(filename='{}/{}{}/results.csv'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.RANDOM_SEED),with_cross_validation=False)
                     else:
                         try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
                             split_vals = vals.split(' ')
                             selected_vals = list(map(int,split_vals))
                             vals_selected = True
                         except ValueError:
-                            print("That wasn't quite right. Look at what you typed and try again!")
+                            print("This command was not recognized. Please try again")
                             vals_selected = False #turns back to false if not able
 
                 # Initialize to all False
