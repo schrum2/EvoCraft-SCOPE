@@ -88,10 +88,11 @@ class FitnessEvolutionMinecraftBreeder(object):
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # If the number of individuals has grown beyond the original size,
-            # given fitness of negative infinity to those extra individuals.
+            # more corners need to be added to reserve a slot in the world for the shape.
             if n >= self.args.POPULATION_SIZE:
-                genome.fitness = float("-inf")
-                continue
+                corner = (self.position_information["startx"] + n*(self.position_information["xrange"]+2+self.args.SPACE_BETWEEN), self.position_information["starty"], self.position_information["startz"])
+                self.corners.append(corner)
+
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
             shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
