@@ -120,7 +120,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
     stop = False
 
     if args.EVOLVE_SNAKE:
-        print("generate_block:EVOLVE_SNAKE")
+        #print("generate_block:EVOLVE_SNAKE")
         direction_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
         if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES:
             # Movements that go out of bounds are made undesirable with a preference of negative infinity
