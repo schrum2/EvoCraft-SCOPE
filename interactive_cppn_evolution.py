@@ -112,7 +112,7 @@ class MinecraftBreeder(object):
                     elif vals== 'q': # Quits the program
                         quit()
                     elif vals== 's':   
-                        self.save_by_user(config)
+                        self.save_by_user(config, genomes)
                     else:
                         try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
                             split_vals = vals.split(' ')
@@ -151,20 +151,20 @@ class MinecraftBreeder(object):
 
             self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
-    def save_by_user(self, config):
+    def save_by_user(self, config, genomes):
         """
         Generates new directories, or accesses them if they exist, and then saves the infromation
         on the shapes generated to the computer
 
         Parameters: 
         config  (Config): NEAT configurations
+        genomes ([int,DefaultGenome]): list of tuples of id numbers and genome pairs
         """
-        pop = neat.Population(config)
+        # Build dictionary out of the lisst of 2-tuples
+        population = {}
+        for (genome_id, genome) in genomes:
+            population[genome_id] = genome
 
-        # Add a stdout reporter to show progress in the terminal.
-        pop.add_reporter(neat.StdOutReporter(True))
-        stats = neat.StatisticsReporter()
-        pop.add_reporter(stats)
         base_path = '{}'.format(self.args.BASE_DIR)
         dir_exists = os.path.isdir(base_path)
         if not dir_exists:
@@ -183,11 +183,7 @@ class MinecraftBreeder(object):
             os.mkdir(pop_path)
 
         checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
-        if not self.args.LOAD_SAVED_POPULATION and self.args.SAVE_POPULATION:
-            # Saves as a file 
-            checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
-        else:
-            print("SAVE_FITNESS_LOG must be True in order to save. Also, LOAD_SAVED_POPULATION must be false.")
+        checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.generation)
 
     def clear_area_and_generate_shapes(self, genomes, config):
         """
