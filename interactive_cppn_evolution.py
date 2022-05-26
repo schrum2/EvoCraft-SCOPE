@@ -141,6 +141,11 @@ class MinecraftBreeder(object):
                                 checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
                             else:
                                 print("SAVE_FITNESS_LOG must be True in order to save. Also, LOAD_SAVED_POPULATION must be false.")
+                        # Load seems to only work for not interactive evolution. Commenting out, but will probably delete 
+                        # else: #vals is l
+                        #     if not self.args.SAVE_POPULATION and self.args.LOAD_SAVED_POPULATION:
+                        #         pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
+                        #     pop.run(mc.eval_fitness, generations)
                     else:
                         try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
                             split_vals = vals.split(' ')
