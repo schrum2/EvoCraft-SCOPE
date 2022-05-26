@@ -250,4 +250,9 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
             yi += direction[1]
             zi += direction[2]
 
+    if(len(snake) == 0):
+        print("Genome at corner {} is empty".format(corner))
+    else:
+        print("Genome at corner {} generated {} blocks of these types: {}".format(corner,len(snake),set(map(lambda x: BlockType.keys()[x.type], snake))))
+
     return snake
