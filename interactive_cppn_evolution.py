@@ -93,58 +93,62 @@ class MinecraftBreeder(object):
         self.current_genomes = genomes
         self.current_config = config
 
-        all_blocks = self.clear_area_and_generate_shapes(genomes, config)  
-        if self.args.IN_GAME_CONTROL:
-            selected = self.in_game_control_options(genomes, config)
-        else:
-            # Controlled externally by keyboard
-
-            # Creates a string that is the user's input, then either resets or quits the program, or converts it into a list of selected shapes
-            vals_selected = False
-            while(not vals_selected):
-                vals = input("Select the shapes you like, or type r to reset, or q to quit:")
-                if(vals=='r'): # Resets structures and shape, potential for refactoring
-                    self.reset_ground_and_numbers() #resets ground and numbers
-                    self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
-                    minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
-                elif vals== 'q': # Quits the program
-                    quit()
-                else:
-                    try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
-                        split_vals = vals.split(' ')
-                        selected_vals = list(map(int,split_vals))
-                        vals_selected = True
-                    except ValueError:
-                        print("That wasn't quite right. Look at what you typed and try again!")
-                        vals_selected = False #turns back to false if not able
-
-            # Initialize to all False
-            selected = [False for i in range(config.pop_size)]
-            # Then set to True for the items that are selected
-            for ind in selected_vals:
-                selected[ind] = True
-        
-        print("Selected: {}".format(selected))
-        for n, (genome_id, genome) in enumerate(genomes):
-            if selected[n]:
-                genome.fitness = 1.0
+        all_blocks = []
+        try:
+            all_blocks = self.clear_area_and_generate_shapes(genomes, config)  
+            if self.args.IN_GAME_CONTROL:
+                selected = self.in_game_control_options(genomes, config)
             else:
-                genome.fitness = 0.0
-            print("{}. {}: {}".format(n,genome_id,genome.fitness))
+                # Controlled externally by keyboard
 
-        if self.args.USE_ELITISM:
-            # To assure that all selected individuals survive, the elitism setting is changed
-            elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
-            print("{} elite survivors".format(elite_count))
-            config.reproduction_config.elitism = elite_count
+                # Creates a string that is the user's input, then either resets or quits the program, or converts it into a list of selected shapes
+                vals_selected = False
+                selected_vals = []
+                while(not vals_selected):
+                    vals = input("Select the shapes you like, or type r to reset, or q to quit:")
+                    if(vals=='r'): # Resets structures and shape, potential for refactoring
+                        self.reset_ground_and_numbers() #resets ground and numbers
+                        self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
+                        minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
+                    elif vals== 'q': # Quits the program
+                        quit()
+                    else:
+                        try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
+                            split_vals = vals.split(' ')
+                            selected_vals = list(map(int,split_vals))
+                            vals_selected = True
+                        except ValueError:
+                            print("That wasn't quite right. Look at what you typed and try again!")
+                            vals_selected = False #turns back to false if not able
 
-        # Take the originally generated shape and replace each block with AIR,
-        # then spawn the blocks to clear the previous shape, even if parts were
-        # out of bounds (mainly an issue for snakes)
-        for s in all_blocks:
-            s.type = AIR
+                # Initialize to all False
+                selected = [False for i in range(config.pop_size)]
+                # Then set to True for the items that are selected
+                for ind in selected_vals:
+                    selected[ind] = True
+            
+            print("Selected: {}".format(selected))
+            for n, (genome_id, genome) in enumerate(genomes):
+                if selected[n]:
+                    genome.fitness = 1.0
+                else:
+                    genome.fitness = 0.0
+                print("{}. {}: {}".format(n,genome_id,genome.fitness))
 
-        self.client.spawnBlocks(Blocks(blocks=all_blocks))
+            if self.args.USE_ELITISM:
+                # To assure that all selected individuals survive, the elitism setting is changed
+                elite_count = int(sum(map(lambda b : 1 if b else 0, selected)))
+                print("{} elite survivors".format(elite_count))
+                config.reproduction_config.elitism = elite_count
+
+        finally:
+            # Take the originally generated shape and replace each block with AIR,
+            # then spawn the blocks to clear the previous shape, even if parts were
+            # out of bounds (mainly an issue for snakes)
+            for s in all_blocks:
+                s.type = AIR
+
+            self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
     def clear_area_and_generate_shapes(self, genomes, config):
         """
