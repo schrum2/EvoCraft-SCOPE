@@ -394,6 +394,7 @@ def player_selection_switches(client, position_information, corners):
         # stores the position underneath one piston as it loops through
         next_block_position = (middle + 1,GROUND_LEVEL - 2,zplacement-5)
         to_spawn.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1]+1, z=next_block_position[2]), type=PISTON, orientation=DOWN))
+        to_spawn.append(Block(position=Point(x=next_block_position[0], y=next_block_position[1], z=next_block_position[2]), type=DIAMOND_BLOCK, orientation=DOWN))
         next_block_positions.append(next_block_position)
         to_spawn.append(Block(position=Point(x=next_block_position[0], y=GROUND_LEVEL, z=zplacement-5), type=WOODEN_BUTTON, orientation=NORTH))
     

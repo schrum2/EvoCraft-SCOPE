@@ -99,10 +99,24 @@ class MinecraftBreeder(object):
         else:
             # Controlled externally by keyboard
 
-            # Creates a string that is the user's input, and the converts it to a list
-            vals = input("Select the ones you like:")
-            split_vals = vals.split(' ')
-            selected_vals = list(map(int,split_vals))
+            # Creates a string that is the user's input, then either resets or quits the program, or converts it into a list of selected shapes
+            vals_selected = False
+            while(not vals_selected):
+                vals = input("Select the shapes you like, or type r to reset, or q to quit:")
+                if(vals=='r'): # Resets structures and shape, potential for refactoring
+                    self.reset_ground_and_numbers() #resets ground and numbers
+                    self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
+                    minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
+                elif vals== 'q': # Quits the program
+                    quit()
+                else:
+                    try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
+                        split_vals = vals.split(' ')
+                        selected_vals = list(map(int,split_vals))
+                        vals_selected = True
+                    except ValueError:
+                        print("That wasn't quite right. Look at what you typed and try again!")
+                        vals_selected = False #turns back to false if not able
 
             # Initialize to all False
             selected = [False for i in range(config.pop_size)]
@@ -201,10 +215,10 @@ class MinecraftBreeder(object):
             while not player_select_done and j < config.pop_size:
                 pressed = next_block_positions[j]
                 done_button = self.client.readCube(Cube(
-                        min=Point(x=pressed[0], y=pressed[1], z=pressed[2]),
-                        max=Point(x=pressed[0], y=pressed[1], z=pressed[2])
+                        min=Point(x=pressed[0], y=pressed[1]-1, z=pressed[2]),
+                        max=Point(x=pressed[0], y=pressed[1]-1, z=pressed[2])
                     ))
-                player_select_done = done_button.blocks[0].type == PISTON_HEAD
+                player_select_done = done_button.blocks[0].type == DIAMOND_BLOCK
                 j += 1
                     
             if self.args.BLOCK_LIST_EVOLVES:
