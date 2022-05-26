@@ -86,9 +86,12 @@ class FitnessEvolutionMinecraftBreeder(object):
         champion_found = False 
 
         # This loop could be parallelized
-        #for n, (genome_id, genome) in enumerate(genomes):
-        for n in range(self.args.POPULATION_SIZE):
-            (genome_id, genome) = genomes[n]
+        for n, (genome_id, genome) in enumerate(genomes):
+            # If the number of individuals has grown beyond the original size,
+            # given fitness of negative infinity to those extra individuals.
+            if n >= self.args.POPULATION_SIZE:
+                genome.fitness = float("-inf")
+                continue
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
             shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
