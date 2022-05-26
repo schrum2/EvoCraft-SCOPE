@@ -71,7 +71,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         return shape
 
-def generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold): 
+def generate_block(net, position_information, corner, args, block_options, scaled_point, relative_position, presence_threshold): 
     """
     Returns a block to generate if it is present at a specific position and None
     if it isn't
@@ -82,7 +82,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
     args (argparse.Namespace): a collection of argument values collected at the command line 
     block_options ([Block]): List of blocks that can be spawned in 
     scaled_point (int, int, int): three-tuple of the position being looked at
-    initial_position (int, int, int): three-tuple used to scale the position of the point
+    relative_position (int, int, int): three-tuple used to scale the position of the point
 
     Returns:
     ((Block), (int,int,int), (bool)): Returns a tuple, including a block if it is present, None otherwise;
@@ -108,11 +108,11 @@ def generate_block(net, position_information, corner, args, block_options, scale
         block_orientation = NORTH
         if args.EVOLVE_ORIENTATION:
             if args.EVOLVE_SNAKE:
-                orientation_preferences = output[len(block_options)+7:len(block_options)+7+NUM_DIRECTIONS]
+                orientation_preferences = output[len(block_options)+NUM_DIRECTIONS+1:len(block_options)+1+2*NUM_DIRECTIONS]
             else: 
-               orientation_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS] 
+                orientation_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS] 
             block_orientation = util.argmax(orientation_preferences) # Argmax from 0-5 to get orienation of block
-        block = Block(position=Point(x=corner[0]+initial_position[0], y=corner[1]+initial_position[1], z=corner[2]+initial_position[2]), type=block_options[output_val], orientation=block_orientation)
+        block = Block(position=Point(x=corner[0]+relative_position[0], y=corner[1]+relative_position[1], z=corner[2]+relative_position[2]), type=block_options[output_val], orientation=block_orientation)
     else:
         block = None
 
@@ -120,30 +120,30 @@ def generate_block(net, position_information, corner, args, block_options, scale
     stop = False
 
     if args.EVOLVE_SNAKE:
-        orientation_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
+        print("generate_block:EVOLVE_SNAKE")
+        direction_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
         if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES:
+            # Movements that go out of bounds are made undesirable with a preference of negative infinity
             for i in range(NUM_DIRECTIONS):
                 possible_direction = next_direction(i)
-                # intial_positions the value to any direction that is out of bounds to float('-inf')
-                if check_out_of_bounds(initial_position, possible_direction, position_information):
-                    orientation_preferences[i] = float('-inf')
-        if args.CONFINE_SNAKES and args.STOP_CONFINED_SNAKES:
-            # intial_positions stop to true when the snake goes out of bounds
-            # MOVE ABOVE!
-            for i in range(NUM_DIRECTIONS):
-                possible_direction = next_direction(i)
-                if check_out_of_bounds(initial_position, possible_direction, position_information):
-                    stop = True
-        else:
-            for i in range(NUM_DIRECTIONS):
-                possible_direction = next_direction(i)
-                if initial_position[1] + possible_direction[1] < 0 :
-                    stop = True
-                else:
-                    stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
+                # relative_position the value to any direction that is out of bounds to float('-inf')
+                if check_out_of_bounds(relative_position, possible_direction, position_information):
+                    direction_preferences[i] = float('-inf')
 
-        direction_index = util.argmax(orientation_preferences)
+        # Pick most preferred direction
+        direction_index = util.argmax(direction_preferences)
         direction = next_direction(direction_index)
+
+        if args.CONFINE_SNAKES and args.STOP_CONFINED_SNAKES:
+            # If confining snakes, simply stop when going out of bounds
+            if check_out_of_bounds(relative_position, direction, position_information):
+                stop = True
+
+        # No matter what, do not allow placement at y lower than 0 since this is illegal
+        if relative_position[1] + direction[1] < 0 :
+            stop = True
+        else: # Otherwise, stopping depends on continuation output
+            stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
 
     return (block, direction, stop)
 
