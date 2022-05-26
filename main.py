@@ -70,6 +70,8 @@ def main(argv):
                         help='Confines the snake generations so that they do not cross with other snakes.')
     parser.add_argument('--REDIRECT_CONFINED_SNAKES', type=boolean_string, default=False, metavar='',
                         help='If the snake goes out of bounds, the direction will change so that it stays within bounds.')
+    parser.add_argument('--REDIRECT_CONFINED_SNAKES_UP', type=boolean_string, default=False, metavar='',
+                        help='If the snake goes out of bounds, the direction will change to go up so that it stays within bounds.')
     parser.add_argument('--STOP_CONFINED_SNAKES', type=boolean_string, default=False, metavar='',
                         help='If the snake goes out of bounds, the snake will stop rendering.')      
     parser.add_argument('--CONTINUATION_THRESHOLD', type=float, default=0.5, metavar='',
