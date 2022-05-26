@@ -152,6 +152,13 @@ class MinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
     def save_by_user(self, config):
+        """
+        Generates new directories, or accesses them if they exist, and then saves the infromation
+        on the shapes generated to the computer
+
+        Parameters: 
+        config  (Config): NEAT configurations
+        """
         pop = neat.Population(config)
 
         # Add a stdout reporter to show progress in the terminal.
@@ -163,13 +170,13 @@ class MinecraftBreeder(object):
         if not dir_exists:
             os.mkdir(base_path)
     
-        # make sub dir too
+        # Makes a sub dir too
         sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
         dir_exists = os.path.isdir(sub_path)
         if not dir_exists:
             os.mkdir(sub_path)
                         
-        #makes one more method
+        # Makes one more method
         pop_path = '{}/gen/'.format(sub_path)
         dir_exists = os.path.isdir(pop_path)
         if not dir_exists:
@@ -177,7 +184,7 @@ class MinecraftBreeder(object):
 
         checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
         if not self.args.LOAD_SAVED_POPULATION and self.args.SAVE_POPULATION:
-                            # pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
+            # Saves as a file 
             checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
         else:
             print("SAVE_FITNESS_LOG must be True in order to save. Also, LOAD_SAVED_POPULATION must be false.")
@@ -281,18 +288,20 @@ class MinecraftBreeder(object):
 
     def console_reset(self):
         """
-        Continusouly prompts the user for a letter. r resets everything that was generate and q quits the program. Any
+        Continusouly prompts the user for a letter. r resets everything that was generate s saves the shapes, and q quits the program. Any
         other letter asks for the user to try again. This is multithreaded so that it runs in the background while 
         the rest of the code does its thing. If anything gets destroyed, reset ensures its still usuable
         """
         while 1:
-            val = input("Press r to reset the world, or q to quit\n")
+            val = input("Press r to reset the world,q to quit, or s to save\n")
             if(val=='r'):
                 self.reset_ground_and_numbers() #resets ground and numbers
                 self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
                 minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
             elif(val=='q'):
                 os._exit(0)
+            elif val== 's':   
+                self.save_by_user(self.current_config)
             else:
                 print("This command was not recognized. Please try again")
                 
