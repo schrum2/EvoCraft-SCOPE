@@ -56,7 +56,7 @@ def main(argv):
                         help='Whether or not the presence threshold depends on the distance of the candidate block from the center of the generated shape.')
     parser.add_argument('--DISTANCE_PRESENCE_MULTIPLIER', type=float, default=0.1, metavar='',
                         help='The multiplier used when DISTANC_PRESENCE_THRESHOLD is true.')
-    parser.add_argument('--RANDOM_SEED', type=random.Random, default=random.randrange(0,100,1), metavar='',
+    parser.add_argument('--RANDOM_SEED', type=int, default=random.randrange(0,100,1), metavar='',
                         help='Random seed of the shapes produced on the initial time.')
     parser.add_argument('--SPACE_BETWEEN', type=int, default=1, metavar='',
                         help='The space between the fences of each shape.')
@@ -112,7 +112,6 @@ def main(argv):
                         help='Generation to load.')
     parser.add_argument('--LOAD_SAVED_SEED', type=int, default=None, metavar='',
                         help='Generation seed to load.')
-
 
     args = parser.parse_args()
    
