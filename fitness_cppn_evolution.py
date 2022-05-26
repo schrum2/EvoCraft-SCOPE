@@ -110,7 +110,7 @@ class FitnessEvolutionMinecraftBreeder(object):
                 minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n], self.args)
                 champion_found = True
       
-        if not champion_found:      
+        if not champion_found and not self.args.KEEP_WORLD_ON_EXIT:      
             for s in all_blocks:
                 s.type = AIR
             self.client.spawnBlocks(Blocks(blocks=all_blocks))
