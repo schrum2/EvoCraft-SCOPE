@@ -114,11 +114,12 @@ def main(argv):
                         help='Generation to load.')
     parser.add_argument('--LOAD_SAVED_SEED', type=int, default=None, metavar='',
                         help='Generation seed to load.')
+    parser.add_argument('--', type=boolean_string, default=False, metavar='',
     parser.add_argument('--NUM_FITNESS_ELITES', type=int, default=2, metavar='',
                         help='Specific number of top elites to copy into the next generation for fitness cppn evolution.')
     parser.add_argument('--MAX_NUM_GENERATIONS', type=int, default=1000, metavar='',
                         help='Max number of generations that can occur if not stopped by a champion.')
-    parser.add_argument('--LOAD_SAVED_POPULATION_NO_EVOLUTION', type=boolean_string, default=False, metavar='',
+    parser.add_argument('--LOAD_SAVED_NO_EVOLUTION', type=boolean_string, default=False, metavar='',
                         help='Whether or not to load a previously saved set of shapes that will not evolve')
 
     args = parser.parse_args()
