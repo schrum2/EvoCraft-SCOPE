@@ -118,6 +118,8 @@ def main(argv):
                         help='Specific number of top elites to copy into the next generation for fitness cppn evolution.')
     parser.add_argument('--MAX_NUM_GENERATIONS', type=int, default=1000, metavar='',
                         help='Max number of generations that can occur if not stopped by a champion.')
+    parser.add_argument('--LOAD_SAVED_POPULATION_NO_EVOLUTION', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to load a previously saved set of shapes that will not evolve')
 
     args = parser.parse_args()
    
