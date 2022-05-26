@@ -67,29 +67,33 @@ def run(args):
 
     pop = neat.Population(config)
 
-    # Add a stdout reporter to show progress in the terminal.
-    pop.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    pop.add_reporter(stats)
-    base_path = '{}'.format(args.BASE_DIR)
-    dir_exists = os.path.isdir(base_path)
-    if not dir_exists:
-        os.mkdir(base_path)
-    
-    # make sub dir too
-    sub_path = '{}/{}{}'.format(base_path,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
-    dir_exists = os.path.isdir(sub_path)
-    if not dir_exists:
-        os.mkdir(sub_path)
-    
-    pop_path = '{}/gen/'.format(sub_path)
-    dir_exists = os.path.isdir(pop_path)
-    if not dir_exists:
-        os.mkdir(pop_path)
+    # do not save unless SAVE_POPULATION is true and names for BASE_DIR and EXPERIMENT_PREFIX other than None are given 
+    invalid_dir_names = args.BASE_DIR is None or args.EXPERIMENT_PREFIX is None
+    print(invalid_dir_names)
+    if args.SAVE_POPULATION and not invalid_dir_names:
+        # Add a stdout reporter to show progress in the terminal.
+        pop.add_reporter(neat.StdOutReporter(True))
+        stats = neat.StatisticsReporter()
+        pop.add_reporter(stats)
+        base_path = '{}'.format(args.BASE_DIR)
+        dir_exists = os.path.isdir(base_path)
+        if not dir_exists:
+            os.mkdir(base_path)
+        
+        # make sub dir too
+        sub_path = '{}/{}{}'.format(base_path,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
+        dir_exists = os.path.isdir(sub_path)
+        if not dir_exists:
+            os.mkdir(sub_path)
+        
+        pop_path = '{}/gen/'.format(sub_path)
+        dir_exists = os.path.isdir(pop_path)
+        if not dir_exists:
+            os.mkdir(pop_path)
 
-    checkpointer = neat.Checkpointer(args.CHECKPOINT_FREQUENCY, args.TIME_INTERVAL, "{}gen".format(pop_path))
+        checkpointer = neat.Checkpointer(args.CHECKPOINT_FREQUENCY, args.TIME_INTERVAL, "{}gen".format(pop_path))
     
-    pop.add_reporter(checkpointer)
+        pop.add_reporter(checkpointer)
 
     # Evolve forever: TODO: Add use means of stopping
     try:
@@ -110,7 +114,7 @@ def run(args):
     finally:
         # only save to csv for fitness based evolution
         if not args.INTERACTIVE_EVOLUTION:
-            if not args.LOAD_SAVED_POPULATION and args.SAVE_POPULATION:
+            if not args.LOAD_SAVED_POPULATION and args.SAVE_POPULATION and not invalid_dir_names:
                 checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
                 stats.save()
                 # cross_validation has to be false, true produces an error, also the git thing said
