@@ -113,7 +113,9 @@ def main(argv):
     parser.add_argument('--LOAD_SAVED_SEED', type=int, default=None, metavar='',
                         help='Generation seed to load.')
     parser.add_argument('--NUM_FITNESS_ELITES', type=int, default=2, metavar='',
-                        help='Generation seed to load.')
+                        help='Specific number of top elites to copy into the next generation for fitness cppn evolution.')
+    parser.add_argument('--MAX_NUM_GENERATIONS', type=int, default=1000, metavar='',
+                        help='Max number of generations that can occur if not stopped by a champion.')
 
     args = parser.parse_args()
    
