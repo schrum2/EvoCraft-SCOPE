@@ -111,37 +111,38 @@ class MinecraftBreeder(object):
                         self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
                     elif vals== 'q': # Quits the program
                         quit()
-                    elif not self.args.LOAD_SAVED_POPULATION and self.args.SAVE_POPULATION:
-                        pop = neat.Population(config)
+                    elif vals== 's':   
+                        if not self.args.LOAD_SAVED_POPULATION and self.args.SAVE_POPULATION:
+                            pop = neat.Population(config)
 
-                        # Add a stdout reporter to show progress in the terminal.
-                        pop.add_reporter(neat.StdOutReporter(True))
-                        stats = neat.StatisticsReporter()
-                        pop.add_reporter(stats)
-                        base_path = '{}'.format(self.args.BASE_DIR)
-                        dir_exists = os.path.isdir(base_path)
-                        if not dir_exists:
-                            os.mkdir(base_path)
+                            # Add a stdout reporter to show progress in the terminal.
+                            pop.add_reporter(neat.StdOutReporter(True))
+                            stats = neat.StatisticsReporter()
+                            pop.add_reporter(stats)
+                            base_path = '{}'.format(self.args.BASE_DIR)
+                            dir_exists = os.path.isdir(base_path)
+                            if not dir_exists:
+                                os.mkdir(base_path)
     
-                        # make sub dir too
-                        sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
-                        dir_exists = os.path.isdir(sub_path)
-                        if not dir_exists:
-                            os.mkdir(sub_path)
+                            # make sub dir too
+                            sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+                            dir_exists = os.path.isdir(sub_path)
+                            if not dir_exists:
+                                os.mkdir(sub_path)
     
-                        pop_path = '{}/gen/'.format(sub_path)
-                        dir_exists = os.path.isdir(pop_path)
-                        if not dir_exists:
-                            os.mkdir(pop_path)
+                            pop_path = '{}/gen/'.format(sub_path)
+                            dir_exists = os.path.isdir(pop_path)
+                            if not dir_exists:
+                                os.mkdir(pop_path)
 
-                        checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
+                            checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
 
-                        # pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
+                            # pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.LOAD_SAVED_SEED, self.args.LOAD_GENERATION))
 
-                        checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
-                        # stats.save()
-                        # cross_validation has to be false, true produces an error, also the git thing said
-                        # stats.save_genome_fitness(filename='{}/{}{}/results.csv'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.RANDOM_SEED),with_cross_validation=False)
+                            checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
+                            stats.save()
+                            # cross_validation has to be false, true produces an error, also the git thing said
+                            stats.save_genome_fitness(filename='{}/{}{}/results.csv'.format(self.args.BASE_DIR, self.args.EXPERIMENT_PREFIX, self.args.RANDOM_SEED),with_cross_validation=False)
                     else:
                         try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
                             split_vals = vals.split(' ')
