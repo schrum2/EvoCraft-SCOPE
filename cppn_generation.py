@@ -151,7 +151,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
             if check_out_of_bounds(relative_position, direction, position_information):
                 stop = True
     
-        if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES_UP
+        if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES_UP:
             for i in range(NUM_DIRECTIONS):
                 possible_direction = next_direction(i)
                 if check_out_of_bounds(relative_position, possible_direction, position_information, True):
