@@ -73,7 +73,7 @@ def main(argv):
     parser.add_argument('--STOP_CONFINED_SNAKES', type=boolean_string, default=False, metavar='',
                         help='If the snake goes out of bounds, the snake will stop rendering.')      
     parser.add_argument('--CONTINUATION_THRESHOLD', type=float, default=0.5, metavar='',
-                        help='The maximum length a snake-like structure can be when EVOLVE_SNAKE is true.')
+                        help='Neuron output required for a snake-like structure to continue generating when EVOLVE_SNAKE is true.')
     parser.add_argument('--INTERACTIVE_EVOLUTION', type=boolean_string, default=True, metavar='',
                         help='Whether or not interactive evolution will be used.')
     parser.add_argument('--POTENTIAL_BLOCK_SET', help='Choose which block set is used for generation', # Can add additional 
