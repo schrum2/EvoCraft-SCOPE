@@ -167,7 +167,9 @@ class MinecraftBreeder(object):
         #clears area for structures
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN) 
         # This loop could be parallelized
-        for n, (genome_id, genome) in enumerate(genomes):
+        #for n, (genome_id, genome) in enumerate(genomes):
+        for n in range(self.args.POPULATION_SIZE):
+            (genome_id, genome) = genomes[n]
             # See how CPPN fills out the shape
             print("{}. {}: ".format(n,genome_id), end = "") # Preceding number before info from query
             shape = self.query_cppn(genome, config, self.corners[n], self.position_information, self.args, self.block_list)
