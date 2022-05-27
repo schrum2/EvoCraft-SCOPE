@@ -8,6 +8,7 @@ import os
 import custom_genomes as cg
 import block_sets
 import fitness_functions as ff
+import novelty_characterizations as nc
 import pickle
 import visualize
 
@@ -34,6 +35,9 @@ def run(args):
     if args.INTERACTIVE_EVOLUTION:
         mc = ice.MinecraftBreeder(args,block_list)
         stagnation = neat_stagnation.InteractiveStagnation
+    elif args.EVOLVE_NOVELTY:
+        mc = fce.NoveltyMinecraftBreeder(args, block_list) #Fix 
+        stagnation = neat.DefaultStagnation
     else: 
         mc = fce.FitnessEvolutionMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
