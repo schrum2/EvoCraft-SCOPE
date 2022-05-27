@@ -1,0 +1,2 @@
+cd..
+python main.py --BASE_DIR=%1 --EXPERIMENT_PREFIX=%2 --RANDOM_SEED=%3 --POPULATION_SIZE=%4
