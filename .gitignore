@@ -8,10 +8,6 @@ __pycache__/
 weights/
 snake/
 test/
-EvoCraft-py/eula.txt
-/EvoCraft-py/logs/
-EvoCraft-py/.mixin.out/audit/mixin_implementation_report.txt
-EvoCraft-py/*.json
-EvoCraft-py/*.json
-/EvoCraft-py/config/sponge/
-EvoCraft-py/libraries/net/minecraft/launchwrapper/1.12/launchwrapper-1.12.jar
+
+
+/EvoCraft-py/
