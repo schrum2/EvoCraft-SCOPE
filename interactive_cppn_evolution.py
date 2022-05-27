@@ -10,7 +10,6 @@ import custom_genomes as cg
 # for Minecraft
 import grpc
 import minecraft_pb2_grpc
-import minecraft_pb2 as mc
 from minecraft_pb2 import *
 
 # For minecraft generation
