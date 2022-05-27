@@ -101,24 +101,25 @@ class MinecraftBreeder(object):
             else:
                 # Controlled externally by keyboard
 
-                # Creates a string that is the user's input, then either resets or quits the program, or converts it into a list of selected shapes
+                # Creates a string that is the user's input, then either resets or quits the program, saves it, or converts it into a list of selected shapes
                 vals_selected = False
                 selected_vals = []
                 while(not vals_selected):
-                    vals = input("Select the shapes you like, or type r to reset, or q to quit:")
-                    if(vals=='r'): # Resets structures and shape, potential for refactoring
+                    vals = input("Select the shapes you like, or type r to reset,q to quit, or s to save:")
+                    if(vals=='r'): # Resets structures and shapes
                         self.reset_ground_and_numbers() #resets ground and numbers
                         self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
-                        minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
                     elif vals== 'q': # Quits the program
                         quit()
+                    elif vals== 's':   
+                        self.save_by_user(config, genomes)
                     else:
                         try: # Otherwise, tries to split string with spaces of values for selection. If it can't loops through again
                             split_vals = vals.split(' ')
                             selected_vals = list(map(int,split_vals))
                             vals_selected = True
                         except ValueError:
-                            print("That wasn't quite right. Look at what you typed and try again!")
+                            print("This command was not recognized. Please try again")
                             vals_selected = False #turns back to false if not able
 
                 # Initialize to all False
@@ -150,6 +151,41 @@ class MinecraftBreeder(object):
 
             self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
+    def save_by_user(self, config, genomes):
+        """
+        Generates new directories, or accesses them if they exist, and then saves the infromation
+        on the shapes generated to the computer
+
+        Parameters: 
+        config  (Config): NEAT configurations
+        genomes ([int,DefaultGenome]): list of tuples of id numbers and genome pairs
+        """
+        # Build dictionary out of the lisst of 2-tuples
+        population = {}
+        for (genome_id, genome) in genomes:
+            population[genome_id] = genome
+
+        base_path = '{}'.format(self.args.BASE_DIR)
+        dir_exists = os.path.isdir(base_path)
+        if not dir_exists:
+            os.mkdir(base_path)
+    
+        # Makes a sub dir too
+        sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+        dir_exists = os.path.isdir(sub_path)
+        if not dir_exists:
+            os.mkdir(sub_path)
+                        
+        # Makes one more method
+        pop_path = '{}/gen/'.format(sub_path)
+        dir_exists = os.path.isdir(pop_path)
+        if not dir_exists:
+            os.mkdir(pop_path)
+
+        checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
+        print(self.generation)
+        checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.generation)
+
     def clear_area_and_generate_shapes(self, genomes, config):
         """
         Clears the area and generates the shapes based on genomes. Then also places the fences.
@@ -161,7 +197,7 @@ class MinecraftBreeder(object):
 
         Return:
 
-        all_blocks(list of Blocks): Dtores info as to where blocks were placed for deleting snakes
+        all_blocks(list of Blocks): Stores info as to where blocks were placed for deleting snakes
         """
         all_blocks = []
         #clears area for structures
@@ -249,18 +285,20 @@ class MinecraftBreeder(object):
 
     def console_reset(self):
         """
-        Continusouly prompts the user for a letter. r resets everything that was generate and q quits the program. Any
+        Continusouly prompts the user for a letter. r resets everything that was generate s saves the shapes, and q quits the program. Any
         other letter asks for the user to try again. This is multithreaded so that it runs in the background while 
         the rest of the code does its thing. If anything gets destroyed, reset ensures its still usuable
         """
         while 1:
-            val = input("Press r to reset the world, or q to quit\n")
+            val = input("Press r to reset the world,q to quit, or s to save\n")
             if(val=='r'):
                 self.reset_ground_and_numbers() #resets ground and numbers
                 self.clear_area_and_generate_shapes(self.current_genomes, self.current_config) #resets shapes and fences
                 minecraft_structures.player_selection_switches(self.client, self.position_information, self.corners) #resets switches
             elif(val=='q'):
                 os._exit(0)
+            elif val== 's':   
+                self.save_by_user(self.current_config)
             else:
                 print("This command was not recognized. Please try again")
                 

@@ -42,6 +42,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
         shape = []
         presence_threshold = args.PRESENCE_THRESHOLD
         done = False
+        attempts = 0
         while not done:
             for xi in range(position_information["xrange"]):
                 x = util.scale_and_center(xi,position_information["xrange"])
@@ -60,9 +61,20 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
             if args.USE_MIN_BLOCK_REQUIREMENT: done = len(shape) >= args.MINIMUM_REQUIRED_BLOCKS
             # At this point we are done regardless of the if statement above.
             else: done = True
-            
-            # Decrease presence_thresold to decrease number of empty shapes
-            if not done: presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT 
+
+            attempts += 1
+            # Decrease presence_thresold to decrease number of empty shapes.
+            # Multiply by attempts so that larger and larger amounts are subtracted
+            if not done: presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT * attempts 
+
+            # TODO: Make the 500 a command line parameter
+            if attempts > 500:
+                # If the program as looped this many times attempting to make a shape, just set the presence threshold to negative infinity
+                presence_threshold = float("-inf")
+                #print("Keeps failing to generate shape, has length {} out of {}. {} attempts. presence_threshold = {}".format(len(shape),args.MINIMUM_REQUIRED_BLOCKS,attempts,presence_threshold))
+                #center_dist = util.distance((scaled_point[0],scaled_point[1],scaled_point[2]),(0,0,0))
+                #output = net.activate([scaled_point[0], scaled_point[1], scaled_point[2], center_dist * math.sqrt(2), 1.0])
+                #print(output)
 
         if(len(shape) == 0):
             print("Genome at corner {} is empty".format(corner))

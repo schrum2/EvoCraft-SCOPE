@@ -98,7 +98,7 @@ def main(argv):
                         help='Shows only the blocks that were placed in the shape in front of the shape')
     parser.add_argument('--EVOLVE_ORIENTATION', type=boolean_string, default=False, metavar='',
                         help='Evloves the orientation of the blocks')
-    parser.add_argument('--SAVE_POPULATION', type=boolean_string, default=False, metavar='',
+    parser.add_argument('--SAVE_FITNESS_LOG', type=boolean_string, default=False, metavar='',
                         help='Save CPPN population.')
     parser.add_argument('--BASE_DIR', type=str, default=None, metavar='',
                         help='Directory where results from several experiments can be stored.')
@@ -118,6 +118,8 @@ def main(argv):
                         help='Specific number of top elites to copy into the next generation for fitness cppn evolution.')
     parser.add_argument('--MAX_NUM_GENERATIONS', type=int, default=1000, metavar='',
                         help='Max number of generations that can occur if not stopped by a champion.')
+    parser.add_argument('--LOAD_SAVED_NO_EVOLUTION', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to load a previously saved set of shapes that will not evolve')
 
     args = parser.parse_args()
    

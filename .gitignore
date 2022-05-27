@@ -4,5 +4,10 @@ __pycache__/
 .pyc
 .vscode/
 *.pyc
+*.csv
 weights/
 snake/
+test/
+
+
+/EvoCraft-py/
