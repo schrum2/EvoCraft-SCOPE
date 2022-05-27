@@ -116,7 +116,7 @@ class FitnessEvolutionMinecraftBreeder(object):
             print("{} elite survivors".format(elite_count))
             config.reproduction_config.elitism = elite_count
 
-        if not champion_found and not self.args.KEEP_WORLD_ON_EXIT:      
+        if not champion_found and (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT):      
             for s in all_blocks:
                 s.type = AIR
             self.client.spawnBlocks(Blocks(blocks=all_blocks))
