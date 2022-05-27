@@ -138,9 +138,13 @@ def generate_block(net, position_information, corner, args, block_options, scale
             # Movements that go out of bounds are made undesirable with a preference of negative infinity
             for i in range(NUM_DIRECTIONS):
                 possible_direction = next_direction(i)
-                # relative_position the value to any direction that is out of bounds to float('-inf')
-                if check_out_of_bounds(relative_position, possible_direction, position_information, False):
-                    direction_preferences[i] = float('-inf')
+                if args.REDIRECT_CONFINED_SNAKES_UP:
+                    if check_out_of_bounds(relative_position, possible_direction, position_information, True):
+                        direction_preferences[i] = float('-inf')
+                else:
+                    # relative_position the value to any direction that is out of bounds to float('-inf')
+                    if check_out_of_bounds(relative_position, possible_direction, position_information, False):
+                        direction_preferences[i] = float('-inf')
 
         # Pick most preferred direction
         direction_index = util.argmax(direction_preferences)
@@ -150,12 +154,6 @@ def generate_block(net, position_information, corner, args, block_options, scale
             # If confining snakes, simply stop when going out of bounds
             if check_out_of_bounds(relative_position, direction, position_information):
                 stop = True
-    
-        if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES_UP:
-            for i in range(NUM_DIRECTIONS - 1):
-                possible_direction = next_direction(i)
-                if check_out_of_bounds(relative_position, possible_direction, position_information, True):
-                    direction_preferences[i] = float('-inf')
 
         # No matter what, do not allow placement at y lower than 0 since this is illegal
         if relative_position[1] + direction[1] < 0 :
