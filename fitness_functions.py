@@ -99,9 +99,6 @@ def height_count(client, position_information, corner, args): # may change
     if client is None:
         return max_possible
 
-    # relative height from one block to the next
-    h = position_information["starty"]
-
     endx= position_information["startx"] + position_information["xrange"]
     endz= position_information["startz"] + position_information["zrange"]
 
@@ -111,6 +108,10 @@ def height_count(client, position_information, corner, args): # may change
         max=Point(x=endx-1, y=max_possible, z=endz-1)
     ))
 
-    max_height = max(list(map(lambda block : block.position.y, parkour_course.blocks)))
-
+    solid_blocks = list(filter(lambda block : block.type != AIR, parkour_course.blocks))
+    if solid_blocks == []:
+        max_height = position_information["starty"] - 1
+    else:
+        max_height = max(list(map(lambda block : block.position.y, solid_blocks)))
+    
     return max_height
