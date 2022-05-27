@@ -16,7 +16,7 @@ import cppn_generation
 # For fitness functions
 import novelty_characterizations as nc
 
-class FitnessEvolutionMinecraftBreeder(object):
+class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
         """
         Construct a class for evolving Minecraft shapes
@@ -102,23 +102,23 @@ class FitnessEvolutionMinecraftBreeder(object):
             # fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
             # genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
             
-            print("{}. {}: Fitness = {}".format(n,genome_id,genome.fitness))
+            print("{}. {}: Distance = {}".format(n,genome_id,genome.distance))
 
-            # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
-            # also the program will stop executing after this loop ends since the threshold was met. 
-            if genome.fitness >= config.fitness_threshold:
-                minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n])
-                champion_found = True
+        #     # # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
+        #     # # also the program will stop executing after this loop ends since the threshold was met. 
+        #     # if genome.fitness >= config.fitness_threshold:
+        #     #     minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n])
+        #     #     champion_found = True
       
-        if self.args.USE_ELITISM:
-            elite_count = self.args.NUM_FITNESS_ELITES
-            print("{} elite survivors".format(elite_count))
-            config.reproduction_config.elitism = elite_count
+        # if self.args.USE_ELITISM:
+        #     elite_count = self.args.NUM_FITNESS_ELITES
+        #     print("{} elite survivors".format(elite_count))
+        #     config.reproduction_config.elitism = elite_count
 
-        if not champion_found and not self.args.KEEP_WORLD_ON_EXIT:      
-            for s in all_blocks:
-                s.type = AIR
-            self.client.spawnBlocks(Blocks(blocks=all_blocks))
+        # if not champion_found and not self.args.KEEP_WORLD_ON_EXIT:      
+        #     for s in all_blocks:
+        #         s.type = AIR
+        #     self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
         
     
