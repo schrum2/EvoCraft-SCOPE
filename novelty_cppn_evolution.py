@@ -77,7 +77,7 @@ class NoveltyMinecraftBreeder(object):
         # # clear previous floating arrows
         # position_information_copy = self.position_information.copy()
         # position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
-        # minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN)                                                                                                               
+        # minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
         all_blocks = []                                                                                                             
 
         # champion_found = False 

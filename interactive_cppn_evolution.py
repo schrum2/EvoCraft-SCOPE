@@ -200,7 +200,7 @@ class MinecraftBreeder(object):
         """
         all_blocks = []
         #clears area for structures
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN) 
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH) 
         # This loop could be parallelized
         #for n, (genome_id, genome) in enumerate(genomes):
         for n in range(self.args.POPULATION_SIZE):

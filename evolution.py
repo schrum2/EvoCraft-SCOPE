@@ -137,10 +137,12 @@ def run(args):
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
             minecraft_structures.restore_ground(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)
-            minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)                                                                                                               
+            minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)                                                                                                               
+            
+            # Should not need this since we clear to such a high ceiling now
             # Clear space in the air to get rid of numbers
-            mc.position_information["starty"] = mc.position_information["starty"]+mc.position_information["yrange"]
-            minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)                                                                                                               
+            #mc.position_information["starty"] = mc.position_information["starty"]+mc.position_information["yrange"]
+            #minecraft_structures.clear_area(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)                                                                                                               
 
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")

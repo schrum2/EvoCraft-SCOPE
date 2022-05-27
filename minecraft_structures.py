@@ -43,7 +43,7 @@ def place_fences(client, position_information, corner):
 
     client.spawnBlocks(Blocks(blocks=fence))
 
-def clear_area(client, position_information, pop_size, space_between):
+def clear_area(client, position_information, pop_size, space_between, ceiling):
     """
     This function clears a large area by creating one
     large cube and filling it with air blocks.
@@ -61,7 +61,7 @@ def clear_area(client, position_information, pop_size, space_between):
     client.fillCube(FillCubeRequest(  
         cube=Cube(
             min=Point(x=position_information["startx"]-BUFFER_ZONE, y=GROUND_LEVEL, z=zplacement-BUFFER_ZONE),
-            max=Point(x=position_information["startx"]-1 + (pop_size+1)*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=position_information["starty"]+BUFFER_ZONE, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
+            max=Point(x=position_information["startx"]-1 + (pop_size+1)*(position_information["xrange"]+space_between)+BUFFER_ZONE, y=position_information["starty"]+position_information["yrange"]+ceiling, z=position_information["startz"]+position_information["zrange"]+BUFFER_ZONE)
         ),
         type=AIR
     ))
