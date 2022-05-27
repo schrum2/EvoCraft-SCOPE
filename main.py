@@ -32,7 +32,7 @@ def block_int(name):
 def main(argv):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--USE_ELITISM', type=boolean_string, default=False, metavar='', 
+    parser.add_argument('--USE_ELITISM', type=boolean_string, default=True, metavar='', 
                         help='When true, selected shapes will be present in the proceeding generation.')
     parser.add_argument('--IN_GAME_CONTROL', type=boolean_string, default=False, metavar='',
                         help='Whether the player can control evolution within the game (via switches).')
