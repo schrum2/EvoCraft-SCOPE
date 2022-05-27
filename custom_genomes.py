@@ -119,7 +119,7 @@ class CustomBlocksGenome(neat.DefaultGenome):
         if(r<BLOCK_CHANGE_PROBABILITY and PREVENT_DUPLICATES and len(self.block_list)<len(POTENTIAL_BLOCK_TYPE_LIST)):
             random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
             while(random_block in self.block_list):
-                print(random_block)
+                #print(random_block)
                 random_block = random.choice(POTENTIAL_BLOCK_TYPE_LIST)
             self.block_list[random_int] = random_block
         elif(r<BLOCK_CHANGE_PROBABILITY):

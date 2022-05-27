@@ -10,6 +10,7 @@ import custom_genomes as cg
 # for Minecraft
 import grpc
 import minecraft_pb2_grpc
+import minecraft_pb2 as mc
 from minecraft_pb2 import *
 
 # For minecraft generation
@@ -92,7 +93,6 @@ class MinecraftBreeder(object):
         """                                                                                                                     
         self.current_genomes = genomes
         self.current_config = config
-
         all_blocks = []
         try:
             all_blocks = self.clear_area_and_generate_shapes(genomes, config)  
@@ -249,10 +249,9 @@ class MinecraftBreeder(object):
                         max=Point(x=first[0], y=first[1], z=first[2])
                     ))
                 selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
-
             player_select_done = False
             j = 0
-                # Checks the hidden Piston Heads associated with each next generation switch. 
+                # Checks the hidden DIAMOND BLOCK associated with each next generation switch. 
                 # If any one is sensed, then player selection is done 
             while not player_select_done and j < config.pop_size:
                 pressed = next_block_positions[j]
