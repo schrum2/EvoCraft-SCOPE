@@ -92,5 +92,25 @@ def occupied_count(client, position_information, corner, args):
 
     return number_of_blocks
 
+def height_count(client, position_information, corner, args): # may change
 
+    max_possible = position_information["starty"] + (position_information["yrange"] // 2) + args.MAX_SNAKE_LENGTH
+    
+    if client is None:
+        return max_possible
 
+    # relative height from one block to the next
+    h = position_information["starty"]
+
+    endx= position_information["startx"] + position_information["xrange"]
+    endz= position_information["startz"] + position_information["zrange"]
+
+    # Read in all the blocks within the x, y, and z range
+    parkour_course = client.readCube(Cube(
+        min=Point(x=position_information["startx"], y=position_information["starty"], z=position_information["startz"]),
+        max=Point(x=endx-1, y=max_possible, z=endz-1)
+    ))
+
+    max_height = max(list(map(lambda block : block.position.y, parkour_course.blocks)))
+
+    return max_height
