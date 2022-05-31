@@ -123,6 +123,10 @@ def run(args):
                             genome_from_pickle = pickle.load(handle)
                         novel_genomes.append(genome_from_pickle)
                     print(novel_genomes)
+
+                    mc.eval_fitness(novel_genomes, config)
+                    quit()
+
                 #mc.eval_fitness(novel_genomes,config)
                 pop.run(mc.eval_fitness, 1)
         else: # Fitness-based evolution
