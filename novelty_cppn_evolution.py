@@ -73,26 +73,24 @@ class NoveltyMinecraftBreeder(object):
     def eval_fitness(self, genomes, config):
         """
         This function is expected by the NEAT-Python framework.
-        It takes a population of genomes and configuration information,
-        and assigns fitness values to each of the genome objects in
-        the population based on how many blocks are the desired blocks in the shape. 
+        It takes a population of genomes and configuration information, 
+        and assigns characterizations to each of the genome objects in
+        the population. These characterizations are then used to ccaluclate
+        the distance from themselves to the other ojects in the archive. 
+        The idea here is to add only novel entities into the archive.
         Nothing is returned, since the genomes themselves
         are modified.
 
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """        
-        # # clear previous floating arrows
-        # position_information_copy = self.position_information.copy()
-        # position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
-        # minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)
+        """    
+        # Clears space and creates list to be used later in the code    
         position_information_copy = self.position_information.copy()
         position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
         minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
         all_blocks = []                                                                                                             
         new_archive_entries = []
-        # champion_found = False 
 
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
@@ -113,43 +111,26 @@ class NoveltyMinecraftBreeder(object):
             # Gets type of characterization to test for
             characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
             # Creates list filled with characterization values
-            character_list = characterization(self.client, self.position_information, self.corners[n], self.args)
+            character_list = characterization(self.client, self.position_information, self.corners[n])
             genome.fitness = self.max_distance # A sufficiently large value that cannot be attained
 
             for a in self.archive:
+                # Convert to arrays to calculate the euclidean disatnce
                 character_list_arr = np.array(character_list)
                 a_arr = np.array(a)
-                adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Not sure ravel is needed here
+                adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Euclidean distance
                 print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
-                genome.fitness = min(genome.fitness, adist)
+                genome.fitness = min(genome.fitness, adist) # Fitness is smallest value 
 
-            if random.random() < 0.02: # <-- not 100% on this
+            # Only if random threshold is hit, then added to the archive
+            if random.random() < 0.02: # <-- add command line param
                 new_archive_entries.append(character_list)
                 
             print('{0} archive entries'.format(len(self.archive)))
-            # print("{}. {}: Fitness = {}".format(n,genome_id,genome.fitness))
 
         # Adds new entries to archive
-        self.archive.extend(new_archive_entries)
-        #     # # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
-        #     # # also the program will stop executing after this loop ends since the threshold was met. 
-        #     # if genome.fitness >= config.fitness_threshold:
-        #     #     minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n])
-        #     #     champion_found = True
-      
-        # if self.args.USE_ELITISM:
-        #     elite_count = self.args.NUM_FITNESS_ELITES
-        #     print("{} elite survivors".format(elite_count))
-        #     config.reproduction_config.elitism = elite_count
-
-        # if not champion_found and not self.args.KEEP_WORLD_ON_EXIT:      
-        #     for s in all_blocks:
-        #         s.type = AIR
-        #     self.client.spawnBlocks(Blocks(blocks=all_blocks))
-
-        
-    
-    # End of FitnessEvolutionMinecraftBreeder                                                                                                            
+        self.archive.extend(new_archive_entries)  
+    # End of NoveltyMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")

@@ -1,6 +1,17 @@
 from minecraft_pb2 import *
 
-def presence_characterization(client, position_information, corner, args):
+def presence_characterization(client, position_information, corner):
+    """
+    Creates a list of whether or not blocks exisit in a shape. To be compared to
+    with one another
+
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): Dictionary containing location related information.
+
+    Return:
+    block_character (list of ints): List containing where blocks are or are not present
+    """
     # End points for all of the shapes
     endx= corner[0] + position_information["xrange"]
     endy= corner[1] + position_information["yrange"]
@@ -13,6 +24,7 @@ def presence_characterization(client, position_information, corner, args):
     ))
 
     block_character = [] 
+    # If a block is present, adds a 1 otherwise, adds 0 (air is not a block)
     for block in block_collection.blocks:
         if block.type == AIR:
             block_character.append(0)
