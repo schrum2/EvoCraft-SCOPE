@@ -13,10 +13,11 @@ import minecraft_structures
 # For CPPN generations
 import cppn_generation
 
-# For fitness functions
+# For novelty search
 import novelty_characterizations as nc
 import numpy as np
 import random
+import os
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -35,6 +36,7 @@ class NoveltyMinecraftBreeder(object):
         self.block_list = block_list
         self.archive = []
         self.random_threshold = args.NOVELTY_RANDOM_SCORE
+        self.save_archive = args.SAVE_NOVELTY
 
         self.position_information = dict()
         self.position_information["startx"] = 0
@@ -127,6 +129,23 @@ class NoveltyMinecraftBreeder(object):
             # Only if random threshold is hit, then added to the archive
             if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
+                if self.save_archive:
+                    base_path = '{}'.format(self.args.BASE_DIR)
+                    dir_exists = os.path.isdir(base_path)
+                    if not dir_exists:
+                        os.mkdir(base_path)
+    
+                    # Makes a sub dir too
+                    sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+                    dir_exists = os.path.isdir(sub_path)
+                    if not dir_exists:
+                        os.mkdir(sub_path)
+                        
+                    # Makes one more method
+                    pop_path = '{}/gen/'.format(sub_path)
+                    dir_exists = os.path.isdir(pop_path)
+                    if not dir_exists:
+                        os.mkdir(pop_path)
                 
             print('{0} archive entries'.format(len(self.archive)))
 
