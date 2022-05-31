@@ -152,6 +152,35 @@ def run(args):
                 visualize.plot_stats(stats, ylog=True, view=True, filename='{}/{}{}/stats.svg'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.RANDOM_SEED))
                 visualize.plot_species(stats, view=True, filename='{}/{}{}/species.svg'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.RANDOM_SEED))
 
+                # save neural network
+                node_names = {-1: 'x', -2: 'y', -3: 'z', -4: 'radius', -5: 'bias', 0: 'presence'}
+                i = 1   
+                while i < block_list_length + 1:
+                    node_names[i] = 'bt {}'.format(i - 1)
+                    i+=1
+                
+                orientations = ['oriented e', 'oriented n', 'oriented ne', 'oriented w', 'oriented s','oriented sw']
+                xi = 0 
+                if args.EVOLVE_ORIENTATION:
+                    for x in orientations:
+                        node_names[i] = orientations[xi]
+                        i+=1
+                        xi+=1
+
+                xi = 0
+                snake_directions = ['x neg', 'y neg', 'z neg','x pos', 'y pos', 'z pos','continue snake']
+                if args.EVOLVE_SNAKE:
+                    for x in snake_directions:
+                        node_names[i] = snake_directions[xi]
+                        i+=1
+                        xi+=1
+            
+                # This line creates issues because graphviz needs to be installed on device, so it is commented out. 
+                # uncommenting it produces a file called digraph.gv that is saved and contains the information
+                # needed to see an image of the neural network.
+                visualize.draw_net(config, stats.best_genome(), True, node_names=node_names)
+
+
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
             minecraft_structures.restore_ground(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)
