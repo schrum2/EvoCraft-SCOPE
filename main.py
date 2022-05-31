@@ -91,7 +91,7 @@ def main(argv):
     parser.add_argument('--DESIRED_BLOCK_COUNT', type=int, default=0, metavar='',
                         help='The desired block count of a specific block.')
     parser.add_argument('--FITNESS_FUNCTION', type=str, metavar='',
-                        help='The desired block count of a specific block.')
+                        help='The fitness function to be used.')
     parser.add_argument('--EVOLVE_NOVELTY', type=boolean_string, default=False, metavar='',
                         help='Whether or not to evolve with novelty search. NOVELTY_CHARACTER is also needed with this')
     parser.add_argument('--NOVELTY_CHARACTER', type=str, metavar='',
