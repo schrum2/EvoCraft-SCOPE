@@ -16,6 +16,7 @@ import cppn_generation
 # For fitness functions
 import novelty_characterizations as nc
 import numpy as np
+import random
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -109,12 +110,14 @@ class NoveltyMinecraftBreeder(object):
             for a in self.archive:
                 adist = np.linalg.norm(character_list.ravel() - a.ravel()) # Not sure ravel is needed here
                 genome.fitness = min(genome.fitness, adist)
-                
-            # fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
-            # genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
-            
-            print("{}. {}: Distance = {}".format(n,genome_id,genome.distance))
 
+            if random.random() < 0.02: # <-- not 100% on this
+                new_archive_entries.append(character_list)
+            
+            # print("{}. {}: Fitness = {}".format(n,genome_id,genome.fitness))
+
+        # Adds new entries to archive
+        self.archive.extend(new_archive_entries)
         #     # # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
         #     # # also the program will stop executing after this loop ends since the threshold was met. 
         #     # if genome.fitness >= config.fitness_threshold:
