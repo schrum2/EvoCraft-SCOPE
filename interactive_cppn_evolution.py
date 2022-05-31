@@ -92,7 +92,6 @@ class MinecraftBreeder(object):
         """                                                                                                                     
         self.current_genomes = genomes
         self.current_config = config
-
         all_blocks = []
         try:
             all_blocks = self.clear_area_and_generate_shapes(genomes, config)  
@@ -201,7 +200,7 @@ class MinecraftBreeder(object):
         """
         all_blocks = []
         #clears area for structures
-        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN) 
+        minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH) 
         # This loop could be parallelized
         #for n, (genome_id, genome) in enumerate(genomes):
         for n in range(self.args.POPULATION_SIZE):
@@ -249,10 +248,9 @@ class MinecraftBreeder(object):
                         max=Point(x=first[0], y=first[1], z=first[2])
                     ))
                 selected[i] = blocks.blocks[0].type == REDSTONE_BLOCK
-
             player_select_done = False
             j = 0
-                # Checks the hidden Piston Heads associated with each next generation switch. 
+                # Checks the hidden DIAMOND BLOCK associated with each next generation switch. 
                 # If any one is sensed, then player selection is done 
             while not player_select_done and j < config.pop_size:
                 pressed = next_block_positions[j]

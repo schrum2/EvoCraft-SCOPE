@@ -134,13 +134,15 @@ def generate_block(net, position_information, corner, args, block_options, scale
     if args.EVOLVE_SNAKE:
         #print("generate_block:EVOLVE_SNAKE")
         direction_preferences = output[len(block_options)+1:len(block_options)+1+NUM_DIRECTIONS]
-        if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES:
+        if args.CONFINE_SNAKES and (args.REDIRECT_CONFINED_SNAKES or args.REDIRECT_CONFINED_SNAKES_UP):
             # Movements that go out of bounds are made undesirable with a preference of negative infinity
             for i in range(NUM_DIRECTIONS):
                 possible_direction = next_direction(i)
-                # relative_position the value to any direction that is out of bounds to float('-inf')
-                if check_out_of_bounds(relative_position, possible_direction, position_information, False):
-                    direction_preferences[i] = float('-inf')
+                # Possibly disallow direction if not only confining upward, or if the direction is not up anyway
+                if not args.REDIRECT_CONFINED_SNAKES_UP or possible_direction != (0,1,0):
+                    if check_out_of_bounds(relative_position, possible_direction, position_information):
+                        # relative_position the value to any direction that is out of bounds to float('-inf')
+                        direction_preferences[i] = float('-inf')
 
         # Pick most preferred direction
         direction_index = util.argmax(direction_preferences)
@@ -150,12 +152,6 @@ def generate_block(net, position_information, corner, args, block_options, scale
             # If confining snakes, simply stop when going out of bounds
             if check_out_of_bounds(relative_position, direction, position_information):
                 stop = True
-    
-        if args.CONFINE_SNAKES and args.REDIRECT_CONFINED_SNAKES_UP:
-            for i in range(NUM_DIRECTIONS - 1):
-                possible_direction = next_direction(i)
-                if check_out_of_bounds(relative_position, possible_direction, position_information, True):
-                    direction_preferences[i] = float('-inf')
 
         # No matter what, do not allow placement at y lower than 0 since this is illegal
         if relative_position[1] + direction[1] < 0 :
@@ -165,7 +161,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
 
     return (block, direction, stop)
 
-def check_out_of_bounds(initial_position, possible_direction, position_information, exclude_y_coordinate):
+def check_out_of_bounds(initial_position, possible_direction, position_information):
     """
     Checks to see if the new possible position relative to the initial position is still
     in bounds
@@ -174,22 +170,14 @@ def check_out_of_bounds(initial_position, possible_direction, position_informati
     initial_position (int, int, int): Three-tuple that represents initial position
     possible_direction (int, int, int): Three-tuple that represents the change in from current position
     position_information (dict): Dictionary that stores the x, y, and z starting points and ranges
-    exclude_y_coordinate (bool): Boolean that ignores the y direction being out of bounds if true, or considers it when
-                                false
 
     Returns:
     (bool): True if it is out of bounds, false otherwise
     """
-    out_of_bounds = False
-    if initial_position[0] + possible_direction[0] >= position_information["xrange"] or initial_position[0] + possible_direction[0] < 0:
-        out_of_bounds = True
-    if not exclude_y_coordinate:
-        if initial_position[1] + possible_direction[1] >= position_information["yrange"] or initial_position[1] + possible_direction[1] < 0:
-            out_of_bounds = True
-    if initial_position[2] + possible_direction[2] >= position_information["zrange"] or initial_position[2] + possible_direction[2] < 0:
-        out_of_bounds = True
-
-    return out_of_bounds
+    return (
+        initial_position[0] + possible_direction[0] >= position_information["xrange"] or initial_position[0] + possible_direction[0] < 0 or
+        initial_position[1] + possible_direction[1] >= position_information["yrange"] or initial_position[1] + possible_direction[1] < 0 or
+        initial_position[2] + possible_direction[2] >= position_information["zrange"] or initial_position[2] + possible_direction[2] < 0)
 
 def next_direction(direction_index):
     """
