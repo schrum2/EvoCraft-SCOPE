@@ -18,10 +18,4 @@ def presence_characterization(client, position_information, corner, args):
             block_character.append(0)
         else:
             block_character.append(1)
-    # for i in range(len(blocks)):
-        
-    #     if(blocks[i].blocks.value==AIR):
-    #         block_collection.append(0)
-    #     else:
-    #         block_collection.append(1)
-    return block_collection
+    return block_character

@@ -108,12 +108,15 @@ class NoveltyMinecraftBreeder(object):
             genome.fitness = 10 #<-- Fix this, placeholder for actual smallest value
 
             for a in self.archive:
-                adist = np.linalg.norm(character_list.ravel() - a.ravel()) # Not sure ravel is needed here
+                character_list_arr = np.array(character_list)
+                a_arr = np.array(a)
+                adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Not sure ravel is needed here
                 genome.fitness = min(genome.fitness, adist)
 
-            if random.random() < 0.02: # <-- not 100% on this
+            if random.random() > 0.02: # <-- not 100% on this
                 new_archive_entries.append(character_list)
-            
+                
+            print('{0} archive entries'.format(len(self.archive)))
             # print("{}. {}: Fitness = {}".format(n,genome_id,genome.fitness))
 
         # Adds new entries to archive
