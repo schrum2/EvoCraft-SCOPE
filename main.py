@@ -3,6 +3,7 @@ import sys
 from tokenize import String
 import evolution
 import random
+import os
 from os.path import exists
 from os import mkdir
 from minecraft_pb2 import *
@@ -124,6 +125,8 @@ def main(argv):
                         help='Max number of generations that can occur if not stopped by a champion.')
     parser.add_argument('--LOAD_SAVED_NO_EVOLUTION', type=boolean_string, default=False, metavar='',
                         help='Whether or not to load a previously saved set of shapes that will not evolve')
+    parser.add_argument('--SAVE_PARAMETERS', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to the parameters being used for future use.')
 
     args = parser.parse_args()
    
@@ -156,7 +159,7 @@ def main(argv):
     
     if not args.INTERACTIVE_EVOLUTION:
         try: is_function = getattr(ff, args.FITNESS_FUNCTION)
-        except: print('{} is not a valid fitness function name.'.format(args.FITNESS_FUNCTION))
+        except: print('{}/{}{}/ is not a valid fitness function name.'.format(args.FITNESS_FUNCTION))
 
     random.seed(args.RANDOM_SEED)
     
@@ -164,6 +167,35 @@ def main(argv):
     #if not args.FITNESS_FUNCTION in dir(ff): 
      #   print('The fitness function name you have given does not exist.')
     
+    # save the parameters if SAVE_PARAMETERS is true.
+    if args.SAVE_PARAMETERS:
+        base_path = '{}'.format(args.BASE_DIR)
+        dir_exists = os.path.isdir(base_path)
+        if not dir_exists:
+            os.mkdir(base_path)
+         
+        path = '{}/{}{}'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
+        dir_exists = os.path.isdir(path)
+        if not dir_exists:
+            os.mkdir(path)
+ 
+        try:
+            # does not already exist, make new file and save args
+            with open('{}/parameters.txt'.format(path), 'x') as f:
+                for arg in args.__dict__:
+                    f.write('{}:{}\n'.format(arg,args.__dict__[arg]))      
+        except FileExistsError:
+            # already exists, load args
+            with open('{}/parameters.txt'.format(path)) as f:
+                lines = f.readlines()
+                for line in lines:
+                    new_line = line.split(':')[1]
+                    #print(new_line)
+                    
+                    # TODO: this part is where I want to assign the args value to new value.
+                    #args[line] = new_line
+                #print(saved_args)
+
     evolution.run(args)
 
 if __name__ == '__main__':
