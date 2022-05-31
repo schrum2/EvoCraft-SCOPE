@@ -81,7 +81,7 @@ def run(args):
     # do not save unless SAVE_FITNESS_LOG is true and names for BASE_DIR and EXPERIMENT_PREFIX other than None are given 
     invalid_dir_names = args.BASE_DIR is None or args.EXPERIMENT_PREFIX is None
     print(invalid_dir_names)
-    if args.SAVE_FITNESS_LOG and not invalid_dir_names:
+    if args.SAVE_FITNESS_LOG and not invalid_dir_names or args.INTERACTIVE_EVOLUTION:
         # Add a stdout reporter to show progress in the terminal.
         pop.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()

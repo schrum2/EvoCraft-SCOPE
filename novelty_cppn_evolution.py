@@ -130,6 +130,10 @@ class NoveltyMinecraftBreeder(object):
             if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
                 if self.save_archive:
+                    population = {}
+                    for (genome_id, genome) in genomes:
+                        population[genome_id] = genome
+
                     base_path = '{}'.format(self.args.BASE_DIR)
                     dir_exists = os.path.isdir(base_path)
                     if not dir_exists:
@@ -146,6 +150,11 @@ class NoveltyMinecraftBreeder(object):
                     dir_exists = os.path.isdir(pop_path)
                     if not dir_exists:
                         os.mkdir(pop_path)
+
+                    checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
+                    print(self.generation)
+                    print("--------------------------------------------------------------------")
+                    checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.generation)
                 
             print('{0} archive entries'.format(len(self.archive)))
 
