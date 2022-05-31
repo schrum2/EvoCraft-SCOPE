@@ -37,6 +37,7 @@ class NoveltyMinecraftBreeder(object):
         self.archive = []
         self.random_threshold = args.NOVELTY_RANDOM_SCORE
         self.save_archive = args.SAVE_NOVELTY
+        self.save_counter = 0
 
         self.position_information = dict()
         self.position_information["startx"] = 0
@@ -131,8 +132,7 @@ class NoveltyMinecraftBreeder(object):
                 new_archive_entries.append(character_list)
                 if self.save_archive:
                     population = {}
-                    for (genome_id, genome) in genomes:
-                        population[genome_id] = genome
+                    population[0] = genome
 
                     base_path = '{}'.format(self.args.BASE_DIR)
                     dir_exists = os.path.isdir(base_path)
@@ -154,12 +154,13 @@ class NoveltyMinecraftBreeder(object):
                     checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
                     print(self.generation)
                     print("--------------------------------------------------------------------")
-                    checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.generation)
+                    checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.save_counter)
+                    self.save_counter+=1
                 
             print('{0} archive entries'.format(len(self.archive)))
 
         # Adds new entries to archive
-        self.archive.extend(new_archive_entries)  
+        self.archive.extend(new_archive_entries) 
     # End of NoveltyMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':
