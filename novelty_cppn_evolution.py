@@ -143,7 +143,6 @@ class NoveltyMinecraftBreeder(object):
                         pickle.dump(genome, handle)
                     with open( "Novelty_Archive/shape{}".format(self.save_counter),'rb') as handle:
                         b = pickle.load(handle)
-                    print(b)
                     print("=======================================")
                     self.save_counter+=1
 

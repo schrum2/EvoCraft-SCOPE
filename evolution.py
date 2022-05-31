@@ -81,7 +81,14 @@ def run(args):
     # do not save unless SAVE_FITNESS_LOG is true and names for BASE_DIR and EXPERIMENT_PREFIX other than None are given 
     invalid_dir_names = args.BASE_DIR is None or args.EXPERIMENT_PREFIX is None
     print(invalid_dir_names)
-    if args.SAVE_FITNESS_LOG and not invalid_dir_names or args.INTERACTIVE_EVOLUTION:
+    if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
+        novel_genomes = []
+        for i in range(config.pop_size):
+            with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
+                    genome_from_pickle = pickle.load(handle)
+            novel_genomes.append(genome_from_pickle)
+            print(novel_genomes)
+    elif args.SAVE_FITNESS_LOG and not invalid_dir_names or args.INTERACTIVE_EVOLUTION:
         # Add a stdout reporter to show progress in the terminal.
         pop.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
