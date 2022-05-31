@@ -1,5 +1,6 @@
 import interactive_cppn_evolution as ice
 import fitness_cppn_evolution as fce
+import novelty_cppn_evolution as nce
 import neat
 from minecraft_pb2 import *
 import neat_stagnation
@@ -10,7 +11,7 @@ import block_sets
 import fitness_functions as ff
 import novelty_characterizations as nc
 import pickle
-import visualize
+#import visualize
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -33,12 +34,15 @@ def run(args):
         #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
     if args.INTERACTIVE_EVOLUTION:
+        print("Interactive evolution")
         mc = ice.MinecraftBreeder(args,block_list)
         stagnation = neat_stagnation.InteractiveStagnation
     elif args.EVOLVE_NOVELTY:
-        mc = fce.NoveltyMinecraftBreeder(args, block_list) #Fix 
+        print("Novelty Search")
+        mc = nce.NoveltyMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
     else: 
+        print("Objective-based evolution")
         mc = fce.FitnessEvolutionMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
 
@@ -54,7 +58,9 @@ def run(args):
     if args.INTERACTIVE_EVOLUTION:
         # Selected items have a fitness of 1, but there is no final/best option
         config.fitness_threshold = 1.01
-    else:
+    elif args.EVOLVE_NOVELTY:
+        config.fitness_threshold = float("inf") # No predetermined cutoff
+    else: # Fitness-based evolution
         # TODO: Change this so it is set depending on the specific fitness function used.
         # At this point, any invalid fitness function name would have been caught in main.
         # start of fitness evolution, clear previous world of 'champion arrows'
