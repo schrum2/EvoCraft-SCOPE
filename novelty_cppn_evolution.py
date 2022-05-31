@@ -18,6 +18,7 @@ import novelty_characterizations as nc
 import numpy as np
 import random
 import os
+import pickle
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -72,6 +73,11 @@ class NoveltyMinecraftBreeder(object):
         
         # Don't try any multithreading yet, but consider for later
         self.num_workers = 1
+
+        self.base_path = 'Novelty_Archive'
+        dir_exists = os.path.isdir(self.base_path)
+        if not dir_exists:
+            os.mkdir(self.base_path)
 
 
     def eval_fitness(self, genomes, config):
@@ -131,31 +137,42 @@ class NoveltyMinecraftBreeder(object):
             if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
                 if self.save_archive:
-                    population = {}
-                    population[0] = genome
-
-                    base_path = '{}'.format(self.args.BASE_DIR)
-                    dir_exists = os.path.isdir(base_path)
-                    if not dir_exists:
-                        os.mkdir(base_path)
-    
-                    # Makes a sub dir too
-                    sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
-                    dir_exists = os.path.isdir(sub_path)
-                    if not dir_exists:
-                        os.mkdir(sub_path)
-                        
-                    # Makes one more method
-                    pop_path = '{}/gen/'.format(sub_path)
-                    dir_exists = os.path.isdir(pop_path)
-                    if not dir_exists:
-                        os.mkdir(pop_path)
-
-                    checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
-                    print(self.generation)
-                    print("--------------------------------------------------------------------")
-                    checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.save_counter)
+                    a=5
+                    print("=======================================")
+                    print(self.base_path)
+                    with open(self.base_path,"shape{}.p".format(self.save_counter), 'wb') as handle:
+                        pickle.dump(genome, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    with open("shape{}.p".format(self.save_counter), 'rb') as handle:
+                        b = pickle.load(handle)
+                    print(b)
+                    print("=======================================")
                     self.save_counter+=1
+
+                    # population = {}
+                    # population[0] = genome
+
+                    # base_path = '{}'.format(self.args.BASE_DIR)
+                    # dir_exists = os.path.isdir(base_path)
+                    # if not dir_exists:
+                    #     os.mkdir(base_path)
+    
+                    # # Makes a sub dir too
+                    # sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+                    # dir_exists = os.path.isdir(sub_path)
+                    # if not dir_exists:
+                    #     os.mkdir(sub_path)
+                        
+                    # # Makes one more method
+                    # pop_path = '{}/gen/'.format(sub_path)
+                    # dir_exists = os.path.isdir(pop_path)
+                    # if not dir_exists:
+                    #     os.mkdir(pop_path)
+
+                    # checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
+                    # print(self.generation)
+                    # print("--------------------------------------------------------------------")
+                    # checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.save_counter)
+                    # self.save_counter+=1
                 
             print('{0} archive entries'.format(len(self.archive)))
 
