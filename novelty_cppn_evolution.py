@@ -13,8 +13,13 @@ import minecraft_structures
 # For CPPN generations
 import cppn_generation
 
-# For fitness functions
+# For novelty search
 import novelty_characterizations as nc
+import numpy as np
+import random
+import os
+import pickle
+from pathlib import Path
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -31,6 +36,10 @@ class NoveltyMinecraftBreeder(object):
         """
         self.args = args
         self.block_list = block_list
+        self.archive = []
+        self.random_threshold = args.NOVELTY_RANDOM_SCORE
+        self.save_archive = args.SAVE_NOVELTY
+        self.save_counter = 0
 
         self.position_information = dict()
         self.position_information["startx"] = 0
@@ -47,6 +56,12 @@ class NoveltyMinecraftBreeder(object):
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
+        # TODO: Refactor! Avoid repetition!
+        zeroes = np.zeros(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
+        ones = np.ones(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
+        self.max_distance = np.linalg.norm(zeroes.ravel() - ones.ravel()) # Not sure ravel is needed here
+        # print("Compare {} to {} to get {}".format(zeroes.ravel(), ones.ravel(), self.max_distance))
+
         # Figure out the lower corner of each shape in advance
         self.corners = []
         for n in range(self.args.POPULATION_SIZE):
@@ -60,27 +75,33 @@ class NoveltyMinecraftBreeder(object):
         # Don't try any multithreading yet, but consider for later
         self.num_workers = 1
 
+        self.base_path = 'Novelty_Archive'
+        dir_exists = os.path.isdir(self.base_path)
+        if not dir_exists:
+            os.mkdir(self.base_path)
+
 
     def eval_fitness(self, genomes, config):
         """
         This function is expected by the NEAT-Python framework.
-        It takes a population of genomes and configuration information,
-        and assigns fitness values to each of the genome objects in
-        the population based on how many blocks are the desired blocks in the shape. 
+        It takes a population of genomes and configuration information, 
+        and assigns characterizations to each of the genome objects in
+        the population. These characterizations are then used to ccaluclate
+        the distance from themselves to the other ojects in the archive. 
+        The idea here is to add only novel entities into the archive.
         Nothing is returned, since the genomes themselves
         are modified.
 
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """        
-        # # clear previous floating arrows
-        # position_information_copy = self.position_information.copy()
-        # position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
-        # minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
+        """    
+        # Clears space and creates list to be used later in the code    
+        position_information_copy = self.position_information.copy()
+        position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
+        minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
         all_blocks = []                                                                                                             
-
-        # champion_found = False 
+        new_archive_entries = []
 
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
@@ -96,33 +117,66 @@ class NoveltyMinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
             all_blocks.extend(shape)
-            #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
-            characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
-            genome.novelty = characterization(self.client, self.position_information, self.corners[n], self.args)
-            # fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
-            # genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
             
-            print("{}. {}: Distance = {}".format(n,genome_id,genome.distance))
+            
+            # Gets type of characterization to test for
+            characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
+            # Creates list filled with characterization values
+            character_list = characterization(self.client, self.position_information, self.corners[n])
+            genome.fitness = self.max_distance # A sufficiently large value that cannot be attained
 
-        #     # # if the genome meets the fitness_threshold, it is the champion and should have some illustration to show that
-        #     # # also the program will stop executing after this loop ends since the threshold was met. 
-        #     # if genome.fitness >= config.fitness_threshold:
-        #     #     minecraft_structures.declare_champion(self.client, self.position_information, self.corners[n])
-        #     #     champion_found = True
-      
-        # if self.args.USE_ELITISM:
-        #     elite_count = self.args.NUM_FITNESS_ELITES
-        #     print("{} elite survivors".format(elite_count))
-        #     config.reproduction_config.elitism = elite_count
+            for a in self.archive:
+                # Convert to arrays to calculate the euclidean disatnce
+                character_list_arr = np.array(character_list)
+                a_arr = np.array(a)
+                adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Euclidean distance
+                # For debugging
+                # print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
+                genome.fitness = min(genome.fitness, adist) # Fitness is smallest value 
 
-        # if not champion_found and not self.args.KEEP_WORLD_ON_EXIT:      
-        #     for s in all_blocks:
-        #         s.type = AIR
-        #     self.client.spawnBlocks(Blocks(blocks=all_blocks))
+            # Only if random threshold is hit, then added to the archive
+            if random.random() < self.random_threshold: # <-- add command line param
+                new_archive_entries.append(character_list)
+                if self.save_archive:
+                    print("=======================================")
+                    with open("Novelty_Archive/shape{}".format(self.save_counter),'wb') as handle:
+                        pickle.dump(genome, handle)
+                    with open( "Novelty_Archive/shape{}".format(self.save_counter),'rb') as handle:
+                        b = pickle.load(handle)
+                    print("=======================================")
+                    self.save_counter+=1
 
-        
+                    # population = {}
+                    # population[0] = genome
+
+                    # base_path = '{}'.format(self.args.BASE_DIR)
+                    # dir_exists = os.path.isdir(base_path)
+                    # if not dir_exists:
+                    #     os.mkdir(base_path)
     
-    # End of FitnessEvolutionMinecraftBreeder                                                                                                            
+                    # # Makes a sub dir too
+                    # sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+                    # dir_exists = os.path.isdir(sub_path)
+                    # if not dir_exists:
+                    #     os.mkdir(sub_path)
+                        
+                    # # Makes one more method
+                    # pop_path = '{}/gen/'.format(sub_path)
+                    # dir_exists = os.path.isdir(pop_path)
+                    # if not dir_exists:
+                    #     os.mkdir(pop_path)
+
+                    # checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
+                    # print(self.generation)
+                    # print("--------------------------------------------------------------------")
+                    # checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.save_counter)
+                    # self.save_counter+=1
+                
+            print('{0} archive entries'.format(len(self.archive)))
+
+        # Adds new entries to archive
+        self.archive.extend(new_archive_entries) 
+    # End of NoveltyMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':
     print("Do not launch this file directly. Launch main.py instead.")

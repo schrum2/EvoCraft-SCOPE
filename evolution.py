@@ -1,5 +1,6 @@
 import interactive_cppn_evolution as ice
 import fitness_cppn_evolution as fce
+import novelty_cppn_evolution as nce
 import neat
 from minecraft_pb2 import *
 import neat_stagnation
@@ -10,7 +11,7 @@ import block_sets
 import fitness_functions as ff
 import novelty_characterizations as nc
 import pickle
-import visualize
+#import visualize
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -33,12 +34,15 @@ def run(args):
         #print("Set BLOCK_CHANGE_PROBABILITY to {}".format(cg.BLOCK_CHANGE_PROBABILITY))
 
     if args.INTERACTIVE_EVOLUTION:
+        print("Interactive evolution")
         mc = ice.MinecraftBreeder(args,block_list)
         stagnation = neat_stagnation.InteractiveStagnation
     elif args.EVOLVE_NOVELTY:
-        mc = fce.NoveltyMinecraftBreeder(args, block_list) #Fix 
+        print("Novelty Search")
+        mc = nce.NoveltyMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
     else: 
+        print("Objective-based evolution")
         mc = fce.FitnessEvolutionMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
 
@@ -54,7 +58,9 @@ def run(args):
     if args.INTERACTIVE_EVOLUTION:
         # Selected items have a fitness of 1, but there is no final/best option
         config.fitness_threshold = 1.01
-    else:
+    elif args.EVOLVE_NOVELTY:
+        config.fitness_threshold = float("inf") # No predetermined cutoff
+    else: # Fitness-based evolution
         # TODO: Change this so it is set depending on the specific fitness function used.
         # At this point, any invalid fitness function name would have been caught in main.
         # start of fitness evolution, clear previous world of 'champion arrows'
@@ -75,7 +81,7 @@ def run(args):
     # do not save unless SAVE_FITNESS_LOG is true and names for BASE_DIR and EXPERIMENT_PREFIX other than None are given 
     invalid_dir_names = args.BASE_DIR is None or args.EXPERIMENT_PREFIX is None
     print(invalid_dir_names)
-    if args.SAVE_FITNESS_LOG and not invalid_dir_names:
+    if args.SAVE_FITNESS_LOG and not invalid_dir_names or args.INTERACTIVE_EVOLUTION:
         # Add a stdout reporter to show progress in the terminal.
         pop.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
@@ -110,6 +116,18 @@ def run(args):
                 elif(args.LOAD_SAVED_NO_EVOLUTION and (args.LOAD_SAVED_SEED== None or args.LOAD_GENERATION ==None)):
                     print("In order to load, make sure you set both the LOAD_SAVED_SEED and the LOAD_GENERATION")
                     quit()
+                elif args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
+                    novel_genomes = []
+                    for i in range(config.pop_size):
+                        with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
+                            genome_from_pickle = pickle.load(handle)
+                        novel_genomes.append(genome_from_pickle)
+                    print(novel_genomes)
+
+                    mc.eval_fitness(novel_genomes, config)
+                    quit()
+
+                #mc.eval_fitness(novel_genomes,config)
                 pop.run(mc.eval_fitness, 1)
         else: # Fitness-based evolution
             # TODO: Change 1000 to a command line parameter NUM_GENERATIONS

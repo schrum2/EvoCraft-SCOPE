@@ -91,11 +91,17 @@ def main(argv):
     parser.add_argument('--DESIRED_BLOCK_COUNT', type=int, default=0, metavar='',
                         help='The desired block count of a specific block.')
     parser.add_argument('--FITNESS_FUNCTION', type=str, metavar='',
-                        help='The desired block count of a specific block.')
+                        help='The fitness function to be used.')
     parser.add_argument('--EVOLVE_NOVELTY', type=boolean_string, default=False, metavar='',
                         help='Whether or not to evolve with novelty search. NOVELTY_CHARACTER is also needed with this')
     parser.add_argument('--NOVELTY_CHARACTER', type=str, metavar='',
                         help='The way novelty is characterized in a shape')
+    parser.add_argument('--NOVELTY_RANDOM_SCORE', type=float, default=0.02, metavar='',
+                        help='Probability that shapes will be added to the archive. Should be between 0.0 and 1.0.')
+    parser.add_argument('--SAVE_NOVELTY', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to save archive in noevlty search')
+    parser.add_argument('--LOAD_NOVELTY', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to load archive in noevlty search')
     parser.add_argument('--ONLY_SHOW_PLACED', type=boolean_string, default=True, metavar='',
                         help='Shows only the blocks that were placed in the shape in front of the shape')
     parser.add_argument('--PREVENT_DUPLICATE_BLOCK_TYPES', type=boolean_string, default=True, metavar='',
@@ -154,7 +160,7 @@ def main(argv):
     if args.PREVENT_DUPLICATE_BLOCK_TYPES and args.NUM_EVOLVED_BLOCK_LIST_TYPES>len(block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)):
         raise ValueError("Block list size is too small to not have duplicates.")
     
-    if not args.INTERACTIVE_EVOLUTION:
+    if not args.INTERACTIVE_EVOLUTION and not args.EVOLVE_NOVELTY:
         try: is_function = getattr(ff, args.FITNESS_FUNCTION)
         except: print('{} is not a valid fitness function name.'.format(args.FITNESS_FUNCTION))
 
