@@ -18,3 +18,4 @@ def presence_characterization(client, position_information, corner, args):
             block_collection.append(0)
         else:
             block_collection.append(1)
+    return block_collection

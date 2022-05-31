@@ -15,6 +15,7 @@ import cppn_generation
 
 # For fitness functions
 import novelty_characterizations as nc
+import numpy as np
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -31,6 +32,7 @@ class NoveltyMinecraftBreeder(object):
         """
         self.args = args
         self.block_list = block_list
+        self.archive = []
 
         self.position_information = dict()
         self.position_information["startx"] = 0
@@ -79,7 +81,7 @@ class NoveltyMinecraftBreeder(object):
         # position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
         # minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
         all_blocks = []                                                                                                             
-
+        new_archive_entries = []
         # champion_found = False 
 
         # This loop could be parallelized
@@ -96,9 +98,18 @@ class NoveltyMinecraftBreeder(object):
             # fill the empty space with the evolved shape
             self.client.spawnBlocks(Blocks(blocks=shape))
             all_blocks.extend(shape)
-            #genome.fitness = ff.type_count(self.client, self.position_information, self.corners[n], self.args)
+            
+            
+            # Gets type of characterization to test for
             characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
-            genome.novelty = characterization(self.client, self.position_information, self.corners[n], self.args)
+            # Creates list filled with characterization values
+            character_list = characterization(self.client, self.position_information, self.corners[n], self.args)
+            genome.fitness = 10 #<-- Fix this, placeholder for actual smallest value
+
+            for a in self.archive:
+                adist = np.linalg.norm(character_list.ravel() - a.ravel()) # Not sure ravel is needed here
+                genome.fitness = min(genome.fitness, adist)
+                
             # fit_function = getattr(ff, self.args.FITNESS_FUNCTION)
             # genome.fitness = fit_function(self.client, self.position_information, self.corners[n], self.args)
             
