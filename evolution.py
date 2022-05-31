@@ -81,14 +81,7 @@ def run(args):
     # do not save unless SAVE_FITNESS_LOG is true and names for BASE_DIR and EXPERIMENT_PREFIX other than None are given 
     invalid_dir_names = args.BASE_DIR is None or args.EXPERIMENT_PREFIX is None
     print(invalid_dir_names)
-    if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
-        novel_genomes = []
-        for i in range(config.pop_size):
-            with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
-                    genome_from_pickle = pickle.load(handle)
-            novel_genomes.append(genome_from_pickle)
-            print(novel_genomes)
-    elif args.SAVE_FITNESS_LOG and not invalid_dir_names or args.INTERACTIVE_EVOLUTION:
+    if args.SAVE_FITNESS_LOG and not invalid_dir_names or args.INTERACTIVE_EVOLUTION:
         # Add a stdout reporter to show progress in the terminal.
         pop.add_reporter(neat.StdOutReporter(True))
         stats = neat.StatisticsReporter()
@@ -123,6 +116,14 @@ def run(args):
                 elif(args.LOAD_SAVED_NO_EVOLUTION and (args.LOAD_SAVED_SEED== None or args.LOAD_GENERATION ==None)):
                     print("In order to load, make sure you set both the LOAD_SAVED_SEED and the LOAD_GENERATION")
                     quit()
+                elif args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
+                    novel_genomes = []
+                    for i in range(config.pop_size):
+                        with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
+                            genome_from_pickle = pickle.load(handle)
+                        novel_genomes.append(genome_from_pickle)
+                    print(novel_genomes)
+                #mc.eval_fitness(novel_genomes,config)
                 pop.run(mc.eval_fitness, 1)
         else: # Fitness-based evolution
             # TODO: Change 1000 to a command line parameter NUM_GENERATIONS
