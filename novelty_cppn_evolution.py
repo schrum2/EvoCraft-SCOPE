@@ -19,6 +19,7 @@ import numpy as np
 import random
 import os
 import pickle
+from pathlib import Path
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -137,12 +138,10 @@ class NoveltyMinecraftBreeder(object):
             if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
                 if self.save_archive:
-                    a=5
                     print("=======================================")
-                    print(self.base_path)
-                    with open(self.base_path,"shape{}.p".format(self.save_counter), 'wb') as handle:
-                        pickle.dump(genome, handle, protocol=pickle.HIGHEST_PROTOCOL)
-                    with open("shape{}.p".format(self.save_counter), 'rb') as handle:
+                    with open("Novelty_Archive/shape{}".format(self.save_counter),'wb') as handle:
+                        pickle.dump(genome, handle)
+                    with open( "Novelty_Archive/shape{}".format(self.save_counter),'rb') as handle:
                         b = pickle.load(handle)
                     print(b)
                     print("=======================================")
