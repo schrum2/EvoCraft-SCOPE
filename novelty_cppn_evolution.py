@@ -34,6 +34,7 @@ class NoveltyMinecraftBreeder(object):
         self.args = args
         self.block_list = block_list
         self.archive = []
+        self.random_threshold = args.NOVELTY_RANDOM_SCORE
 
         self.position_information = dict()
         self.position_information["startx"] = 0
@@ -119,11 +120,12 @@ class NoveltyMinecraftBreeder(object):
                 character_list_arr = np.array(character_list)
                 a_arr = np.array(a)
                 adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Euclidean distance
-                print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
+                # For debugging
+                # print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
                 genome.fitness = min(genome.fitness, adist) # Fitness is smallest value 
 
             # Only if random threshold is hit, then added to the archive
-            if random.random() < 0.02: # <-- add command line param
+            if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
                 
             print('{0} archive entries'.format(len(self.archive)))
