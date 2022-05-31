@@ -138,10 +138,10 @@ def run(args):
                 node_names = {-1: 'x', -2: 'y', -3: 'z', -4: 'radius', -5: 'bias', 0: 'presence'}
                 i = 1   
                 while i < block_list_length + 1:
-                    node_names[i] = 'block type {}'.format(i)
+                    node_names[i] = 'bt {}'.format(i - 1)
                     i+=1
                 
-                orientations = ['oriented east', 'oriented north', 'oriented northeast', 'oriented west', 'oriented south','oriented southwest']
+                orientations = ['oriented e', 'oriented n', 'oriented ne', 'oriented w', 'oriented s','oriented sw']
                 xi = 0 
                 if args.EVOLVE_ORIENTATION:
                     for x in orientations:
@@ -160,7 +160,7 @@ def run(args):
                 # This line creates issues because graphviz needs to be installed on device, so it is commented out. 
                 # uncommenting it produces a file called digraph.gv that is saved and contains the information
                 # needed to see an image of the neural network.
-                # visualize.draw_net(config, stats.best_genome(), True, node_names=node_names)
+                visualize.draw_net(config, stats.best_genome(), True, node_names=node_names)
 
 
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
