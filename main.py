@@ -154,7 +154,7 @@ def main(argv):
     if args.PREVENT_DUPLICATE_BLOCK_TYPES and args.NUM_EVOLVED_BLOCK_LIST_TYPES>len(block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)):
         raise ValueError("Block list size is too small to not have duplicates.")
     
-    if not args.INTERACTIVE_EVOLUTION:
+    if not args.INTERACTIVE_EVOLUTION and not args.EVOLVE_NOVELTY:
         try: is_function = getattr(ff, args.FITNESS_FUNCTION)
         except: print('{} is not a valid fitness function name.'.format(args.FITNESS_FUNCTION))
 

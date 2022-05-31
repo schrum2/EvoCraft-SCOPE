@@ -50,6 +50,12 @@ class NoveltyMinecraftBreeder(object):
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
+        # TODO: Refactor! Avoid repetition!
+        zeroes = np.zeros(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
+        ones = np.ones(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
+        self.max_distance = np.linalg.norm(zeroes.ravel() - ones.ravel()) # Not sure ravel is needed here
+        # print("Compare {} to {} to get {}".format(zeroes.ravel(), ones.ravel(), self.max_distance))
+
         # Figure out the lower corner of each shape in advance
         self.corners = []
         for n in range(self.args.POPULATION_SIZE):
@@ -80,7 +86,10 @@ class NoveltyMinecraftBreeder(object):
         # # clear previous floating arrows
         # position_information_copy = self.position_information.copy()
         # position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
-        # minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
+        # minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)
+        position_information_copy = self.position_information.copy()
+        position_information_copy["starty"] = self.position_information["starty"]+self.position_information["yrange"]
+        minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
         all_blocks = []                                                                                                             
         new_archive_entries = []
         # champion_found = False 
@@ -105,15 +114,16 @@ class NoveltyMinecraftBreeder(object):
             characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
             # Creates list filled with characterization values
             character_list = characterization(self.client, self.position_information, self.corners[n], self.args)
-            genome.fitness = 10 #<-- Fix this, placeholder for actual smallest value
+            genome.fitness = self.max_distance # A sufficiently large value that cannot be attained
 
             for a in self.archive:
                 character_list_arr = np.array(character_list)
                 a_arr = np.array(a)
                 adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Not sure ravel is needed here
+                print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
                 genome.fitness = min(genome.fitness, adist)
 
-            if random.random() > 0.02: # <-- not 100% on this
+            if random.random() < 0.02: # <-- not 100% on this
                 new_archive_entries.append(character_list)
                 
             print('{0} archive entries'.format(len(self.archive)))
