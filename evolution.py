@@ -75,16 +75,18 @@ def run(args):
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
-        # The shapes in the list are generated
+        # The shapes in the list are generated, returned for clearing
         loaded_blocks = mc.eval_fitness(novel_genomes, config)
         print("All shapes from the archive were generated!")
 
-        user_input = input("press q to quit")
+        user_input = input("Press q to quit and delete the shapes: ")
         while(user_input!="q"):
-            user_input = input("press q to quit: ")
+            user_input = input("That wasn't q! Press q to quit and delete the shapes: ")
+        #Clears all blocks that were generated
         for s in loaded_blocks:
             s.type = AIR
         mc.client.spawnBlocks(Blocks(blocks=loaded_blocks))
+        print("Area cleared, program terminating")
         quit() # Quit because nothing else will be evolved
 
     if args.INTERACTIVE_EVOLUTION:

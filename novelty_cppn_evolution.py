@@ -33,6 +33,10 @@ class NoveltyMinecraftBreeder(object):
         block_list ([int]): List where each int represents a Minecraft block type.
                             This will be empty if block lists are maintained within
                             each genome rather than shared among them.
+
+        Return:
+        self.loaded_all_blocks (list of blocks): A list containg all blocks that were
+                                                 generated when loading. Used to clear
         """
         self.args = args
         self.block_list = block_list
@@ -165,6 +169,8 @@ class NoveltyMinecraftBreeder(object):
                 for s in all_blocks:
                     s.type = AIR
                 self.client.spawnBlocks(Blocks(blocks=all_blocks))
+
+            # If loading, save ALL blocks generated here, to be returned
             if self.args.LOAD_NOVELTY:
                 self.loaded_all_blocks.extend(shape)
 
