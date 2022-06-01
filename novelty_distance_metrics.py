@@ -18,7 +18,8 @@ def euclidean_distance(arr1,arr2):
 
 def hamming_distance(arr1,arr2):
     """
-    Calculates the hamming distance between two arrays
+    Calculates the hamming distance between two arrays. Adds 1 to sum if the 
+    values are different, nothing if they're the same
     
     Parameters:
     arr1(numpy array): Array containg the information of one shape
@@ -31,6 +32,18 @@ def hamming_distance(arr1,arr2):
     return float(hdist)
 
 def custom_hamming_distance(arr1,arr2):
+    """
+    Custom version of the hamming distance. If one block is air and another block
+    isn't, 1 is added. If the two blocks are different, but not air, .05 is added.
+    If the block is the same, nothing is added 
+    
+    Parameters:
+    arr1(numpy array): Array containg the information of one shape
+    arr2(numpy array): Array containg the information of another shape
+
+    Return:
+    chdist (float): The distance calculated between the two arrays
+    """
     chdist = 0
     for h1, h2 in zip(arr1, arr2):
         if h1 != h2:
@@ -38,5 +51,5 @@ def custom_hamming_distance(arr1,arr2):
                 chdist+=1
             else:
                 chdist+=.05
-    return chdist
+    return float(chdist)
 

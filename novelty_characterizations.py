@@ -8,6 +8,7 @@ def presence_characterization(client, position_information, corner):
     Parameters:
     client (MinecraftServiceStub): Minecraft server stub being used.
     position_information (dict): Dictionary containing location related information.
+    corner (int,int,int): 3-tuple defining minimal coordinates of generated object
 
     Return:
     block_character (list of ints): List containing where blocks are or are not present
@@ -33,6 +34,17 @@ def presence_characterization(client, position_information, corner):
     return block_character
 
 def block_type_characterization(client, position_information, corner):
+    """
+    Adds all the blocks that were read in to a list based on their constant value
+
+    Parameters:
+    client (MinecraftServiceStub): Minecraft server stub being used.
+    position_information (dict): Dictionary containing location related information.
+    corner (int,int,int): 3-tuple defining minimal coordinates of generated object
+
+    Return:
+    block_types ([int]): list of all values in the shape
+    """
     # End points for all of the shapes
     endx= corner[0] + position_information["xrange"]
     endy= corner[1] + position_information["yrange"]

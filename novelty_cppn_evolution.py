@@ -65,6 +65,8 @@ class NoveltyMinecraftBreeder(object):
         self.distance_metric = getattr(ndm, self.args.NOVELTY_DISTANCE)
 
         zeroes = np.zeros(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
+        if(self.args.NOVELTY_DISTANCE=="custom_hamming_distance"):
+            zeroes+=5
         ones = np.ones(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
         self.max_distance = self.distance_metric(zeroes, ones)
         # print("Compare {} to {} to get {}".format(zeroes.ravel(), ones.ravel(), self.max_distance))
@@ -166,7 +168,7 @@ class NoveltyMinecraftBreeder(object):
                     self.save_counter+=1 # Increases counter for next shape
                 
             print('{0} archive entries'.format(len(self.archive)))
-            if not self.args.LOAD_NOVELTY and (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT):      
+            if self.args.EVOLVE_SNAKE and (not self.args.LOAD_NOVELTY or (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT)):      
                 for s in all_blocks:
                     s.type = AIR
                 self.client.spawnBlocks(Blocks(blocks=all_blocks))
@@ -178,10 +180,6 @@ class NoveltyMinecraftBreeder(object):
         # Adds new entries to archive
         self.archive.extend(new_archive_entries)
         return self.loaded_all_blocks 
-
-    def Euclidean_distance(self, arr1, arr2):
-        adist = np.linalg.norm(arr1.ravel() - arr2.ravel())
-        return adist
     # End of NoveltyMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':
