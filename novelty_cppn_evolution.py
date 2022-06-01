@@ -15,6 +15,7 @@ import cppn_generation
 
 # For novelty search
 import novelty_characterizations as nc
+import novelty_distance_metrics as ndm
 import numpy as np
 import random
 import os
@@ -59,10 +60,13 @@ class NoveltyMinecraftBreeder(object):
 
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+        
+        # Gets the distance metric here to calculate the max, and to be used later on in the code
+        self.distance_metric = getattr(ndm, self.args.NOVELTY_DISTANCE)
 
         zeroes = np.zeros(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
         ones = np.ones(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
-        self.max_distance = self.Euclidean_distance(zeroes, ones)
+        self.max_distance = self.distance_metric(zeroes, ones)
         # print("Compare {} to {} to get {}".format(zeroes.ravel(), ones.ravel(), self.max_distance))
 
         # Figure out the lower corner of each shape in advance
@@ -135,8 +139,7 @@ class NoveltyMinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shape))
             all_blocks.extend(shape)
             
-            
-            # Gets type of characterization to test for
+            # Gets type of characterization and distance metric to test for
             characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
             # Creates list filled with characterization values
             character_list = characterization(self.client, self.position_information, self.corners[n])
@@ -146,7 +149,7 @@ class NoveltyMinecraftBreeder(object):
                 # Convert to arrays to calculate the euclidean disatnce
                 character_list_arr = np.array(character_list)
                 a_arr = np.array(a)
-                adist = self.Euclidean_distance(character_list_arr, a_arr) # Euclidean distance
+                adist = self.distance_metric(character_list_arr, a_arr) # Euclidean distance
                 # For debugging
                 # print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
                 genome.fitness = min(genome.fitness, adist) # Fitness is smallest value 
