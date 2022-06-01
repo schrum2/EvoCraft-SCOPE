@@ -109,7 +109,7 @@ def main(argv):
                         help='Shows only the blocks that were placed in the shape in front of the shape')
     parser.add_argument('--PREVENT_DUPLICATE_BLOCK_TYPES', type=boolean_string, default=True, metavar='',
                         help='Shows only the blocks that were placed in the shape in front of the shape')
-    parser.add_argument('--EVOLVE_ORIENTATION', type=boolean_string, default=False, metavar='',
+    parser.add_argument('--EVOLVE_ORIENTATION', type=boolean_string, default=True, metavar='',
                         help='Evloves the orientation of the blocks')
     parser.add_argument('--SAVE_FITNESS_LOG', type=boolean_string, default=False, metavar='',
                         help='Save CPPN population.')
