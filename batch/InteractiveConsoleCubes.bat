@@ -1,2 +1,3 @@
+REM Usage ./InteractiveConsoleCubes.bat <seed>
 cd..
-python main.py --BASE_DIR=%1 --EXPERIMENT_PREFIX=%2 --RANDOM_SEED=%3 --POPULATION_SIZE=%4
+python main.py --BASE_DIR=console --EXPERIMENT_PREFIX=cubes --RANDOM_SEED=%1 --POPULATION_SIZE=10 --USE_ELITISM=True
