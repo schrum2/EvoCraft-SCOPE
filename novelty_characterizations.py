@@ -78,7 +78,12 @@ def composition_characterization(client, position_information, corner, args):
     for block in block_collection.blocks:
         block_collection_types.append(block.type)
     
-    counter=collections.Counter(block_collection_types)
+    all_blocks_counter=collections.Counter(block_collection_types)
+
+    final_result = []
     block_set = block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)
-    counter2=collections.Counter(block_set)
+    for type in block_set:
+        final_result.append(all_blocks_counter[type])
+    return final_result
+
 
