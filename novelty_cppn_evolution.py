@@ -160,6 +160,10 @@ class NoveltyMinecraftBreeder(object):
                     self.save_counter+=1 # Increases counter for next shape
                 
             print('{0} archive entries'.format(len(self.archive)))
+            if not self.args.LOAD_NOVELTY and (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT):      
+                for s in all_blocks:
+                    s.type = AIR
+                self.client.spawnBlocks(Blocks(blocks=all_blocks))
 
         # Adds new entries to archive
         self.archive.extend(new_archive_entries) 
