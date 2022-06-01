@@ -99,6 +99,8 @@ def main(argv):
                         help='Whether or not to evolve with novelty search. NOVELTY_CHARACTER is also needed with this')
     parser.add_argument('--NOVELTY_CHARACTER', type=str, metavar='',
                         help='The way novelty is characterized in a shape')
+    parser.add_argument('--NOVELTY_DISTANCE', type=str, metavar='',
+                        help='The distance metric specified for novelty search')
     parser.add_argument('--NOVELTY_RANDOM_SCORE', type=float, default=0.02, metavar='',
                         help='Probability that shapes will be added to the archive. Should be between 0.0 and 1.0.')
     parser.add_argument('--SAVE_NOVELTY', type=boolean_string, default=False, metavar='',

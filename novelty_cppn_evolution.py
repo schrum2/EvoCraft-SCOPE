@@ -176,8 +176,8 @@ class NoveltyMinecraftBreeder(object):
         self.archive.extend(new_archive_entries)
         return self.loaded_all_blocks 
 
-    def Euclidean_distance(self, character_list_arr, a_arr):
-        adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel())
+    def Euclidean_distance(self, arr1, arr2):
+        adist = np.linalg.norm(arr1.ravel() - arr2.ravel())
         return adist
     # End of NoveltyMinecraftBreeder                                                                                                            
 
