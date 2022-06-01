@@ -145,6 +145,8 @@ def main(argv):
                         help='Whether or not to load a previously saved set of shapes that will not evolve')
     parser.add_argument('--SAVE_PARAMETERS', type=boolean_string, default=False, metavar='',
                         help='Whether or not to the parameters being used for future use.')
+    parser.add_argument('--MIN_BLOCK_FAILSAFE_ITERATIONS', type=int, default=500, metavar='',
+                        help='The number of chnces given to creating a minimum number of blocks before the presence threshold is set to negative infinity (meaning that every block will generate).')
 
     args = parser.parse_args()
    
