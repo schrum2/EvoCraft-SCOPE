@@ -11,7 +11,7 @@ import block_sets
 import fitness_functions as ff
 import novelty_characterizations as nc
 import pickle
-#import visualize
+import visualize
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -41,11 +41,9 @@ def run(args):
         print("Novelty Search")
         mc = nce.NoveltyMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
-    elif args.FITNESS_FUNCTION=="type_count": #CHANGE!!!
+    else: 
         print("Objective-based evolution")
         mc = fce.FitnessEvolutionMinecraftBreeder(args, block_list)
-        stagnation = neat.DefaultStagnation
-    else:
         stagnation = neat.DefaultStagnation
 
     # Determine path to configuration file.
