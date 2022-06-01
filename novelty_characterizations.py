@@ -31,3 +31,21 @@ def presence_characterization(client, position_information, corner):
         else:
             block_character.append(1)
     return block_character
+
+def block_type_characterization(client, position_information, corner):
+    # End points for all of the shapes
+    endx= corner[0] + position_information["xrange"]
+    endy= corner[1] + position_information["yrange"]
+    endz= corner[2] + position_information["zrange"]
+
+    # read all the blocks at once as one big block
+    block_collection = client.readCube(Cube(
+        min=Point(x=corner[0], y=corner[1], z=corner[2]),
+        max=Point(x=endx, y=endy, z=endz)
+    ))
+
+    block_types = []
+
+    for block in block_collection.blocks:
+        block_types.append(block.type)
+    return block_types
