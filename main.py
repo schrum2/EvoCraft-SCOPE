@@ -91,6 +91,8 @@ def main(argv):
                         help='The desired block.')
     parser.add_argument('--DESIRED_BLOCK_COUNT', type=int, default=0, metavar='',
                         help='The desired block count of a specific block.')
+    parser.add_argument('--EVOLVE_FITNESS', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to evolve with Objective-based evolution. FITNESS_FUNCTION is also needed with this')
     parser.add_argument('--FITNESS_FUNCTION', type=str, metavar='',
                         help='The fitness function to be used.')
     parser.add_argument('--EVOLVE_NOVELTY', type=boolean_string, default=False, metavar='',
