@@ -148,14 +148,16 @@ class NoveltyMinecraftBreeder(object):
                 # print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
                 genome.fitness = min(genome.fitness, adist) # Fitness is smallest value 
 
-            # Only if random threshold is hit, then added to the archive
-            if random.random() < self.random_threshold: # <-- add command line param
+            # Only if random threshold is hit, then added to the archive. Random threshold based on command line param
+            if random.random() < self.random_threshold:
                 new_archive_entries.append(character_list)
+
+                # Saves the genomes in a file based on a counter. Based on command line param
                 if self.save_archive:
                     with open("{}/{}{}/archive/shape{}".format(self.args.BASE_DIR,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED,self.save_counter),'wb') as handle:
                         pickle.dump(genome, handle)
                     print("shape{} added to {}/{}{}/archive".format(self.save_counter,self.args.BASE_DIR,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED))
-                    self.save_counter+=1
+                    self.save_counter+=1 # Increases counter for next shape
                 
             print('{0} archive entries'.format(len(self.archive)))
 

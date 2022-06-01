@@ -61,15 +61,20 @@ def run(args):
                          neat.DefaultSpeciesSet, stagnation,
                          config_path)
 
+    # If loading generated novelty structures
     if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
         novel_genomes = [] 
-        onlyfiles = [f for f in listdir("C:/schrum2MM-NEAT/EvoCraft-SCOPE/None/None30/archive") if isfile(join("C:/schrum2MM-NEAT/EvoCraft-SCOPE/None/None30/archive", f))]
+        # Finds all shapes in the archive folder and makes them into a list. The length of this list is how long the next loop runs for
+        file_path = "C:/schrum2MM-NEAT/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED)
+        print(file_path)
+        onlyfiles = [f for f in listdir(file_path) if isfile(join(file_path, f))]
         print("Loading {} saved structures from {}/{}{}/archive".format(len(onlyfiles),args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
+        # Loops through all files in archive and adds them, with their key, to a new list
         for i in range(len(onlyfiles)):
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
-
+        # The shapes in the list are generated
         mc.eval_fitness(novel_genomes, config)
         print("All shapes from the archive were generated!")
         quit()
