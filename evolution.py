@@ -11,6 +11,9 @@ import block_sets
 import fitness_functions as ff
 import novelty_characterizations as nc
 import pickle
+# For loading novelty shapes
+from os import listdir
+from os.path import isfile, join
 #import visualize
 
 def run(args):
@@ -59,14 +62,12 @@ def run(args):
                          config_path)
 
     if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
-        novel_genomes = []
-        for i in range(args.POPULATION_SIZE):
+        novel_genomes = [] 
+        onlyfiles = [f for f in listdir("C:/schrum2MM-NEAT/EvoCraft-SCOPE/None/None30/archive") if isfile(join("C:/schrum2MM-NEAT/EvoCraft-SCOPE/None/None30/archive", f))]
+        for i in range(len(onlyfiles)):
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
-        #print(novel_genomes)
-        #print(type(novel_genomes))
-        #print(type(novel_genomes[0]))
 
         mc.eval_fitness(novel_genomes, config)
         print("All shapes from the files were generated!")
