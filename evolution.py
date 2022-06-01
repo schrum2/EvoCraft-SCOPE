@@ -37,7 +37,7 @@ def run(args):
         print("Interactive evolution")
         mc = ice.MinecraftBreeder(args,block_list)
         stagnation = neat_stagnation.InteractiveStagnation
-    elif args.EVOLVE_NOVELTY and not args.LOAD_NOVELTY:
+    elif args.EVOLVE_NOVELTY:
         print("Novelty Search")
         mc = nce.NoveltyMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
@@ -45,6 +45,9 @@ def run(args):
         print("Objective-based evolution")
         mc = fce.FitnessEvolutionMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
+    else:
+        print("Please select a way to evolve!")
+        quit()
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
@@ -56,7 +59,6 @@ def run(args):
                          config_path)
 
     if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
-        mc = nce.NoveltyMinecraftBreeder(args, block_list)
         novel_genomes = []
         for i in range(args.POPULATION_SIZE):
             with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
@@ -67,6 +69,7 @@ def run(args):
         #print(type(novel_genomes[0]))
 
         mc.eval_fitness(novel_genomes, config)
+        print("All shapes from the files were generated!")
         quit()
 
     if args.INTERACTIVE_EVOLUTION:
