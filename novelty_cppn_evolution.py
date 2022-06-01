@@ -40,6 +40,7 @@ class NoveltyMinecraftBreeder(object):
         self.random_threshold = args.NOVELTY_RANDOM_SCORE
         self.save_archive = args.SAVE_NOVELTY
         self.save_counter = 0
+        self.loaded_all_blocks = []
 
         self.position_information = dict()
         self.position_information["startx"] = 0
@@ -164,9 +165,12 @@ class NoveltyMinecraftBreeder(object):
                 for s in all_blocks:
                     s.type = AIR
                 self.client.spawnBlocks(Blocks(blocks=all_blocks))
+            if self.args.LOAD_NOVELTY:
+                self.loaded_all_blocks.extend(shape)
 
         # Adds new entries to archive
-        self.archive.extend(new_archive_entries) 
+        self.archive.extend(new_archive_entries)
+        return self.loaded_all_blocks 
     # End of NoveltyMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':
