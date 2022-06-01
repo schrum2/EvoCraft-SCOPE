@@ -99,7 +99,7 @@ def composition_characterization(client, position_information, corner, args):
 
     all_blocks_counter=collections.Counter(block_collection_types)
 
-    # Appends all of the percentages into the list, percentages divided by size of the shape
+    # Appends all of the percentages into the list, divided by size of the shape for percentages
     final_result = []
     block_set = block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)
     for type in block_set:
