@@ -144,7 +144,7 @@ class NoveltyMinecraftBreeder(object):
             # Gets type of characterization and distance metric to test for
             characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
             # Creates list filled with characterization values
-            character_list = characterization(self.client, self.position_information, self.corners[n])
+            character_list = characterization(self.client, self.position_information, self.corners[n], self.args)
             genome.fitness = self.max_distance # A sufficiently large value that cannot be attained
 
             for a in self.archive:
