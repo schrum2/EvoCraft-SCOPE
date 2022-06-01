@@ -9,6 +9,8 @@ from os import mkdir
 from minecraft_pb2 import *
 import fitness_functions as ff
 import block_sets
+import ast
+
 def boolean_string(s):
     """
     Checks a string that should only be either True or False and converts to associated boolean.
@@ -29,6 +31,16 @@ def block_int(name):
     Converts the name of a block into its corresponding int value.
     """
     return BlockType.Value(name)
+
+def tryeval(val):
+    """
+    Converts the string value into its appropriate value type.
+    """
+    try:
+        val = ast.literal_eval(val)
+    except ValueError:
+        pass
+    return val
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -169,39 +181,45 @@ def main(argv):
 
     random.seed(args.RANDOM_SEED)
     
-    
     #if not args.FITNESS_FUNCTION in dir(ff): 
      #   print('The fitness function name you have given does not exist.')
     
-    # save the parameters if SAVE_PARAMETERS is true.
-    if args.SAVE_PARAMETERS:
-        base_path = '{}'.format(args.BASE_DIR)
-        dir_exists = os.path.isdir(base_path)
-        if not dir_exists:
-            os.mkdir(base_path)
+    base_path = '{}'.format(args.BASE_DIR)
+    dir_exists = os.path.isdir(base_path)
+    if not dir_exists:
+        os.mkdir(base_path)
          
-        path = '{}/{}{}'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
-        dir_exists = os.path.isdir(path)
-        if not dir_exists:
-            os.mkdir(path)
- 
+    path = '{}/{}{}'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.RANDOM_SEED)
+    dir_exists = os.path.isdir(path)
+    if not dir_exists:
+        os.mkdir(path)
+    
+    # if the file of parameters already exists in the specified location, then load it
+    if exists('{}/parameters.txt'.format(path)):
+        with open('{}/parameters.txt'.format(path)) as f:
+            # read all of the lines
+            lines = f.readlines()
+            # split all of the lines to get the value
+            for line in lines:
+                rhs = line.split(':')[1]
+                # get rid of the \n that was being saved with it
+                new_line = rhs[0:len(rhs)-1]
+                        
+                k = line.split(':')[0]
+                setattr(args, k, tryeval(new_line))
+    
+    # save the parameters if SAVE_PARAMETERS is true.      
+    if args.SAVE_PARAMETERS:    
         try:
-            # does not already exist, make new file and save args
-            with open('{}/parameters.txt'.format(path), 'x') as f:
+        # does not already exist, make new file and save args
+          with open('{}/parameters.txt'.format(path), 'x') as f:
                 for arg in args.__dict__:
                     f.write('{}:{}\n'.format(arg,args.__dict__[arg]))      
         except FileExistsError:
-            # already exists, load args
-            with open('{}/parameters.txt'.format(path)) as f:
-                lines = f.readlines()
-                for line in lines:
-                    new_line = line.split(':')[1]
-                    #print(new_line)
-                    
-                    # TODO: this part is where I want to assign the args value to new value.
-                    #args[line] = new_line
-                #print(saved_args)
-
+            # already exists, not overriding the data in a preexisting file
+            # letting this exception pass since it will be loaded anyways by the code above.
+            pass
+    
     evolution.run(args)
 
 if __name__ == '__main__':
