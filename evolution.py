@@ -64,13 +64,14 @@ def run(args):
     if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
         novel_genomes = [] 
         onlyfiles = [f for f in listdir("C:/schrum2MM-NEAT/EvoCraft-SCOPE/None/None30/archive") if isfile(join("C:/schrum2MM-NEAT/EvoCraft-SCOPE/None/None30/archive", f))]
+        print("Loading {} saved structures from {}/{}{}/archive".format(len(onlyfiles),args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
         for i in range(len(onlyfiles)):
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
 
         mc.eval_fitness(novel_genomes, config)
-        print("All shapes from the files were generated!")
+        print("All shapes from the archive were generated!")
         quit()
 
     if args.INTERACTIVE_EVOLUTION:

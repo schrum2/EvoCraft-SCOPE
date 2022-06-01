@@ -152,36 +152,10 @@ class NoveltyMinecraftBreeder(object):
             if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
                 if self.save_archive:
-                    print("======================================= MADE FILE")
                     with open("{}/{}{}/archive/shape{}".format(self.args.BASE_DIR,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED,self.save_counter),'wb') as handle:
                         pickle.dump(genome, handle)
+                    print("shape{} added to {}/{}{}/archive".format(self.save_counter,self.args.BASE_DIR,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED))
                     self.save_counter+=1
-
-                    # population = {}
-                    # population[0] = genome
-
-                    # base_path = '{}'.format(self.args.BASE_DIR)
-                    # dir_exists = os.path.isdir(base_path)
-                    # if not dir_exists:
-                    #     os.mkdir(base_path)
-    
-                    # # Makes a sub dir too
-                    # sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
-                    # dir_exists = os.path.isdir(sub_path)
-                    # if not dir_exists:
-                    #     os.mkdir(sub_path)
-                        
-                    # # Makes one more method
-                    # pop_path = '{}/gen/'.format(sub_path)
-                    # dir_exists = os.path.isdir(pop_path)
-                    # if not dir_exists:
-                    #     os.mkdir(pop_path)
-
-                    # checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
-                    # print(self.generation)
-                    # print("--------------------------------------------------------------------")
-                    # checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.save_counter)
-                    # self.save_counter+=1
                 
             print('{0} archive entries'.format(len(self.archive)))
 
