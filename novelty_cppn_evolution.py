@@ -19,7 +19,6 @@ import numpy as np
 import random
 import os
 import pickle
-from pathlib import Path
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -61,10 +60,9 @@ class NoveltyMinecraftBreeder(object):
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
-        # TODO: Refactor! Avoid repetition!
         zeroes = np.zeros(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
         ones = np.ones(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
-        self.max_distance = np.linalg.norm(zeroes.ravel() - ones.ravel()) # Not sure ravel is needed here
+        self.max_distance = self.Euclidean_distance(zeroes, ones)
         # print("Compare {} to {} to get {}".format(zeroes.ravel(), ones.ravel(), self.max_distance))
 
         # Figure out the lower corner of each shape in advance
@@ -148,7 +146,7 @@ class NoveltyMinecraftBreeder(object):
                 # Convert to arrays to calculate the euclidean disatnce
                 character_list_arr = np.array(character_list)
                 a_arr = np.array(a)
-                adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Euclidean distance
+                adist = self.Euclidean_distance(character_list_arr, a_arr) # Euclidean distance
                 # For debugging
                 # print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
                 genome.fitness = min(genome.fitness, adist) # Fitness is smallest value 
@@ -177,6 +175,10 @@ class NoveltyMinecraftBreeder(object):
         # Adds new entries to archive
         self.archive.extend(new_archive_entries)
         return self.loaded_all_blocks 
+
+    def Euclidean_distance(self, character_list_arr, a_arr):
+        adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel())
+        return adist
     # End of NoveltyMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':
