@@ -296,7 +296,7 @@ class MinecraftBreeder(object):
             elif(val=='q'):
                 os._exit(0)
             elif val== 's':   
-                self.save_by_user(self.current_config)
+                self.save_by_user(self.current_config, self.current_genomes)
             else:
                 print("This command was not recognized. Please try again")
                 
