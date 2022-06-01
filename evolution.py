@@ -61,7 +61,7 @@ def run(args):
     if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
         novel_genomes = []
         for i in range(args.POPULATION_SIZE):
-            with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
+            with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
         #print(novel_genomes)
