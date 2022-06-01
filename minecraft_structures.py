@@ -445,7 +445,6 @@ def declare_champion(client,position_information,corner):
     client (MinecraftServiceStub): Minecraft server stub being used.
     position_information (dict): contains initial x,y,z coordinates and the x,y,z-sizes of each shape
     corner (int,int,int): 3-tuple defining minimal coordinates of generated object
-    args (argparse.Namespace): A collection of argument values collected at the command line
     """
 
     # Coordinates for bottom of number shape

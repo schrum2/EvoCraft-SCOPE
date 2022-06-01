@@ -1,2 +1,3 @@
+REM Usage ./InteractiveInGameCubes.bat <seed>
 cd..
-python main.py --BASE_DIR=%1 --EXPERIMENT_PREFIX=%2 --RANDOM_SEED=%3 --POPULATION_SIZE=%4 --IN_GAME_CONTROL=True
+python main.py --BASE_DIR=interactive --EXPERIMENT_PREFIX=cubes --RANDOM_SEED=%1 --POPULATION_SIZE=10 --IN_GAME_CONTROL=True --USE_ELITISM=True

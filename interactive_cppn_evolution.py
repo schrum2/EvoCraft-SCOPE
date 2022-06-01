@@ -59,9 +59,6 @@ class MinecraftBreeder(object):
 
         self.generation = 0
 
-        # Don't try any multithreading yet, but consider for later
-        self.num_workers = 2
-
     def reset_ground_and_numbers(self):
         """
         Resets the ground and numbers above the shapes. Extracted from __init__
@@ -69,6 +66,12 @@ class MinecraftBreeder(object):
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
 
+        self.place_0_to_9()
+        
+    def place_0_to_9(self):
+        """
+            Place the numbers 0 to 9 above shapes to help identify them for selection
+        """
         # Figure out the lower corner of each shape in advance
         self.corners = []
         for n in range(self.args.POPULATION_SIZE):
@@ -201,6 +204,7 @@ class MinecraftBreeder(object):
         all_blocks = []
         #clears area for structures
         minecraft_structures.clear_area(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH) 
+        self.place_0_to_9()
         # This loop could be parallelized
         #for n, (genome_id, genome) in enumerate(genomes):
         for n in range(self.args.POPULATION_SIZE):
@@ -296,7 +300,7 @@ class MinecraftBreeder(object):
             elif(val=='q'):
                 os._exit(0)
             elif val== 's':   
-                self.save_by_user(self.current_config)
+                self.save_by_user(self.current_config, self.current_genomes)
             else:
                 print("This command was not recognized. Please try again")
                 

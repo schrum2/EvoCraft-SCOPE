@@ -11,7 +11,7 @@ import block_sets
 import fitness_functions as ff
 import novelty_characterizations as nc
 import pickle
-#import visualize
+import visualize
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -37,7 +37,7 @@ def run(args):
         print("Interactive evolution")
         mc = ice.MinecraftBreeder(args,block_list)
         stagnation = neat_stagnation.InteractiveStagnation
-    elif args.EVOLVE_NOVELTY:
+    elif args.EVOLVE_NOVELTY and not args.LOAD_NOVELTY:
         print("Novelty Search")
         mc = nce.NoveltyMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
@@ -54,6 +54,20 @@ def run(args):
     config = neat.Config(genome_type, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, stagnation,
                          config_path)
+
+    if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
+        mc = nce.NoveltyMinecraftBreeder(args, block_list)
+        novel_genomes = []
+        for i in range(args.POPULATION_SIZE):
+            with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
+                genome_from_pickle = pickle.load(handle)
+            novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
+        #print(novel_genomes)
+        #print(type(novel_genomes))
+        #print(type(novel_genomes[0]))
+
+        mc.eval_fitness(novel_genomes, config)
+        quit()
 
     if args.INTERACTIVE_EVOLUTION:
         # Selected items have a fitness of 1, but there is no final/best option
@@ -115,16 +129,6 @@ def run(args):
                     pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
                 elif(args.LOAD_SAVED_NO_EVOLUTION and (args.LOAD_SAVED_SEED== None or args.LOAD_GENERATION ==None)):
                     print("In order to load, make sure you set both the LOAD_SAVED_SEED and the LOAD_GENERATION")
-                    quit()
-                elif args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
-                    novel_genomes = []
-                    for i in range(config.pop_size):
-                        with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
-                            genome_from_pickle = pickle.load(handle)
-                        novel_genomes.append(genome_from_pickle)
-                    print(novel_genomes)
-
-                    mc.eval_fitness(novel_genomes, config)
                     quit()
 
                 #mc.eval_fitness(novel_genomes,config)

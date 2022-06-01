@@ -71,9 +71,6 @@ class NoveltyMinecraftBreeder(object):
         self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
 
         self.generation = 0
-        
-        # Don't try any multithreading yet, but consider for later
-        self.num_workers = 1
 
         self.base_path = 'Novelty_Archive'
         dir_exists = os.path.isdir(self.base_path)
@@ -138,12 +135,11 @@ class NoveltyMinecraftBreeder(object):
             if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
                 if self.save_archive:
-                    print("=======================================")
+                    print("======================================= MADE FILE")
                     with open("Novelty_Archive/shape{}".format(self.save_counter),'wb') as handle:
                         pickle.dump(genome, handle)
                     with open( "Novelty_Archive/shape{}".format(self.save_counter),'rb') as handle:
                         b = pickle.load(handle)
-                    print("=======================================")
                     self.save_counter+=1
 
                     # population = {}
