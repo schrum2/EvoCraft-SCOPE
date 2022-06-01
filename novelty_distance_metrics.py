@@ -29,3 +29,14 @@ def hamming_distance(arr1,arr2):
     """
     hdist = sum(h1 != h2 for h1, h2 in zip(arr1, arr2))
     return float(hdist)
+
+def custom_hamming_distance(arr1,arr2):
+    chdist = 0
+    for h1, h2 in zip(arr1, arr2):
+        if h1 != h2:
+            if h1==AIR or h2==AIR:
+                chdist+=1
+            else:
+                chdist+=.05
+    return chdist
+
