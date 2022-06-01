@@ -60,7 +60,7 @@ class MinecraftBreeder(object):
         self.generation = 0
 
         # Don't try any multithreading yet, but consider for later
-        self.num_workers = 2
+        self.num_workers = 1
 
     def reset_ground_and_numbers(self):
         """

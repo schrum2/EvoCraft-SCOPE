@@ -71,9 +71,6 @@ class NoveltyMinecraftBreeder(object):
         self.query_cppn = cppn_generation.query_cppn_for_snake_shape if self.args.EVOLVE_SNAKE else cppn_generation.query_cppn_for_shape
 
         self.generation = 0
-        
-        # Don't try any multithreading yet, but consider for later
-        self.num_workers = 1
 
         self.base_path = 'Novelty_Archive'
         dir_exists = os.path.isdir(self.base_path)
