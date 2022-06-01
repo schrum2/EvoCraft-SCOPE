@@ -72,10 +72,27 @@ class NoveltyMinecraftBreeder(object):
 
         self.generation = 0
 
-        self.base_path = 'Novelty_Archive'
-        dir_exists = os.path.isdir(self.base_path)
+        base_path = '{}'.format(self.args.BASE_DIR)
+        dir_exists = os.path.isdir(base_path)
         if not dir_exists:
-            os.mkdir(self.base_path)
+            os.mkdir(base_path)
+    
+        # Makes a sub dir too
+        sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+        dir_exists = os.path.isdir(sub_path)
+        if not dir_exists:
+            os.mkdir(sub_path)
+                        
+        # Makes one more method
+        pop_path = '{}/archive/'.format(sub_path)
+        dir_exists = os.path.isdir(pop_path)
+        if not dir_exists:
+            os.mkdir(pop_path)
+
+        # self.base_path = 'Novelty_Archive'
+        # dir_exists = os.path.isdir(self.base_path)
+        # if not dir_exists:
+        #     os.mkdir(self.base_path)
 
 
     def eval_fitness(self, genomes, config):
@@ -136,10 +153,8 @@ class NoveltyMinecraftBreeder(object):
                 new_archive_entries.append(character_list)
                 if self.save_archive:
                     print("======================================= MADE FILE")
-                    with open("Novelty_Archive/shape{}".format(self.save_counter),'wb') as handle:
+                    with open("{}/{}{}/archive/shape{}".format(self.args.BASE_DIR,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED,self.save_counter),'wb') as handle:
                         pickle.dump(genome, handle)
-                    with open( "Novelty_Archive/shape{}".format(self.save_counter),'rb') as handle:
-                        b = pickle.load(handle)
                     self.save_counter+=1
 
                     # population = {}
