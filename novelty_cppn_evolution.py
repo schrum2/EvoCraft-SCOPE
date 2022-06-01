@@ -138,12 +138,11 @@ class NoveltyMinecraftBreeder(object):
             if random.random() < self.random_threshold: # <-- add command line param
                 new_archive_entries.append(character_list)
                 if self.save_archive:
-                    print("=======================================")
+                    print("======================================= MADE FILE")
                     with open("Novelty_Archive/shape{}".format(self.save_counter),'wb') as handle:
                         pickle.dump(genome, handle)
                     with open( "Novelty_Archive/shape{}".format(self.save_counter),'rb') as handle:
                         b = pickle.load(handle)
-                    print("=======================================")
                     self.save_counter+=1
 
                     # population = {}
