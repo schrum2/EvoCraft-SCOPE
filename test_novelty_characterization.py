@@ -200,3 +200,61 @@ def test_presence_characterization():
          1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     except:
         pytest.fail('Currently not connected to a minecraft server.')
+
+def test_block_type_characterization():
+    try:
+        # Need client and position information here too in order to call the function right
+        channel = grpc.insecure_channel('localhost:5001')
+        client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
+        
+        
+        position_information = dict()
+        position_information["startx"] = -100
+        position_information["starty"] = 5
+        position_information["startz"] = 250
+        position_information["xrange"] = 4
+        position_information["yrange"] = 4
+        position_information["zrange"] = 4
+
+        corners = []
+        for n in range(10):
+            corner = (position_information["startx"] + n*(position_information["xrange"]+2+1), position_information["starty"], position_information["startz"])
+            corners.append(corner)
+
+        x = position_information["startx"]
+        y = position_information["starty"]
+        z = position_information["startz"]
+
+        # may need to delete or rework this. Not doinf anything now, but args is necessary to call
+        test_parser = argparse.ArgumentParser()
+        
+        def block_int(name):
+            """
+            Converts the name of a block into its corresponding int value.
+            """
+            return BlockType.Value(name)
+        
+        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=block_int, default=GLOWSTONE, metavar='',
+                            help='block_set')
+        
+        args = test_parser.parse_args()
+        
+        # Goes in order Z,Y,X starting from the corner
+        # For shape1, hard coded in
+        # GLOWSTONE = 89, COAL_BLOCK = 39 AIR = 5
+        assert nc.block_type_characterization(client, position_information, corners[0], args) == [89, 89, 89, 89, 89, 5, 5, 89, 89, 5, 5, 89, 89, 89, 89, 89, 89, 5, 5, 89, 5, 39, 39, 5,
+         5, 39, 39, 5, 89, 5, 5, 89, 89, 5, 5, 89, 5, 39, 39, 5, 5, 39, 39, 5, 89, 5, 5, 89, 89, 89, 89, 89, 89, 5, 5, 89, 89, 5, 5, 89, 89, 89, 89, 89]
+        
+        # # For shape2, layered cube
+        # assert nc.presence_characterization(client, position_information, corners[1], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        #  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
+        # #For shape3, solid cube
+        # assert nc.presence_characterization(client, position_information, corners[2], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+        #  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        
+        # #For shape4, custom cube with blocks taken out
+        # assert nc.presence_characterization(client, position_information, corners[3], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0,
+        #  1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    except:
+        pytest.fail('Currently not connected to a minecraft server.')
