@@ -245,16 +245,19 @@ def test_block_type_characterization():
         assert nc.block_type_characterization(client, position_information, corners[0], args) == [89, 89, 89, 89, 89, 5, 5, 89, 89, 5, 5, 89, 89, 89, 89, 89, 89, 5, 5, 89, 5, 39, 39, 5,
          5, 39, 39, 5, 89, 5, 5, 89, 89, 5, 5, 89, 5, 39, 39, 5, 5, 39, 39, 5, 89, 5, 5, 89, 89, 89, 89, 89, 89, 5, 5, 89, 89, 5, 5, 89, 89, 89, 89, 89]
         
-        # # For shape2, layered cube
-        # assert nc.presence_characterization(client, position_information, corners[1], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        #  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        # For shape2, layered cube
+        # CYAN_GLAZED_TERRACOTTA = 48, MAGENTA_GLAZED_TERRACOTTA = 133, GREEN_GLAZED_TERRACOTTA = 98, BLACK_GLAZED_TERRACOTTA = 16
+        assert nc.block_type_characterization(client, position_information, corners[1], args) == [48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,
+         98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,]
 
-        # #For shape3, solid cube
-        # assert nc.presence_characterization(client, position_information, corners[2], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-        #  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        # For shape3, solid cube
+        # GOLD_BLOCK = 91
+        assert nc.block_type_characterization(client, position_information, corners[2], args) == [91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+         91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91]
         
-        # #For shape4, custom cube with blocks taken out
-        # assert nc.presence_characterization(client, position_information, corners[3], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0,
-        #  1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        # For shape4, custom cube with blocks taken out
+        # QUARTZ_STAIRS = 177 AIR = 5
+        assert nc.block_type_characterization(client, position_information, corners[3], args) == [177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 5, 5, 177, 177, 5, 5,
+         177, 177, 5, 5, 177, 177, 5, 5, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
     except:
         pytest.fail('Currently not connected to a minecraft server.')
