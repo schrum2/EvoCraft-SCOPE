@@ -1,4 +1,5 @@
 # For neat
+from tkinter import E
 import neat
 
 # For utility functions
@@ -78,7 +79,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
 
         return shape
 
-def generate_block(net, position_information, corner, args, block_options, scaled_point, relative_position, presence_threshold): 
+def generate_block(net, position_information, corner, args, block_options, scaled_point, relative_position, presence_threshold, continuation_threshold = float("-inf")): 
     """
     Returns a block to generate if it is present at a specific position and None
     if it isn't
@@ -90,6 +91,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
     block_options ([Block]): List of blocks that can be spawned in 
     scaled_point (int, int, int): three-tuple of the position being looked at
     relative_position (int, int, int): three-tuple used to scale the position of the point
+    continuation_threshold (float): for snakes, continuation output must be greater than this to keep generating
 
     Returns:
     ((Block), (int,int,int), (bool)): Returns a tuple, including a block if it is present, None otherwise;
@@ -152,7 +154,7 @@ def generate_block(net, position_information, corner, args, block_options, scale
         if relative_position[1] + direction[1] < 0 :
             stop = True
         else: # Otherwise, stopping depends on continuation output
-            stop = output[len(block_options)+1+NUM_DIRECTIONS] <= args.CONTINUATION_THRESHOLD
+            stop = output[len(block_options)+1+NUM_DIRECTIONS] <= continuation_threshold
 
     return (block, direction, stop)
 
@@ -212,10 +214,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     # Create CPPN out of genome
     net = neat.nn.FeedForwardNetwork.create(genome, config)
         
-    done = False
-
-    number_of_iterations = 0
-
     # If not evolving block list, use the static one specified earlier. Otherwise, use the genome's list
     if not args.BLOCK_LIST_EVOLVES:
         block_options = block_list
@@ -226,33 +224,56 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     # For regular shape generation, this is required to make USE_MIN_BLOCK_REQUIREMENT
     # work. Such an option may also be used here eventually.
     presence_threshold = args.PRESENCE_THRESHOLD
+    continuation_threshold = args.CONTINUATION_THRESHOLD
 
-    # Used to scale the point
-    xi = int(position_information["xrange"]/2)
-    yi = int(position_information["yrange"]/2)
-    zi = int(position_information["zrange"]/2)
+    outer_loop_done = False
+    attempts = 0
 
-    snake = []
-    while not done:
-        number_of_iterations += 1
-        x = util.scale_and_center(xi,position_information["xrange"])
-        y = util.scale_and_center(yi,position_information["yrange"])
-        z = util.scale_and_center(zi,position_information["zrange"])
-        scaled_point = (x, y, z)
-        initial_position = (xi, yi, zi)
+    while not outer_loop_done:
+        done = False
+        # Used to scale the point
+        xi = int(position_information["xrange"]/2)
+        yi = int(position_information["yrange"]/2)
+        zi = int(position_information["zrange"]/2)
+        number_of_iterations = 0
+        snake = []
+        while not done:
+            number_of_iterations += 1
+            x = util.scale_and_center(xi,position_information["xrange"])
+            y = util.scale_and_center(yi,position_information["yrange"])
+            z = util.scale_and_center(zi,position_information["zrange"])
+            scaled_point = (x, y, z)
+            initial_position = (xi, yi, zi)
 
-        (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold)
+            (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold, continuation_threshold)
 
-        if block is not None:
-            snake.append(block)
+            if block is not None:
+                snake.append(block)
 
-        # Once it has reach the maximum length, it should stop
-        if stop or number_of_iterations == args.MAX_SNAKE_LENGTH:
-            done = True
-        else:
-            xi += direction[0]
-            yi += direction[1]
-            zi += direction[2]
+            # Once it has reach the maximum length, it should stop
+            if stop or number_of_iterations == args.MAX_SNAKE_LENGTH:
+                done = True
+            else:
+                xi += direction[0]
+                yi += direction[1]
+                zi += direction[2]
+        
+        if args.USE_MIN_BLOCK_REQUIREMENT: 
+            outer_loop_done = len(snake) >= args.MINIMUM_REQUIRED_BLOCKS
+        # At this point we are done regardless of the if statement above.
+        else: 
+            outer_loop_done = True   
+
+        attempts += 1
+        # Decrease presence_thresold to decrease number of empty shapes.
+        # Multiply by attempts so that larger and larger amounts are subtracted
+        if not outer_loop_done: 
+            presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT * attempts 
+            continuation_threshold -= args.CONTINUATION_INCREMENT * attempts
+        if attempts > args.MIN_BLOCK_FAILSAFE_ITERATIONS:
+            # If the program as looped this many times attempting to make a shape, just set the presence threshold to negative infinity
+            presence_threshold = float("-inf")
+            continuation_threshold = float("-inf")
 
     if(len(snake) == 0):
         print("Genome at corner {} is empty".format(corner))
