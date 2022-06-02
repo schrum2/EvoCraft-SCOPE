@@ -212,6 +212,9 @@ def main(argv):
                 new_line = rhs[0:len(rhs)-1]
                         
                 k = line.split(':')[0]
+                if str(args.__dict__[k]) != new_line:
+                    raise Exception("The value you have chosen for {} does not match the value loaded from the already existing parameters file. \nProposed Value: {} \nPreexisting Value: {}".format(k, tryeval(new_line), args.__dict__[k]))
+               
                 setattr(args, k, tryeval(new_line))
     
     # save the parameters if SAVE_PARAMETERS is true.      
@@ -226,6 +229,9 @@ def main(argv):
             # letting this exception pass since it will be loaded anyways by the code above.
             pass
     
+    # check if loaded value differs from attempted saved value and crash with message similar to 'The proposed command line parameter differs from the existing command line parameter.'
+
+
     evolution.run(args)
 
 if __name__ == '__main__':
