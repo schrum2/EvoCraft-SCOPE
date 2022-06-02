@@ -47,35 +47,35 @@ def run_around_tests():
             Block(position=Point(x=x+5, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
             Block(position=Point(x=x+4, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
 
-            Block(position=Point(x=x,   y=y+2,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+2,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+2,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+2,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+4,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+4,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+4,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+4,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y,    z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+1,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+3,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+3,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+5, y=y+3,  z=z+4), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+4, y=y+3,  z=z+4), type=SLIME, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y,    z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+5, y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+4, y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
             
-            Block(position=Point(x=x,   y=y+2,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+2,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+2,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+2,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+4,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+4,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+4,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+4,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y,    z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+1,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+3,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+3,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+5, y=y+3,  z=z+1), type=SLIME, orientation=NORTH),
-            Block(position=Point(x=x+4, y=y+3,  z=z+1), type=SLIME, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+2, y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+1, y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y,    z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+1,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x,   y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+3, y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+5, y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
+            Block(position=Point(x=x+4, y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
             
             Block(position=Point(x=x,   y=y+2,  z=z+2), type=GLOWSTONE, orientation=NORTH),
             Block(position=Point(x=x+1, y=y+2,  z=z+2), type=GLOWSTONE, orientation=NORTH),
@@ -119,16 +119,16 @@ def run_around_tests():
         # fill sides
         for i in range(10):
             for xi in range(position_information["xrange"]):
-                shape2.append(Block(position=Point(x=x + xi, y=y, z=z+i), type=RED_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+2, z=z+i), type=RED_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+1, z=z+i), type=BLUE_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+3, z=z+i), type=BLUE_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+6, z=z+i), type=BLUE_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+4, z=z+i), type=RED_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+5, z=z+i), type=RED_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+8, z=z+i), type=BLUE_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+7, z=z+i), type=RED_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+9, z=z+i), type=RED_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+2, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+1, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+3, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+6, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+4, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+5, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+8, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+7, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+9, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
 
         client.spawnBlocks(Blocks(blocks=shape2))
 
@@ -143,7 +143,7 @@ def run_around_tests():
         for i in range(10):
             for xi in range(position_information["xrange"]):
                 for yi in range(position_information["yrange"]):
-                    shape3.append(Block(position=Point(x=x + xi, y=y+yi, z=z+i), type=IRON_BLOCK, orientation=NORTH))
+                    shape3.append(Block(position=Point(x=x + xi, y=y+yi, z=z+i), type=GOLD_BLOCK, orientation=NORTH))
                 
         client.spawnBlocks(Blocks(blocks=shape3))
 
@@ -158,7 +158,7 @@ def run_around_tests():
         for i in range(8):
             for xi in range(6):
                 for yi in range(7):
-                    shape4.append(Block(position=Point(x=x + xi, y=y+yi, z=z+i), type=NETHER_WART_BLOCK, orientation=NORTH))
+                    shape4.append(Block(position=Point(x=x + xi, y=y+yi, z=z+i), type=QUARTZ_STAIRS, orientation=NORTH))
 
         for i in range(7):
             shape4.append(Block(position=Point(x=x+3, y=y + i, z=z+4), type=AIR, orientation=NORTH))
@@ -194,33 +194,32 @@ def test_presence_characterization():
         x = position_information["startx"]
         y = position_information["starty"]
         z = position_information["startz"]
-        # ms.clear_area(client, position_information, 10, 1, 5)
 
-        # test_parser = argparse.ArgumentParser()
+        test_parser = argparse.ArgumentParser()
         
-        # def block_int(name):
-        #     """
-        #     Converts the name of a block into its corresponding int value.
-        #     """
-        #     return BlockType.Value(name)
+        def block_int(name):
+            """
+            Converts the name of a block into its corresponding int value.
+            """
+            return BlockType.Value(name)
         
-        # test_parser.add_argument('--DESIRED_BLOCK', type=block_int, default=GLOWSTONE, metavar='',
-        #                     help='The desired block.')
+        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=block_int, default=GLOWSTONE, metavar='',
+                            help='block_set')
         
-        # args = test_parser.parse_args()
+        args = test_parser.parse_args()
         
-        # # number of glow blocks = 42
-        # assert ff.type_count(client, position_information, corners[0], args) == 42
+        # number of glow blocks = 42
+        assert len(nc.presence_characterization(client, position_information, corners[0], args)) == 42
         
         # # 100 * 6 = 600
-        # args.DESIRED_BLOCK = RED_GLAZED_TERRACOTTA
+        # args.DESIRed_BLOCK = Red_GLAZED_TERRACOTTA
         # assert ff.type_count(client, position_information, corners[1], args) == 600
 
         # # 10^3 = 1000
-        # args.DESIRED_BLOCK = IRON_BLOCK
+        # args.DESIRed_BLOCK = IRON_BLOCK
         # assert ff.type_count(client, position_information, corners[2], args) == 1000
 
-        # args.DESIRED_BLOCK = NETHER_WART_BLOCK
+        # args.DESIRed_BLOCK = NETHER_WART_BLOCK
         # # (8 * 7 * 6) - (7 * 4) = 308  
         # assert ff.type_count(client, position_information, corners[3], args) == 308
     except:
