@@ -18,9 +18,9 @@ def run_around_tests():
         position_information["startx"] = -100
         position_information["starty"] = 5
         position_information["startz"] = 250
-        position_information["xrange"] = 10
-        position_information["yrange"] = 10
-        position_information["zrange"] = 10 
+        position_information["xrange"] = 4
+        position_information["yrange"] = 4
+        position_information["zrange"] = 4 
 
         corners = []
         for n in range(10):
@@ -31,81 +31,54 @@ def run_around_tests():
         y = position_information["starty"]
         z = position_information["startz"]
         ms.clear_area(client, position_information, 10, 1, 5)
-        shape1 = [
-            Block(position=Point(x=x,   y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+2,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+4,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y,    z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+1,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+5, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+4, y=y+3,  z=z), type=GLOWSTONE, orientation=NORTH),
 
-            Block(position=Point(x=x,   y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+2,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+4,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y,    z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+1,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+5, y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+4, y=y+3,  z=z+4), type=OBSIDIAN, orientation=NORTH),
-            
-            Block(position=Point(x=x,   y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+2,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+4,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y,    z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+1,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+5, y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            Block(position=Point(x=x+4, y=y+3,  z=z+1), type=OBSIDIAN, orientation=NORTH),
-            
-            Block(position=Point(x=x,   y=y+2,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+2,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+2,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+2,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+4,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+4,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+4,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+4,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y,    z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+1,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+3,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+3,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+5, y=y+3,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+4, y=y+3,  z=z+2), type=GLOWSTONE, orientation=NORTH),
-            
-            Block(position=Point(x=x,   y=y+2,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+2,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+2,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+2,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+4,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+2, y=y+4,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+1, y=y+4,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+4,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y,    z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+1,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x,   y=y+3,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+3, y=y+3,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+5, y=y+3,  z=z+3), type=GLOWSTONE, orientation=NORTH),
-            Block(position=Point(x=x+4, y=y+3,  z=z+3), type=GLOWSTONE, orientation=NORTH)]
+        # Shape1 is shape generated by hard coding it in
+        shape1 = [
+            # Bottom square
+            Block(position=Point(x=x,y=y,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,y=y,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y,z=z+1), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y,z=z+2), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,y=y,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y,z=z+2), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y,z=z+1), type=GLOWSTONE, orientation=NORTH),
+            # Top Square
+            Block(position=Point(x=x,y=y+3,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,y=y+3,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y+3,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+3,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y+3,z=z+1), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y+3,z=z+2), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y+3,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+1,y=y+3,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y+3,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+3,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+3,z=z+2), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+3,z=z+1), type=GLOWSTONE, orientation=NORTH),
+            # Sides
+            Block(position=Point(x=x,y=y+1,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y+2,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+1,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+2,z=z), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y+1,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x,y=y+2,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+1,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            Block(position=Point(x=x+3,y=y+2,z=z+3), type=GLOWSTONE, orientation=NORTH),
+            # Inside cube
+            Block(position=Point(x=x+1,y=y+1,z=z+1), type=COAL_BLOCK, orientation=NORTH),
+            Block(position=Point(x=x+1,y=y+2,z=z+1), type=COAL_BLOCK, orientation=NORTH),
+            Block(position=Point(x=x+1,y=y+1,z=z+2), type=COAL_BLOCK, orientation=NORTH),
+            Block(position=Point(x=x+1,y=y+2,z=z+2), type=COAL_BLOCK, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y+1,z=z+1), type=COAL_BLOCK, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y+2,z=z+1), type=COAL_BLOCK, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y+1,z=z+2), type=COAL_BLOCK, orientation=NORTH),
+            Block(position=Point(x=x+2,y=y+2,z=z+2), type=COAL_BLOCK, orientation=NORTH),
+            ]
 
         client.spawnBlocks(Blocks(blocks=shape1))    
 
@@ -182,9 +155,9 @@ def test_presence_characterization():
         position_information["startx"] = -100
         position_information["starty"] = 5
         position_information["startz"] = 250
-        position_information["xrange"] = 10
-        position_information["yrange"] = 10
-        position_information["zrange"] = 10 
+        position_information["xrange"] = 4
+        position_information["yrange"] = 4
+        position_information["zrange"] = 4
 
         corners = []
         for n in range(10):
@@ -208,8 +181,8 @@ def test_presence_characterization():
         
         args = test_parser.parse_args()
         
-        # number of glow blocks = 42
-        assert len(nc.presence_characterization(client, position_information, corners[0], args)) == 42
+        # Goes in order Z,Y,X starting from the corner
+        assert nc.presence_characterization(client, position_information, corners[0], args) == [1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1]
         
         # # 100 * 6 = 600
         # args.DESIRed_BLOCK = Red_GLAZED_TERRACOTTA
