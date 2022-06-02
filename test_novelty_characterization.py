@@ -10,33 +10,6 @@ from minecraft_pb2 import *
 
 @pytest.fixture(autouse=True)
 def run_around_tests():
-    
-    yield
-    channel = grpc.insecure_channel('localhost:5001')
-    client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
-        
-        
-    position_information = dict()
-    position_information["startx"] = -100
-    position_information["starty"] = 5
-    position_information["startz"] = 250
-    position_information["xrange"] = 10
-    position_information["yrange"] = 10
-    position_information["zrange"] = 10 
-
-    corners = []
-    for n in range(10):
-        corner = (position_information["startx"] + n*(position_information["xrange"]+2+1), position_information["starty"], position_information["startz"])
-        corners.append(corner)
-
-    x = position_information["startx"]
-    y = position_information["starty"]
-    z = position_information["startz"]
-    ms.clear_area(client, position_information, 10, 1, 5)
-    print("second")
-
-def test_presence_characterization():
-    try:
         channel = grpc.insecure_channel('localhost:5001')
         client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
         
@@ -194,6 +167,34 @@ def test_presence_characterization():
             shape4.append(Block(position=Point(x=x+2, y=y + i, z=z+3), type=AIR, orientation=NORTH))
                     
         client.spawnBlocks(Blocks(blocks=shape4))
+        yield # Signifes what runs after code. Before yeild is set up, after is teardown
+    
+        #ms.clear_area(client, position_information, 10, 1, 5)
+        print("second")
+
+def test_presence_characterization():
+    try:
+        channel = grpc.insecure_channel('localhost:5001')
+        client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
+        
+        
+        position_information = dict()
+        position_information["startx"] = -100
+        position_information["starty"] = 5
+        position_information["startz"] = 250
+        position_information["xrange"] = 10
+        position_information["yrange"] = 10
+        position_information["zrange"] = 10 
+
+        corners = []
+        for n in range(10):
+            corner = (position_information["startx"] + n*(position_information["xrange"]+2+1), position_information["starty"], position_information["startz"])
+            corners.append(corner)
+
+        x = position_information["startx"]
+        y = position_information["starty"]
+        z = position_information["startz"]
+        # ms.clear_area(client, position_information, 10, 1, 5)
 
         # test_parser = argparse.ArgumentParser()
         
