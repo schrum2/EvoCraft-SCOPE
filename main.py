@@ -91,12 +91,16 @@ def main(argv):
                         help='The desired block.')
     parser.add_argument('--DESIRED_BLOCK_COUNT', type=int, default=0, metavar='',
                         help='The desired block count of a specific block.')
+    parser.add_argument('--EVOLVE_FITNESS', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to evolve with Objective-based evolution. FITNESS_FUNCTION is also needed with this')
     parser.add_argument('--FITNESS_FUNCTION', type=str, metavar='',
                         help='The fitness function to be used.')
     parser.add_argument('--EVOLVE_NOVELTY', type=boolean_string, default=False, metavar='',
                         help='Whether or not to evolve with novelty search. NOVELTY_CHARACTER is also needed with this')
     parser.add_argument('--NOVELTY_CHARACTER', type=str, metavar='',
                         help='The way novelty is characterized in a shape')
+    parser.add_argument('--NOVELTY_DISTANCE', type=str, metavar='',
+                        help='The distance metric specified for novelty search')
     parser.add_argument('--NOVELTY_RANDOM_SCORE', type=float, default=0.02, metavar='',
                         help='Probability that shapes will be added to the archive. Should be between 0.0 and 1.0.')
     parser.add_argument('--SAVE_NOVELTY', type=boolean_string, default=False, metavar='',
@@ -107,7 +111,7 @@ def main(argv):
                         help='Shows only the blocks that were placed in the shape in front of the shape')
     parser.add_argument('--PREVENT_DUPLICATE_BLOCK_TYPES', type=boolean_string, default=True, metavar='',
                         help='Shows only the blocks that were placed in the shape in front of the shape')
-    parser.add_argument('--EVOLVE_ORIENTATION', type=boolean_string, default=False, metavar='',
+    parser.add_argument('--EVOLVE_ORIENTATION', type=boolean_string, default=True, metavar='',
                         help='Evloves the orientation of the blocks')
     parser.add_argument('--SAVE_FITNESS_LOG', type=boolean_string, default=False, metavar='',
                         help='Save CPPN population.')

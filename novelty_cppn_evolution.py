@@ -15,11 +15,11 @@ import cppn_generation
 
 # For novelty search
 import novelty_characterizations as nc
+import novelty_distance_metrics as ndm
 import numpy as np
 import random
 import os
 import pickle
-from pathlib import Path
 
 class NoveltyMinecraftBreeder(object):
     def __init__(self, args, block_list):
@@ -33,6 +33,10 @@ class NoveltyMinecraftBreeder(object):
         block_list ([int]): List where each int represents a Minecraft block type.
                             This will be empty if block lists are maintained within
                             each genome rather than shared among them.
+
+        Return:
+        self.loaded_all_blocks (list of blocks): A list containg all blocks that were
+                                                 generated when loading. Used to clear
         """
         self.args = args
         self.block_list = block_list
@@ -40,6 +44,7 @@ class NoveltyMinecraftBreeder(object):
         self.random_threshold = args.NOVELTY_RANDOM_SCORE
         self.save_archive = args.SAVE_NOVELTY
         self.save_counter = 0
+        self.loaded_all_blocks = []
 
         self.position_information = dict()
         self.position_information["startx"] = 0
@@ -55,11 +60,15 @@ class NoveltyMinecraftBreeder(object):
 
         # Restore ground at the start of evolution
         minecraft_structures.restore_ground(self.client, self.position_information, self.args.POPULATION_SIZE, self.args.SPACE_BETWEEN)
+        
+        # Gets the distance metric here to calculate the max, and to be used later on in the code
+        self.distance_metric = getattr(ndm, self.args.NOVELTY_DISTANCE)
 
-        # TODO: Refactor! Avoid repetition!
         zeroes = np.zeros(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
+        if(self.args.NOVELTY_DISTANCE=="custom_hamming_distance"):
+            zeroes+=5
         ones = np.ones(self.args.XRANGE*self.args.YRANGE*self.args.ZRANGE)
-        self.max_distance = np.linalg.norm(zeroes.ravel() - ones.ravel()) # Not sure ravel is needed here
+        self.max_distance = self.distance_metric(zeroes, ones)
         # print("Compare {} to {} to get {}".format(zeroes.ravel(), ones.ravel(), self.max_distance))
 
         # Figure out the lower corner of each shape in advance
@@ -72,10 +81,27 @@ class NoveltyMinecraftBreeder(object):
 
         self.generation = 0
 
-        self.base_path = 'Novelty_Archive'
-        dir_exists = os.path.isdir(self.base_path)
+        base_path = '{}'.format(self.args.BASE_DIR)
+        dir_exists = os.path.isdir(base_path)
         if not dir_exists:
-            os.mkdir(self.base_path)
+            os.mkdir(base_path)
+    
+        # Makes a sub dir too
+        sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
+        dir_exists = os.path.isdir(sub_path)
+        if not dir_exists:
+            os.mkdir(sub_path)
+                        
+        # Makes one more method
+        pop_path = '{}/archive/'.format(sub_path)
+        dir_exists = os.path.isdir(pop_path)
+        if not dir_exists:
+            os.mkdir(pop_path)
+
+        # self.base_path = 'Novelty_Archive'
+        # dir_exists = os.path.isdir(self.base_path)
+        # if not dir_exists:
+        #     os.mkdir(self.base_path)
 
 
     def eval_fitness(self, genomes, config):
@@ -115,63 +141,45 @@ class NoveltyMinecraftBreeder(object):
             self.client.spawnBlocks(Blocks(blocks=shape))
             all_blocks.extend(shape)
             
-            
-            # Gets type of characterization to test for
+            # Gets type of characterization and distance metric to test for
             characterization = getattr(nc, self.args.NOVELTY_CHARACTER)
             # Creates list filled with characterization values
-            character_list = characterization(self.client, self.position_information, self.corners[n])
+            character_list = characterization(self.client, self.position_information, self.corners[n], self.args)
             genome.fitness = self.max_distance # A sufficiently large value that cannot be attained
 
             for a in self.archive:
                 # Convert to arrays to calculate the euclidean disatnce
                 character_list_arr = np.array(character_list)
                 a_arr = np.array(a)
-                adist = np.linalg.norm(character_list_arr.ravel() - a_arr.ravel()) # Euclidean distance
+                adist = self.distance_metric(character_list_arr, a_arr) # Euclidean distance
                 # For debugging
                 # print("Compare {} to {} to get {}".format(character_list_arr.ravel(), a_arr.ravel(), adist))
                 genome.fitness = min(genome.fitness, adist) # Fitness is smallest value 
 
-            # Only if random threshold is hit, then added to the archive
-            if random.random() < self.random_threshold: # <-- add command line param
+            # Only if random threshold is hit, then added to the archive. Random threshold based on command line param
+            if random.random() < self.random_threshold:
                 new_archive_entries.append(character_list)
+
+                # Saves the genomes in a file based on a counter. Based on command line param
                 if self.save_archive:
-                    print("======================================= MADE FILE")
-                    with open("Novelty_Archive/shape{}".format(self.save_counter),'wb') as handle:
+                    with open("{}/{}{}/archive/shape{}".format(self.args.BASE_DIR,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED,self.save_counter),'wb') as handle:
                         pickle.dump(genome, handle)
-                    with open( "Novelty_Archive/shape{}".format(self.save_counter),'rb') as handle:
-                        b = pickle.load(handle)
-                    self.save_counter+=1
-
-                    # population = {}
-                    # population[0] = genome
-
-                    # base_path = '{}'.format(self.args.BASE_DIR)
-                    # dir_exists = os.path.isdir(base_path)
-                    # if not dir_exists:
-                    #     os.mkdir(base_path)
-    
-                    # # Makes a sub dir too
-                    # sub_path = '{}/{}{}'.format(base_path,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED)
-                    # dir_exists = os.path.isdir(sub_path)
-                    # if not dir_exists:
-                    #     os.mkdir(sub_path)
-                        
-                    # # Makes one more method
-                    # pop_path = '{}/gen/'.format(sub_path)
-                    # dir_exists = os.path.isdir(pop_path)
-                    # if not dir_exists:
-                    #     os.mkdir(pop_path)
-
-                    # checkpointer = neat.Checkpointer(self.args.CHECKPOINT_FREQUENCY, self.args.TIME_INTERVAL, "{}gen".format(pop_path))
-                    # print(self.generation)
-                    # print("--------------------------------------------------------------------")
-                    # checkpointer.save_checkpoint(config, population, neat.DefaultSpeciesSet, self.save_counter)
-                    # self.save_counter+=1
+                    print("shape{} added to {}/{}{}/archive".format(self.save_counter,self.args.BASE_DIR,self.args.EXPERIMENT_PREFIX,self.args.RANDOM_SEED))
+                    self.save_counter+=1 # Increases counter for next shape
                 
             print('{0} archive entries'.format(len(self.archive)))
+            if self.args.EVOLVE_SNAKE and (not self.args.LOAD_NOVELTY or (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT)):      
+                for s in all_blocks:
+                    s.type = AIR
+                self.client.spawnBlocks(Blocks(blocks=all_blocks))
+
+            # If loading, save ALL blocks generated here, to be returned
+            if self.args.LOAD_NOVELTY:
+                self.loaded_all_blocks.extend(shape)
 
         # Adds new entries to archive
-        self.archive.extend(new_archive_entries) 
+        self.archive.extend(new_archive_entries)
+        return self.loaded_all_blocks 
     # End of NoveltyMinecraftBreeder                                                                                                            
 
 if __name__ == '__main__':

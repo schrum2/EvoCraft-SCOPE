@@ -11,7 +11,10 @@ import block_sets
 import fitness_functions as ff
 import novelty_characterizations as nc
 import pickle
-import visualize
+# For loading novelty shapes
+from os import listdir
+from os.path import isfile, join
+#import visualize
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -37,14 +40,17 @@ def run(args):
         print("Interactive evolution")
         mc = ice.MinecraftBreeder(args,block_list)
         stagnation = neat_stagnation.InteractiveStagnation
-    elif args.EVOLVE_NOVELTY and not args.LOAD_NOVELTY:
+    elif args.EVOLVE_NOVELTY:
         print("Novelty Search")
         mc = nce.NoveltyMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
-    else: 
+    elif(args.EVOLVE_FITNESS): 
         print("Objective-based evolution")
         mc = fce.FitnessEvolutionMinecraftBreeder(args, block_list)
         stagnation = neat.DefaultStagnation
+    else:
+        print("Please select a way to evolve!")
+        quit()
 
     # Determine path to configuration file.
     local_dir = os.path.dirname(__file__)
@@ -55,19 +61,33 @@ def run(args):
                          neat.DefaultSpeciesSet, stagnation,
                          config_path)
 
-    if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:
-        mc = nce.NoveltyMinecraftBreeder(args, block_list)
-        novel_genomes = []
-        for i in range(args.POPULATION_SIZE):
-            with open( "Novelty_Archive/shape{}".format(i),'rb') as handle:
+    # If loading generated novelty structures
+    if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:  
+        novel_genomes = [] 
+        file_path = "C:/schrum2MM-NEAT/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # File path for loop below
+        # Finds all shapes in the archive folder and makes them into a list. The length of this list is how long the next loop runs for
+        novel_shapes = [f for f in listdir(file_path) if isfile(join(file_path, f))]
+        print("Loading {} saved structures from {}/{}{}/archive".format(len(novel_shapes),args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
+        # Clear space for shapes
+        minecraft_structures.clear_area(mc.client, mc.position_information, len(novel_shapes)*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
+        # Loops through all files in archive and adds them, with their key, to a new list
+        for i in range(len(novel_shapes)):
+            with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
-        #print(novel_genomes)
-        #print(type(novel_genomes))
-        #print(type(novel_genomes[0]))
+        # The shapes in the list are generated, returned for clearing
+        loaded_blocks = mc.eval_fitness(novel_genomes, config)
+        print("All shapes from the archive were generated!")
 
-        mc.eval_fitness(novel_genomes, config)
-        quit()
+        user_input = input("Press q to quit and delete the shapes: ")
+        while(user_input!="q"):
+            user_input = input("That wasn't q! Press q to quit and delete the shapes: ")
+        #Clears all blocks that were generated
+        for s in loaded_blocks:
+            s.type = AIR
+        mc.client.spawnBlocks(Blocks(blocks=loaded_blocks))
+        print("Area cleared, program terminating")
+        quit() # Quit because nothing else will be evolved
 
     if args.INTERACTIVE_EVOLUTION:
         # Selected items have a fitness of 1, but there is no final/best option

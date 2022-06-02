@@ -71,10 +71,6 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
             if attempts > 500:
                 # If the program as looped this many times attempting to make a shape, just set the presence threshold to negative infinity
                 presence_threshold = float("-inf")
-                #print("Keeps failing to generate shape, has length {} out of {}. {} attempts. presence_threshold = {}".format(len(shape),args.MINIMUM_REQUIRED_BLOCKS,attempts,presence_threshold))
-                #center_dist = util.distance((scaled_point[0],scaled_point[1],scaled_point[2]),(0,0,0))
-                #output = net.activate([scaled_point[0], scaled_point[1], scaled_point[2], center_dist * math.sqrt(2), 1.0])
-                #print(output)
 
         if(len(shape) == 0):
             print("Genome at corner {} is empty".format(corner))
@@ -252,7 +248,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
             snake.append(block)
 
         # Once it has reach the maximum length, it should stop
-        if(stop or number_of_iterations == args.MAX_SNAKE_LENGTH):
+        if stop or number_of_iterations == args.MAX_SNAKE_LENGTH:
             done = True
         else:
             xi += direction[0]
