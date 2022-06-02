@@ -67,3 +67,37 @@ def test_hamming_distance():
     assert ndm.hamming_distance(pytest_namespace()['ones'],pytest_namespace()['ones']) == 0
     assert ndm.hamming_distance((pytest_namespace()['ones']+3),pytest_namespace()['zeroes']) == 50
     assert ndm.hamming_distance((pytest_namespace()['ones']-1),pytest_namespace()['zeroes']) == 0
+
+def test_custom_hamming_distance():
+    assert ndm.custom_hamming_distance(pytest_namespace()['arr1'],pytest_namespace()['arr2']) == 0
+    assert ndm.custom_hamming_distance(pytest_namespace()['arr1'],pytest_namespace()['arr3']) == pytest.approx(1.2)
+    assert ndm.custom_hamming_distance(pytest_namespace()['arr1'],pytest_namespace()['arr4']) == pytest.approx(2.1)
+    assert ndm.custom_hamming_distance(pytest_namespace()['arr2'],pytest_namespace()['arr3']) == pytest.approx(1.2)
+    assert ndm.custom_hamming_distance(pytest_namespace()['arr2'],pytest_namespace()['arr4']) == pytest.approx(2.1)
+    assert ndm.custom_hamming_distance(pytest_namespace()['arr3'],pytest_namespace()['arr4']) == pytest.approx(1.2)
+
+    assert ndm.custom_hamming_distance(pytest_namespace()['point1'],pytest_namespace()['point2']) == pytest.approx(.1)
+    assert ndm.custom_hamming_distance(pytest_namespace()['point1'],pytest_namespace()['point3']) == pytest.approx(1.05)
+    assert ndm.custom_hamming_distance(pytest_namespace()['point1'],pytest_namespace()['point4']) == pytest.approx(.1)
+    assert ndm.custom_hamming_distance(pytest_namespace()['point2'],pytest_namespace()['point3']) == pytest.approx(1.05)
+    assert ndm.custom_hamming_distance(pytest_namespace()['point2'],pytest_namespace()['point4']) == pytest.approx(.1)
+    assert ndm.custom_hamming_distance(pytest_namespace()['point3'],pytest_namespace()['point4']) == pytest.approx(1.05)
+    assert ndm.custom_hamming_distance(pytest_namespace()['point3'],pytest_namespace()['point3']) == 0
+
+    assert ndm.custom_hamming_distance(pytest_namespace()['long_arr1'],pytest_namespace()['long_arr1']) == 0
+    assert ndm.custom_hamming_distance(pytest_namespace()['long_arr1'],pytest_namespace()['long_arr2']) == pytest.approx(1.4)
+    assert ndm.custom_hamming_distance(pytest_namespace()['long_arr1'],pytest_namespace()['long_arr3']) == pytest.approx(2.4)
+    assert ndm.custom_hamming_distance(pytest_namespace()['long_arr2'],pytest_namespace()['long_arr3']) == pytest.approx(1.45)
+
+    assert ndm.custom_hamming_distance(pytest_namespace()['hamming_arr1'],pytest_namespace()['hamming_arr2']) == pytest.approx(1.45)
+    assert ndm.custom_hamming_distance(pytest_namespace()['hamming_arr1'],pytest_namespace()['hamming_arr3']) == pytest.approx(13.15)
+    assert ndm.custom_hamming_distance(pytest_namespace()['hamming_arr1'],pytest_namespace()['hamming_arr4']) == pytest.approx(17)
+    assert ndm.custom_hamming_distance(pytest_namespace()['hamming_arr2'],pytest_namespace()['hamming_arr3']) == pytest.approx(12.2)
+    assert ndm.custom_hamming_distance(pytest_namespace()['hamming_arr2'],pytest_namespace()['hamming_arr4']) == pytest.approx(16)
+    assert ndm.custom_hamming_distance(pytest_namespace()['hamming_arr3'],pytest_namespace()['hamming_arr4']) == pytest.approx(4)
+
+    assert ndm.custom_hamming_distance(pytest_namespace()['ones'],pytest_namespace()['zeroes']) == pytest.approx(2.5)
+    assert ndm.custom_hamming_distance(pytest_namespace()['ones'],pytest_namespace()['ones']) == 0
+    assert ndm.custom_hamming_distance((pytest_namespace()['ones']+3),pytest_namespace()['zeroes']) == pytest.approx(2.5)
+    assert ndm.custom_hamming_distance((pytest_namespace()['ones']-1),pytest_namespace()['zeroes']) == 0
+    assert ndm.custom_hamming_distance((pytest_namespace()['ones']*5),pytest_namespace()['zeroes']) == pytest.approx(50)
