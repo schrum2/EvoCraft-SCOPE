@@ -82,26 +82,18 @@ def run_around_tests():
 
         client.spawnBlocks(Blocks(blocks=shape1))    
 
-
         x = position_information["startx"] + position_information["xrange"] + 3
         y = position_information["starty"]
         z = position_information["startz"]
         
-        shape2 = []
-            
-        # fill sides
-        for i in range(10):
+        # Shape2 creates a block that has 4 different types of blocks in layers
+        shape2 = []   
+        for i in range(4):
             for xi in range(position_information["xrange"]):
-                shape2.append(Block(position=Point(x=x + xi, y=y, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y, z=z+i), type=CYAN_GLAZED_TERRACOTTA, orientation=NORTH))
                 shape2.append(Block(position=Point(x=x + xi, y=y+2, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+1, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+3, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+6, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+4, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+5, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+8, z=z+i), type=PINK_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+7, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
-                shape2.append(Block(position=Point(x=x + xi, y=y+9, z=z+i), type=GREEN_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+1, z=z+i), type=MAGENTA_GLAZED_TERRACOTTA, orientation=NORTH))
+                shape2.append(Block(position=Point(x=x + xi, y=y+3, z=z+i), type=BLACK_GLAZED_TERRACOTTA, orientation=NORTH))
 
         client.spawnBlocks(Blocks(blocks=shape2))
 
@@ -110,10 +102,9 @@ def run_around_tests():
         y = position_information["starty"]
         z = position_information["startz"]
         
+        # Shape3 is a block made of only one type
         shape3 = []
-            
-        # fill sides
-        for i in range(10):
+        for i in range(4):
             for xi in range(position_information["xrange"]):
                 for yi in range(position_information["yrange"]):
                     shape3.append(Block(position=Point(x=x + xi, y=y+yi, z=z+i), type=GOLD_BLOCK, orientation=NORTH))
@@ -182,18 +173,16 @@ def test_presence_characterization():
         args = test_parser.parse_args()
         
         # Goes in order Z,Y,X starting from the corner
-        assert nc.presence_characterization(client, position_information, corners[0], args) == [1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1]
+        # For shape1, hard coded in
+        assert nc.presence_characterization(client, position_information, corners[0], args) == [1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+         0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1]
         
-        # # 100 * 6 = 600
-        # args.DESIRed_BLOCK = Red_GLAZED_TERRACOTTA
-        # assert ff.type_count(client, position_information, corners[1], args) == 600
+        # For shape2, layered cube
+        assert nc.presence_characterization(client, position_information, corners[1], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-        # # 10^3 = 1000
-        # args.DESIRed_BLOCK = IRON_BLOCK
-        # assert ff.type_count(client, position_information, corners[2], args) == 1000
-
-        # args.DESIRed_BLOCK = NETHER_WART_BLOCK
-        # # (8 * 7 * 6) - (7 * 4) = 308  
-        # assert ff.type_count(client, position_information, corners[3], args) == 308
+        #For shape3, solid cube
+        assert nc.presence_characterization(client, position_information, corners[2], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     except:
         pytest.fail('Currently not connected to a minecraft server.')
