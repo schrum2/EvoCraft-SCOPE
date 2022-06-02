@@ -289,33 +289,24 @@ def test_composition_characterization():
         # may need to delete or rework this. Not doinf anything now, but args is necessary to call
         test_parser = argparse.ArgumentParser()
         
-        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=str, default="undroppable", metavar='',
+        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=str, default="test", metavar='',
                             help='block_set')
         
         args = test_parser.parse_args()
         
         # Goes in order Z,Y,X starting from the corner
         # For shape1, hard coded in
-        # GLOWSTONE = 89, COAL_BLOCK = 39
-        assert nc.composition_characterization(client, position_information, corners[0], args) == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        
-        # # For shape2, layered cube
-        # # CYAN_GLAZED_TERRACOTTA = 48, MAGENTA_GLAZED_TERRACOTTA = 133, GREEN_GLAZED_TERRACOTTA = 98, BLACK_GLAZED_TERRACOTTA = 16
-        # assert nc.block_type_characterization(client, position_information, corners[1], args) == [48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,
-        #  98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,]
+        assert nc.composition_characterization(client, position_information, corners[0], args) == [0.5, 0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
-        # # For shape3, solid cube
-        # # GOLD_BLOCK = 91
-        # assert nc.block_type_characterization(client, position_information, corners[2], args) == [91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
-        #  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91]
+        # For shape2, layered cube
+        assert nc.composition_characterization(client, position_information, corners[1], args) == [0.0, 0.0, 0.25, 0.25, 0.25, 0.25, 0.0, 0.0]
+
+        # For shape3, solid cube
+        assert nc.composition_characterization(client, position_information, corners[2], args) == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
         
-        # # For shape4, custom cube with blocks taken out
-        # # QUARTZ_STAIRS = 177 AIR = 5
-        # assert nc.block_type_characterization(client, position_information, corners[3], args) == [177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 5, 5, 177, 177, 5, 5,
-        #  177, 177, 5, 5, 177, 177, 5, 5, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+        # For shape4, custom cube with blocks taken out
+        assert nc.composition_characterization(client, position_information, corners[3], args) == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5625]
+        
+
     except:
         pytest.fail('Currently not connected to a minecraft server.')
