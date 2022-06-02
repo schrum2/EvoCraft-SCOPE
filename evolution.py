@@ -202,7 +202,7 @@ def run(args):
                 # This line creates issues because graphviz needs to be installed on device, so it is commented out. 
                 # uncommenting it produces a file called digraph.gv that is saved and contains the information
                 # needed to see an image of the neural network.
-                visualize.draw_net(config, stats.best_genome(), True, node_names=node_names)
+                # visualize.draw_net(config, stats.best_genome(), True, node_names=node_names)
 
 
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space

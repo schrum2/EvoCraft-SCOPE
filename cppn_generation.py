@@ -67,8 +67,7 @@ def query_cppn_for_shape(genome, config, corner, position_information, args, blo
             # Multiply by attempts so that larger and larger amounts are subtracted
             if not done: presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT * attempts 
 
-            # TODO: Make the 500 a command line parameter
-            if attempts > 500:
+            if attempts > args.MIN_BLOCK_FAILSAFE_ITERATIONS:
                 # If the program as looped this many times attempting to make a shape, just set the presence threshold to negative infinity
                 presence_threshold = float("-inf")
 
