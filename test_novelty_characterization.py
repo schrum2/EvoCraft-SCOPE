@@ -261,3 +261,61 @@ def test_block_type_characterization():
          177, 177, 5, 5, 177, 177, 5, 5, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
     except:
         pytest.fail('Currently not connected to a minecraft server.')
+
+def test_composition_characterization():
+    try:
+        # Need client and position information here too in order to call the function right
+        channel = grpc.insecure_channel('localhost:5001')
+        client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
+        
+        
+        position_information = dict()
+        position_information["startx"] = -100
+        position_information["starty"] = 5
+        position_information["startz"] = 250
+        position_information["xrange"] = 4
+        position_information["yrange"] = 4
+        position_information["zrange"] = 4
+
+        corners = []
+        for n in range(10):
+            corner = (position_information["startx"] + n*(position_information["xrange"]+2+1), position_information["starty"], position_information["startz"])
+            corners.append(corner)
+
+        x = position_information["startx"]
+        y = position_information["starty"]
+        z = position_information["startz"]
+
+        # may need to delete or rework this. Not doinf anything now, but args is necessary to call
+        test_parser = argparse.ArgumentParser()
+        
+        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=str, default="undroppable", metavar='',
+                            help='block_set')
+        
+        args = test_parser.parse_args()
+        
+        # Goes in order Z,Y,X starting from the corner
+        # For shape1, hard coded in
+        # GLOWSTONE = 89, COAL_BLOCK = 39
+        assert nc.composition_characterization(client, position_information, corners[0], args) == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+         0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        
+        # # For shape2, layered cube
+        # # CYAN_GLAZED_TERRACOTTA = 48, MAGENTA_GLAZED_TERRACOTTA = 133, GREEN_GLAZED_TERRACOTTA = 98, BLACK_GLAZED_TERRACOTTA = 16
+        # assert nc.block_type_characterization(client, position_information, corners[1], args) == [48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,
+        #  98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,48,48,48,48,133,133,133,133,98,98,98,98,16,16,16,16,]
+
+        # # For shape3, solid cube
+        # # GOLD_BLOCK = 91
+        # assert nc.block_type_characterization(client, position_information, corners[2], args) == [91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91,
+        #  91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91, 91]
+        
+        # # For shape4, custom cube with blocks taken out
+        # # QUARTZ_STAIRS = 177 AIR = 5
+        # assert nc.block_type_characterization(client, position_information, corners[3], args) == [177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 177, 5, 5, 177, 177, 5, 5,
+        #  177, 177, 5, 5, 177, 177, 5, 5, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 177, 5, 177, 177, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+    except:
+        pytest.fail('Currently not connected to a minecraft server.')
