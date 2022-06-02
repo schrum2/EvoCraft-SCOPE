@@ -2,13 +2,15 @@ import novelty_distance_metrics as ndm
 import pytest
 import numpy as np
 
-# Global variables, stores in a dictionary
+# Global variables, stores in a dictionary for use in all tests
 def pytest_namespace():
     return {'arr1': np.array([1,2,3,4,5]),'arr2': np.array([1,2,3,4,5]),'arr3': np.array([0,0,0,0,0]),'arr4': np.array([5,4,3,2,1]),
     'long_arr1': np.array([1,2,3,4,5,6,7,8,9,10]),'long_arr2': np.array([1,80,0,9,8,8,2,3,0,0]),'long_arr3': np.array([2,34,8,5,-2,30,-123,7,23,4]),
     'hamming_arr1': np.array([8,6,7,5,3,0,9,1,8,0,0,9,8,8,2,3,0,0]),'hamming_arr2': np.array([8,6,7,5,3,0,9,12,-90,12,564,-1000,5,21,564,9,10,0]),
     'hamming_arr3': np.array([5,5,5,5,5,9,5,5,8,5,5,5,5,5,3,2,5,5]),'hamming_arr4': np.array([5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5]),
     'point1': np.array([0,0]),'point2': np.array([2,2]),'point3': np.array([5,-1]),'point4': np.array([-3,6]),'zeroes':np.zeros(50),'ones':np.ones(50)}
+
+# Everthing in each test was also hand calculated to make sure it functioned correctly
 
 def test_euclidean_distance():
     assert ndm.euclidean_distance(pytest_namespace()['arr1'],pytest_namespace()['arr2']) == 0
@@ -25,7 +27,6 @@ def test_euclidean_distance():
     assert ndm.euclidean_distance(pytest_namespace()['point3'],pytest_namespace()['point4']) == np.sqrt(113)
     assert ndm.euclidean_distance(pytest_namespace()['point3'],pytest_namespace()['point3']) == 0
 
-    # Calculated by hand to verify
     assert ndm.euclidean_distance(pytest_namespace()['long_arr1'],pytest_namespace()['long_arr1']) == 0
     assert ndm.euclidean_distance(pytest_namespace()['long_arr1'],pytest_namespace()['long_arr2']) == np.sqrt(6362)
     assert ndm.euclidean_distance(pytest_namespace()['long_arr1'],pytest_namespace()['long_arr3']) == np.sqrt(18809)

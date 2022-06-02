@@ -8,6 +8,7 @@ import grpc
 import minecraft_pb2_grpc
 from minecraft_pb2 import *
 
+# Used for setup and teardown
 @pytest.fixture(autouse=True)
 def run_around_tests():
         channel = grpc.insecure_channel('localhost:5001')
@@ -139,10 +140,10 @@ def run_around_tests():
                     
         client.spawnBlocks(Blocks(blocks=shape4))
 
-        yield # Signifes what runs after code. Before yeild is set up, after is teardown
+        yield # Signifes what runs after code. Before yield is set up, after is teardown
     
-        #ms.clear_area(client, position_information, 10, 1, 5)
-        print("second")
+        ms.clear_area(client, position_information, 10, 1, 5)
+    # end run_around_tests
 
 def test_presence_characterization():
     try:
@@ -164,20 +165,10 @@ def test_presence_characterization():
             corner = (position_information["startx"] + n*(position_information["xrange"]+2+1), position_information["starty"], position_information["startz"])
             corners.append(corner)
 
-        x = position_information["startx"]
-        y = position_information["starty"]
-        z = position_information["startz"]
-
-        # may need to delete or rework this. Not doinf anything now, but args is necessary to call
+        # Doesn't need args in this charact. but still has as a param
         test_parser = argparse.ArgumentParser()
         
-        def block_int(name):
-            """
-            Converts the name of a block into its corresponding int value.
-            """
-            return BlockType.Value(name)
-        
-        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=block_int, default=GLOWSTONE, metavar='',
+        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=str, default="test", metavar='',
                             help='block_set')
         
         args = test_parser.parse_args()
@@ -221,20 +212,10 @@ def test_block_type_characterization():
             corner = (position_information["startx"] + n*(position_information["xrange"]+2+1), position_information["starty"], position_information["startz"])
             corners.append(corner)
 
-        x = position_information["startx"]
-        y = position_information["starty"]
-        z = position_information["startz"]
-
-        # may need to delete or rework this. Not doinf anything now, but args is necessary to call
+        # Doesn't need args in this charact. but still has as a param
         test_parser = argparse.ArgumentParser()
         
-        def block_int(name):
-            """
-            Converts the name of a block into its corresponding int value.
-            """
-            return BlockType.Value(name)
-        
-        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=block_int, default=GLOWSTONE, metavar='',
+        test_parser.add_argument('--POTENTIAL_BLOCK_SET', type=str, default="test", metavar='',
                             help='block_set')
         
         args = test_parser.parse_args()
@@ -282,10 +263,6 @@ def test_composition_characterization():
             corner = (position_information["startx"] + n*(position_information["xrange"]+2+1), position_information["starty"], position_information["startz"])
             corners.append(corner)
 
-        x = position_information["startx"]
-        y = position_information["starty"]
-        z = position_information["startz"]
-
         # may need to delete or rework this. Not doinf anything now, but args is necessary to call
         test_parser = argparse.ArgumentParser()
         
@@ -294,7 +271,10 @@ def test_composition_characterization():
         
         args = test_parser.parse_args()
         
-        # Goes in order Z,Y,X starting from the corner
+        # Reads in order Z,Y,X starting from the corner
+        # order for compoition is based on the list in block_sets,
+        # Percentages of [GLOWSTONE,COAL_BLOCK,MAGENTA_GLAZED_TERRACOTTA,GREEN_GLAZED_TERRACOTTA,BLACK_GLAZED_TERRACOTTA,CYAN_GLAZED_TERRACOTTA,GOLD_BLOCK,QUARTZ_STAIRS]
+
         # For shape1, hard coded in
         assert nc.composition_characterization(client, position_information, corners[0], args) == [0.5, 0.125, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
