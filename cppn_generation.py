@@ -230,7 +230,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
     attempts = 0
 
     while not outer_loop_done:
-     #   print('infinte outer loop')
         done = False
         # Used to scale the point
         xi = int(position_information["xrange"]/2)
@@ -239,7 +238,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         number_of_iterations = 0
         snake = []
         while not done:
-            #print('infinte loop')
             number_of_iterations += 1
             x = util.scale_and_center(xi,position_information["xrange"])
             y = util.scale_and_center(yi,position_information["yrange"])
@@ -260,20 +258,11 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
                 yi += direction[1]
                 zi += direction[2]
         
-        #print('exited inner loop')
         if args.USE_MIN_BLOCK_REQUIREMENT: 
             outer_loop_done = len(snake) >= args.MINIMUM_REQUIRED_BLOCKS
         # At this point we are done regardless of the if statement above.
         else: 
-            outer_loop_done = True
-        
-        #if outer_loop_done:
-            print(outer_loop_done)
-            print("SNAKE IS LONG ENOUGH TO EXIT!")
-        #else:
-            print("Not long enough: len = {} when threshold is {}".format(len(snake),presence_threshold))
-            print("continuation_threshold: {}".format(continuation_threshold))
-            
+            outer_loop_done = True   
 
         attempts += 1
         # Decrease presence_thresold to decrease number of empty shapes.
@@ -286,9 +275,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
             presence_threshold = float("-inf")
             continuation_threshold = float("-inf")
 
-        #print(attempts)
-        #print(presence_threshold)
-    #print('exited outer loop')
     if(len(snake) == 0):
         print("Genome at corner {} is empty".format(corner))
     else:

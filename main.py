@@ -150,7 +150,7 @@ def main(argv):
     parser.add_argument('--SAVE_PARAMETERS', type=boolean_string, default=False, metavar='',
                         help='Whether or not to the parameters being used for future use.')
     parser.add_argument('--MIN_BLOCK_FAILSAFE_ITERATIONS', type=int, default=500, metavar='',
-                        help='The number of chnces given to creating a minimum number of blocks before the presence threshold is set to negative infinity (meaning that every block will generate).')
+                        help='The number of chances given to creating a minimum number of blocks before the presence threshold is set to negative infinity (meaning that every block will generate).')
     parser.add_argument('--CONTINUATION_INCREMENT', type=float, default=0.1, metavar='',
                         help='How big the step size is for the snake continuation.')
 
