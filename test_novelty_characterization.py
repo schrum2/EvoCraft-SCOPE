@@ -116,21 +116,29 @@ def run_around_tests():
         y = position_information["starty"]
         z = position_information["startz"]
         
+        # Shape4 starts as a cube, then gets blocks taken out of it
         shape4 = []
-            
-        # fill sides
-        for i in range(8):
-            for xi in range(6):
-                for yi in range(7):
+        for i in range(4):
+            for xi in range(3):
+                for yi in range(4):
                     shape4.append(Block(position=Point(x=x + xi, y=y+yi, z=z+i), type=QUARTZ_STAIRS, orientation=NORTH))
 
-        for i in range(7):
-            shape4.append(Block(position=Point(x=x+3, y=y + i, z=z+4), type=AIR, orientation=NORTH))
-            shape4.append(Block(position=Point(x=x+3, y=y + i, z=z+3), type=AIR, orientation=NORTH))
-            shape4.append(Block(position=Point(x=x+2, y=y + i, z=z+4), type=AIR, orientation=NORTH))
-            shape4.append(Block(position=Point(x=x+2, y=y + i, z=z+3), type=AIR, orientation=NORTH))
+
+        shape4.append(Block(position=Point(x=x+1, y=y + 1, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+1, y=y + 2, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+1, y=y + 3, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+1, y=y, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+2, y=y + 1, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+2, y=y + 2, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+2, y=y + 3, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+2, y=y, z=z+1), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+1, y=y + 1, z=z+2), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+1, y=y + 2, z=z+2), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+1, y=y + 3, z=z+2), type=AIR, orientation=NORTH))
+        shape4.append(Block(position=Point(x=x+1, y=y, z=z+2), type=AIR, orientation=NORTH))
                     
         client.spawnBlocks(Blocks(blocks=shape4))
+
         yield # Signifes what runs after code. Before yeild is set up, after is teardown
     
         #ms.clear_area(client, position_information, 10, 1, 5)
@@ -138,6 +146,7 @@ def run_around_tests():
 
 def test_presence_characterization():
     try:
+        # Need client and position information here too in order to call the function right
         channel = grpc.insecure_channel('localhost:5001')
         client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
         
@@ -159,6 +168,7 @@ def test_presence_characterization():
         y = position_information["starty"]
         z = position_information["startz"]
 
+        # may need to delete or rework this. Not doinf anything now, but args is necessary to call
         test_parser = argparse.ArgumentParser()
         
         def block_int(name):
@@ -184,5 +194,9 @@ def test_presence_characterization():
         #For shape3, solid cube
         assert nc.presence_characterization(client, position_information, corners[2], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        
+        #For shape4, custom cube with blocks taken out
+        assert nc.presence_characterization(client, position_information, corners[3], args) == [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0,
+         1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     except:
         pytest.fail('Currently not connected to a minecraft server.')
