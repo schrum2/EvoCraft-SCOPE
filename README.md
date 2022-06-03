@@ -16,11 +16,14 @@
 ### 1. Install Requirements
 <!--- AFTER LAYOUT AND TEXT IS MORE OR LESS PLACED, FIND WAY TO MAKE LOOK CLEANER BY INDENTING  --> 
 
-1. You need to install this project's dependencies by running `pip install --user -r requirements.txt`
+1. You need to install this project's dependencies by running `pip install --user -r requirements.txt` (the version for python needs to be 3.7+)
 
 <!--- CONSIDER COMBINING #1 AND #2 INTO ONE HEADING AREA -->
 
 ### 2. Server Setup
+Before you begin setting up your server directory, you should look at the setup steps in [**Evocraft-py**](https://github.com/real-itu/Evocraft-py).
+There you can also find useful minecraft commands that you may need.
+
 To set up  the server directory:
 1. Make a copy of the directory called `EvoCraft-py-Backup`.
 2. Rename the newly made copy `EvoCraft-py`.
@@ -29,7 +32,7 @@ To set up  the server directory:
 You can now connect to the server by launching minecraft!
 To connect to the server from within the game:
 1. Make sure the batch file `LaunchServer.bat` is running and the eula is set to true.
-2. Open up the minecraft launcher, and play the jave edition 1.12.2
+2. Open up the minecraft launcher, and play the java edition 1.12.2
 3. Select the gamemode Multiplayer.
 4. Select Direct Connect, and in the server address box, type 'localhost'.
 5. Join Server!
