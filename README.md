@@ -8,10 +8,10 @@ A Python interface for Minecraft built on [grpc](https://github.com/real-itu/min
 
 <!--- DO NOT FORGET TO SITE THE TWO SOURCES -->  
 <!--- IS THIS WHERE THE SOURCES NEED TO BE SITED? OR SHOULD IT BE SOMEWHERE ELSE? -->
-  
-**Site original EvoCraft repo**
+<!--- RIGHT NOW JUST THE LINKS ARE HERE. NEEDS TO CITED IT BETTER. -->  
+**Site original EvoCraft repo** [neat-python](https://github.com/CodeReclaimers/neat-python)
 <br>
-**Site original NEAT-Python**
+**Site original NEAT-Python** [Evocraft-py](https://github.com/real-itu/Evocraft-py)
 
 </div>
 
@@ -20,7 +20,7 @@ A Python interface for Minecraft built on [grpc](https://github.com/real-itu/min
 
 <!--- AFTER LAYOUT AND TEXT IS MORE OR LESS PLACED, FIND WAY TO MAKE LOOK CLEANER BY INDENTING  --> 
 
-- You can install the project's dependencies by running `pip install --user -r requirements.txt`
+1. You can install the project's dependencies by running `pip install --user -r requirements.txt`
 
 <!--- CONSIDER COMBINING #1 AND #2 INTO ONE HEADING AREA -->
 
@@ -42,14 +42,13 @@ To connect to the server from within the game:
 ### 3. Recommendations
 If you run `python main.py --help`, then you will be able to see all of the available command line parameters that can be changed when running `main.py`.
 
-
 <!--- RECONSIDER IMAGE HERE. -->
 ![help in cmd](https://user-images.githubusercontent.com/100097809/171904819-f48e61f5-7746-47da-b94f-db2d100d32bc.png)
 
 There are also batch files that you can run. These batch files are in the directory `batch` and execute the `main.py` script in combination with some commonly used command line parameter sets. 
 You can run a batch file by:
 1. Opening a command prompt in the directory `batch`.
-2. Tpye in the apporpriate name of the batch file you want to run (or press tab to look for a batch file that interests you).
+2. Type in the apporpriate name of the batch file you want to run (or press tab to look for a batch file that interests you).
 3. Include a space followed by any digit within the range of 0-100. This value will be the random seed for the world and is required for the batch files to run. 
 <!--- CHECK AGAIN IF THE RANGE OF RANDOM SEEDS IS 0-100 AND IF THAT IS INCLUSIVE/EXCLUSIVE --> 
 
