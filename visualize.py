@@ -126,6 +126,13 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
             width = str(0.1 + abs(cg.weight / 5.0))
             dot.edge(a, b, _attributes={'style': style, 'color': color, 'penwidth': width})
 
-    dot.render(filename, view=view)
-
+    # This raises an exception if GraphViz is not installed on the PATH, but
+    # requiring users to install this seems like a hassle, especially since we
+    # can get the .gv output anyway, which can easily be viewed on a website.
+    # Therefore, suppress the error.
+    try:
+        dot.render(filename, view=view)
+    except RuntimeError:
+        pass
+    
     return dot
