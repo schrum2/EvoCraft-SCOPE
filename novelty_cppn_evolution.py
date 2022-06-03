@@ -171,8 +171,8 @@ class NoveltyMinecraftBreeder(object):
             # If loading, save ALL blocks generated here, to be returned
             if self.args.LOAD_NOVELTY:
                 self.loaded_all_blocks.extend(shape)
-            
-        self.generation+=1
+        # Increases generation number
+        self.generation= self.generation+1
 
         # Adds new entries to archive
         self.archive.extend(new_archive_entries)
