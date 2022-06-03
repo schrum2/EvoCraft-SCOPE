@@ -150,7 +150,10 @@ def main(argv):
     parser.add_argument('--SAVE_PARAMETERS', type=boolean_string, default=False, metavar='',
                         help='Whether or not to the parameters being used for future use.')
     parser.add_argument('--MIN_BLOCK_FAILSAFE_ITERATIONS', type=int, default=500, metavar='',
-                        help='The number of chnces given to creating a minimum number of blocks before the presence threshold is set to negative infinity (meaning that every block will generate).')
+                        help='The number of chances given to creating a minimum number of blocks before the presence threshold is set to negative infinity (meaning that every block will generate).')
+    parser.add_argument('--CONTINUATION_INCREMENT', type=float, default=0.1, metavar='',
+                        help='How big the step size is for the snake continuation.')
+
 
     args = parser.parse_args()
    
@@ -212,6 +215,9 @@ def main(argv):
                 new_line = rhs[0:len(rhs)-1]
                         
                 k = line.split(':')[0]
+                if str(args.__dict__[k]) != new_line:
+                    raise Exception("The value you have chosen for {} does not match the value loaded from the already existing parameters file. \nProposed Value: {} \nPreexisting Value: {}".format(k, tryeval(new_line), args.__dict__[k]))
+               
                 setattr(args, k, tryeval(new_line))
     
     # save the parameters if SAVE_PARAMETERS is true.      
@@ -226,6 +232,9 @@ def main(argv):
             # letting this exception pass since it will be loaded anyways by the code above.
             pass
     
+    # check if loaded value differs from attempted saved value and crash with message similar to 'The proposed command line parameter differs from the existing command line parameter.'
+
+
     evolution.run(args)
 
 if __name__ == '__main__':
