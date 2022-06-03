@@ -237,6 +237,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         number_of_iterations = 0
         snake = []
         while not done:
+            print("loops")
             number_of_iterations += 1
             x = util.scale_and_center(xi,position_information["xrange"])
             y = util.scale_and_center(yi,position_information["yrange"])
@@ -256,7 +257,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
                 xi += direction[0]
                 yi += direction[1]
                 zi += direction[2]
-        
         if args.USE_MIN_BLOCK_REQUIREMENT: 
             outer_loop_done = len(snake) >= args.MINIMUM_REQUIRED_BLOCKS
         # At this point we are done regardless of the if statement above.
@@ -270,7 +270,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
             presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT * attempts 
             continuation_threshold -= args.CONTINUATION_INCREMENT * attempts
         if attempts > args.MIN_BLOCK_FAILSAFE_ITERATIONS:
-            # If the program as looped this many times attempting to make a shape, just set the presence threshold to negative infinity
+            # If the program has looped this many times attempting to make a shape, just set the presence threshold to negative infinity
             presence_threshold = float("-inf")
             continuation_threshold = float("-inf")
     if(len(snake) == 0):
