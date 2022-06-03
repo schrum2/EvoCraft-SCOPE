@@ -3,24 +3,20 @@
 <!--- DO NOT FORGET TO REMOVE ALL THE COMMENTS -->  
   
 # EvoCraft-SCOPE  
-  
-A Python interface for Minecraft built on [grpc](https://github.com/real-itu/minecraft-rpc). 
-
+ 
+<!--- RIGHT HERE THERE NEEDS TO BE SOME SORT OF "INTRODUCTION" OR SHORT EXPLANATION OF WHAT THIS REPOSITORY IS (LIKE MOST OF THE OTHER REPOS DO) --> 
+ 
 <!--- DO NOT FORGET TO SITE THE TWO SOURCES -->  
 <!--- IS THIS WHERE THE SOURCES NEED TO BE SITED? OR SHOULD IT BE SOMEWHERE ELSE? -->
 <!--- RIGHT NOW JUST THE LINKS ARE HERE. NEEDS TO CITED IT BETTER. -->  
-**Site original EvoCraft repo** [neat-python](https://github.com/CodeReclaimers/neat-python)
-<br>
-**Site original NEAT-Python** [Evocraft-py](https://github.com/real-itu/Evocraft-py)
 
 </div>
 
 <!--- THE BATCH FILE TAKES AWAY THE NEED -->
 ### 1. Install Requirements
-
 <!--- AFTER LAYOUT AND TEXT IS MORE OR LESS PLACED, FIND WAY TO MAKE LOOK CLEANER BY INDENTING  --> 
 
-1. You can install the project's dependencies by running `pip install --user -r requirements.txt`
+1. You need to install this project's dependencies by running `pip install --user -r requirements.txt`
 
 <!--- CONSIDER COMBINING #1 AND #2 INTO ONE HEADING AREA -->
 
@@ -53,3 +49,8 @@ You can run a batch file by:
 <!--- CHECK AGAIN IF THE RANGE OF RANDOM SEEDS IS 0-100 AND IF THAT IS INCLUSIVE/EXCLUSIVE --> 
 
 <!--- ASK IF THERE SHOULD BE ANY MENTION OF THE PYTESTS IN HERE. -->
+
+<!--- NEED BETTER WAY TO WORD THIS SECTION -->
+#### This repository utilizes/builds upon/expands on the following repositories
+- [**neat-python**](https://github.com/CodeReclaimers/neat-python)
+- [**Evocraft-py**](https://github.com/real-itu/Evocraft-py)
