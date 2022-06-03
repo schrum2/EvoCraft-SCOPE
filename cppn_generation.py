@@ -245,6 +245,7 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
             initial_position = (xi, yi, zi)
 
             (block, direction, stop) = generate_block(net, position_information, corner, args, block_options, scaled_point, initial_position, presence_threshold, continuation_threshold)
+            #print("START", number_of_iterations, block, direction, stop, "END")
 
             if block is not None:
                 snake.append(block)
@@ -256,12 +257,14 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
                 xi += direction[0]
                 yi += direction[1]
                 zi += direction[2]
-        
+                
         if args.USE_MIN_BLOCK_REQUIREMENT: 
             outer_loop_done = len(snake) >= args.MINIMUM_REQUIRED_BLOCKS
         # At this point we are done regardless of the if statement above.
         else: 
             outer_loop_done = True   
+
+        #print("\t\t", outer_loop_done, len(snake))
 
         attempts += 1
         # Decrease presence_thresold to decrease number of empty shapes.
@@ -269,10 +272,19 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
         if not outer_loop_done: 
             presence_threshold -= args.MIN_BLOCK_PRESENCE_INCREMENT * attempts 
             continuation_threshold -= args.CONTINUATION_INCREMENT * attempts
-        if attempts > args.MIN_BLOCK_FAILSAFE_ITERATIONS:
-            # If the program as looped this many times attempting to make a shape, just set the presence threshold to negative infinity
+
+        if attempts == args.MIN_BLOCK_FAILSAFE_ITERATIONS:
+            # If the program has looped this many times attempting to make a shape, just set the presence threshold to negative infinity
+            # last chance
             presence_threshold = float("-inf")
             continuation_threshold = float("-inf")
+        elif attempts > args.MIN_BLOCK_FAILSAFE_ITERATIONS:
+            # Even after one more chance, snake can fail to reach min num blocks 
+            # if it builds down into the group and goes out of the bounds of the world.
+            # Have to end in this case.
+            outer_loop_done = True
+
+
     if(len(snake) == 0):
         print("Genome at corner {} is empty".format(corner))
     else:
