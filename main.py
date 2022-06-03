@@ -153,6 +153,8 @@ def main(argv):
                         help='The number of chances given to creating a minimum number of blocks before the presence threshold is set to negative infinity (meaning that every block will generate).')
     parser.add_argument('--CONTINUATION_INCREMENT', type=float, default=0.1, metavar='',
                         help='How big the step size is for the snake continuation.')
+    parser.add_argument('--MAINTAIN_EVOLUTIONARY_HISTORY', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to keep all generated shapes')
 
 
     args = parser.parse_args()

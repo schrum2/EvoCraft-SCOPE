@@ -92,7 +92,7 @@ class MinecraftBreeder(object):
         Parameters:
         genomes ([DefaultGenome]): list of CPPN genomes
         config  (Config): NEAT configurations
-        """                                                                                                                     
+        """                                                                                                                    
         self.current_genomes = genomes
         self.current_config = config
         all_blocks = []
@@ -102,7 +102,6 @@ class MinecraftBreeder(object):
                 selected = self.in_game_control_options(genomes, config)
             else:
                 # Controlled externally by keyboard
-
                 # Creates a string that is the user's input, then either resets or quits the program, saves it, or converts it into a list of selected shapes
                 vals_selected = False
                 selected_vals = []
@@ -152,6 +151,8 @@ class MinecraftBreeder(object):
                 s.type = AIR
 
             self.client.spawnBlocks(Blocks(blocks=all_blocks))
+
+        self.generation += 1
 
     def save_by_user(self, config, genomes):
         """

@@ -114,6 +114,8 @@ class FitnessEvolutionMinecraftBreeder(object):
             for s in all_blocks:
                 s.type = AIR
             self.client.spawnBlocks(Blocks(blocks=all_blocks))
+        self.generation += 1
+        print(self.generation)
 
         
     

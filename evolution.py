@@ -144,7 +144,6 @@ def run(args):
     try:
         if args.INTERACTIVE_EVOLUTION:
             while True:
-                mc.generation = pop.generation + 1
                 if(args.LOAD_SAVED_NO_EVOLUTION and args.LOAD_SAVED_SEED!= None and args.LOAD_GENERATION !=None):
                     pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
                 elif(args.LOAD_SAVED_NO_EVOLUTION and (args.LOAD_SAVED_SEED== None or args.LOAD_GENERATION ==None)):
