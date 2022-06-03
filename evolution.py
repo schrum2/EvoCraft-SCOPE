@@ -199,10 +199,6 @@ def run(args):
                         i+=1
                         xi+=1
             
-                # This line creates issues because graphviz needs to be installed on device, so it is commented out. 
-                # uncommenting it produces a file called digraph.gv that is saved and contains the information
-                # needed to see an image of the neural network.
-                
                 visualize.draw_net(config, stats.best_genome(), view=True, filename='{}/{}{}/champion_neural_network.gv'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.RANDOM_SEED), node_names=node_names)
 
 
