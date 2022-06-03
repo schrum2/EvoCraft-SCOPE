@@ -228,7 +228,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
 
     outer_loop_done = False
     attempts = 0
-
     while not outer_loop_done:
         done = False
         # Used to scale the point
@@ -274,7 +273,6 @@ def query_cppn_for_snake_shape(genome, config, corner, position_information, arg
             # If the program as looped this many times attempting to make a shape, just set the presence threshold to negative infinity
             presence_threshold = float("-inf")
             continuation_threshold = float("-inf")
-
     if(len(snake) == 0):
         print("Genome at corner {} is empty".format(corner))
     else:

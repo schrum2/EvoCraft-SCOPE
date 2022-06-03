@@ -98,11 +98,6 @@ class NoveltyMinecraftBreeder(object):
         if not dir_exists:
             os.mkdir(pop_path)
 
-        # self.base_path = 'Novelty_Archive'
-        # dir_exists = os.path.isdir(self.base_path)
-        # if not dir_exists:
-        #     os.mkdir(self.base_path)
-
 
     def eval_fitness(self, genomes, config):
         """
@@ -168,7 +163,7 @@ class NoveltyMinecraftBreeder(object):
                     self.save_counter+=1 # Increases counter for next shape
                 
             print('{0} archive entries'.format(len(self.archive)))
-            if self.args.EVOLVE_SNAKE and (not self.args.LOAD_NOVELTY or (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT)):      
+            if self.args.EVOLVE_SNAKE and (not self.args.LOAD_NOVELTY or (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT)):     
                 for s in all_blocks:
                     s.type = AIR
                 self.client.spawnBlocks(Blocks(blocks=all_blocks))
