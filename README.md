@@ -34,7 +34,10 @@ To connect to the server from within the game:
 4. Select Direct Connect, and in the server address box, type 'localhost'.
 5. Join Server!
 
+<!--- ANOTHER PICTURE THAT NEEDS TO BE RECONSIDERED -->
+<img src="https://user-images.githubusercontent.com/100097809/171940906-a4be83fd-0825-4cdf-b339-01d8810a1b01.png" width="500">
 <!--- THINK OF A BETTER NAME FOR THIS HEADING -->
+
 ### 3. Recommendations
 If you run `python main.py --help`, then you will be able to see all of the available command line parameters that can be changed when running `main.py`.
 
