@@ -98,11 +98,6 @@ class NoveltyMinecraftBreeder(object):
         if not dir_exists:
             os.mkdir(pop_path)
 
-        # self.base_path = 'Novelty_Archive'
-        # dir_exists = os.path.isdir(self.base_path)
-        # if not dir_exists:
-        #     os.mkdir(self.base_path)
-
 
     def eval_fitness(self, genomes, config):
         """
@@ -125,7 +120,7 @@ class NoveltyMinecraftBreeder(object):
         minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
         all_blocks = []                                                                                                             
         new_archive_entries = []
-
+        print(self.generation)
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # If the number of individuals has grown beyond the original size,
@@ -168,7 +163,7 @@ class NoveltyMinecraftBreeder(object):
                     self.save_counter+=1 # Increases counter for next shape
                 
             print('{0} archive entries'.format(len(self.archive)))
-            if self.args.EVOLVE_SNAKE and (not self.args.LOAD_NOVELTY or (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT)):      
+            if self.args.EVOLVE_SNAKE and (not self.args.LOAD_NOVELTY or (self.generation < self.args.MAX_NUM_GENERATIONS or not self.args.KEEP_WORLD_ON_EXIT)):     
                 for s in all_blocks:
                     s.type = AIR
                 self.client.spawnBlocks(Blocks(blocks=all_blocks))
@@ -176,6 +171,8 @@ class NoveltyMinecraftBreeder(object):
             # If loading, save ALL blocks generated here, to be returned
             if self.args.LOAD_NOVELTY:
                 self.loaded_all_blocks.extend(shape)
+        # Increases generation number
+        self.generation= self.generation+1
 
         # Adds new entries to archive
         self.archive.extend(new_archive_entries)

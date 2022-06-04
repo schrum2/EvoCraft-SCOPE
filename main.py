@@ -92,7 +92,7 @@ def main(argv):
     parser.add_argument('--INTERACTIVE_EVOLUTION', type=boolean_string, default=True, metavar='',
                         help='Whether or not interactive evolution will be used.')
     parser.add_argument('--POTENTIAL_BLOCK_SET', help='Choose which block set is used for generation', # Can add additional 
-                        action='store', choices=['all', 'undroppable','machine'], default='undroppable', required=False)
+                        action='store', choices=['all', 'undroppable','machine','restrictive_machine'], default='undroppable', required=False)
     parser.add_argument('--MINIMUM_REQUIRED_BLOCKS', type=int, default=10, metavar='',
                         help='The number of minimum required blocks to be used.')
     parser.add_argument('--USE_MIN_BLOCK_REQUIREMENT', type=boolean_string, default=True, metavar='',
@@ -153,6 +153,8 @@ def main(argv):
                         help='The number of chances given to creating a minimum number of blocks before the presence threshold is set to negative infinity (meaning that every block will generate).')
     parser.add_argument('--CONTINUATION_INCREMENT', type=float, default=0.1, metavar='',
                         help='How big the step size is for the snake continuation.')
+    parser.add_argument('--MAINTAIN_EVOLUTIONARY_HISTORY', type=boolean_string, default=False, metavar='',
+                        help='Whether or not to keep all generated shapes')
 
 
     args = parser.parse_args()
@@ -182,6 +184,7 @@ def main(argv):
         raise ValueError("Block list size must at least two.")
 
     if args.PREVENT_DUPLICATE_BLOCK_TYPES and args.NUM_EVOLVED_BLOCK_LIST_TYPES>len(block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)):
+        print(len(block_sets.select_possible_block_sets(args.POTENTIAL_BLOCK_SET)))
         raise ValueError("Block list size is too small to not have duplicates.")
     
     if not args.INTERACTIVE_EVOLUTION and not args.EVOLVE_NOVELTY:

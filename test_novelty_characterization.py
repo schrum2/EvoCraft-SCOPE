@@ -143,6 +143,20 @@ def run_around_tests():
         yield # Signifes what runs after code. Before yield is set up, after is teardown
     
         ms.clear_area(client, position_information, 10, 1, 5)
+        # Testing flying machine
+        # shape5 = []
+        # shape5.append(Block(position=Point(x=x+1, y=y, z=z), type=SLIME, orientation=NORTH))
+        # shape5.append(Block(position=Point(x=x+2, y=y, z=z+1), type=SLIME, orientation=NORTH))
+        # shape5.append(Block(position=Point(x=x+2, y=y, z=z), type=STICKY_PISTON, orientation=WEST))
+        # shape5.append(Block(position=Point(x=x, y=y, z=z), type=OBSERVER, orientation=WEST))
+        # shape5.append(Block(position=Point(x=x+1, y=y, z=z+1), type=STICKY_PISTON, orientation=EAST))
+        
+
+        # client.spawnBlocks(Blocks(blocks=shape5))
+
+        # shape6 = []
+        # shape6.append(Block(position=Point(x=x+3, y=y, z=z+1), type=OBSERVER, orientation=EAST))
+        # client.spawnBlocks(Blocks(blocks=shape6))
     # end run_around_tests
 
 def test_presence_characterization():

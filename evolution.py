@@ -14,7 +14,7 @@ import pickle
 # For loading novelty shapes
 from os import listdir
 from os.path import isfile, join
-#import visualize
+import visualize
 
 def run(args):
     # If the block list evolves, customGenome is used. Otherwise it's the Default 
@@ -144,7 +144,6 @@ def run(args):
     try:
         if args.INTERACTIVE_EVOLUTION:
             while True:
-                mc.generation = pop.generation + 1
                 if(args.LOAD_SAVED_NO_EVOLUTION and args.LOAD_SAVED_SEED!= None and args.LOAD_GENERATION !=None):
                     pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
                 elif(args.LOAD_SAVED_NO_EVOLUTION and (args.LOAD_SAVED_SEED== None or args.LOAD_GENERATION ==None)):
@@ -199,10 +198,7 @@ def run(args):
                         i+=1
                         xi+=1
             
-                # This line creates issues because graphviz needs to be installed on device, so it is commented out. 
-                # uncommenting it produces a file called digraph.gv that is saved and contains the information
-                # needed to see an image of the neural network.
-                # visualize.draw_net(config, stats.best_genome(), True, node_names=node_names)
+                visualize.draw_net(config, stats.best_genome(), view=True, filename='{}/{}{}/champion_neural_network.gv'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.RANDOM_SEED), node_names=node_names)
 
 
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
