@@ -45,6 +45,13 @@ def custom_hamming_distance(arr1,arr2):
     chdist (float): The distance calculated between the two arrays
     """
     chdist = 0
+    # assert len(arr1)==len(arr2)
+    # for i in range(len(arr1)):
+    #     if(arr1[i]!=arr2[i]):
+    #         if(arr1[i]==AIR or arr2[i]==AIR):
+    #             chdist+=1
+    #         else:
+    #             chdist+=.05
     for h1, h2 in zip(arr1, arr2):
         if h1 != h2:
             if h1==AIR or h2==AIR:
