@@ -67,9 +67,8 @@ def run(args):
         file_path = "C:/schrum2MM-NEAT/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # File path for loop below
         # Finds all shapes in the archive folder and makes them into a list. The length of this list is how long the next loop runs for
         novel_shapes = [f for f in listdir(file_path) if isfile(join(file_path, f))]
-        
-        # Loops through all files in archive and adds them, with their key, to a new list
 
+        # Gets the start point based on the command line param
         if(args.LOAD_NOVELTY_MIN>args.LOAD_NOVELTY_MAX):
             print("Invalid range. The start is bigger than the end. Try again")
             quit()
@@ -82,6 +81,7 @@ def run(args):
         else: 
             i = 0
 
+        # Gets the end point based on the command line param
         if args.LOAD_NOVELTY_MAX > -1 and args.LOAD_NOVELTY_MAX<len_files:
             end = args.LOAD_NOVELTY_MAX
         elif(args.LOAD_NOVELTY_MAX>len_files):
@@ -94,11 +94,7 @@ def run(args):
         # Clear space for shapes
         minecraft_structures.clear_area(mc.client, mc.position_information, end-i*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
 
-        # for i in range(len(novel_shapes)):
-        #     with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
-        #         genome_from_pickle = pickle.load(handle)
-        #     novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
-        
+        # Loops through from start to end, generating all shapes
         while i <end:
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
