@@ -120,7 +120,7 @@ class NoveltyMinecraftBreeder(object):
         minecraft_structures.clear_area(self.client, position_information_copy, self.args.POPULATION_SIZE*2, self.args.SPACE_BETWEEN, self.args.MAX_SNAKE_LENGTH)                                                                                                               
         all_blocks = []                                                                                                             
         new_archive_entries = []
-
+        print(self.generation)
         # This loop could be parallelized
         for n, (genome_id, genome) in enumerate(genomes):
             # If the number of individuals has grown beyond the original size,
@@ -171,6 +171,8 @@ class NoveltyMinecraftBreeder(object):
             # If loading, save ALL blocks generated here, to be returned
             if self.args.LOAD_NOVELTY:
                 self.loaded_all_blocks.extend(shape)
+        # Increases generation number
+        self.generation= self.generation+1
 
         # Adds new entries to archive
         self.archive.extend(new_archive_entries)
