@@ -71,10 +71,19 @@ def run(args):
         # Clear space for shapes
         minecraft_structures.clear_area(mc.client, mc.position_information, len(novel_shapes)*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
         # Loops through all files in archive and adds them, with their key, to a new list
-        for i in range(len(novel_shapes)):
+        # if args.LOAD_NOVELTY_MIN > -1:
+        #     start = args.LOAD_NOVELTY_MIN
+        # for i in range(len(novel_shapes)):
+        #     with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
+        #         genome_from_pickle = pickle.load(handle)
+        #     novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
+        i = 0
+        len_files = len(novel_shapes)
+        while i <len_files:
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
+            i+=1
         # The shapes in the list are generated, returned for clearing
         loaded_blocks = mc.eval_fitness(novel_genomes, config)
         print("All shapes from the archive were generated!")
