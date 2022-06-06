@@ -67,23 +67,41 @@ def run(args):
         file_path = "C:/schrum2MM-NEAT/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # File path for loop below
         # Finds all shapes in the archive folder and makes them into a list. The length of this list is how long the next loop runs for
         novel_shapes = [f for f in listdir(file_path) if isfile(join(file_path, f))]
-        print("Loading {} saved structures from {}/{}{}/archive".format(len(novel_shapes),args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
         # Clear space for shapes
         minecraft_structures.clear_area(mc.client, mc.position_information, len(novel_shapes)*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
         # Loops through all files in archive and adds them, with their key, to a new list
-        # if args.LOAD_NOVELTY_MIN > -1:
-        #     start = args.LOAD_NOVELTY_MIN
+
+        if(args.LOAD_NOVELTY_MIN>args.LOAD_NOVELTY_MAX):
+            print("Invalid range. The start is bigger than the end. Try again")
+            quit()
+        len_files = len(novel_shapes)
+        if args.LOAD_NOVELTY_MIN > -1 and args.LOAD_NOVELTY_MIN<len_files:
+            i = args.LOAD_NOVELTY_MIN
+        elif(args.LOAD_NOVELTY_MIN>len_files):
+            print("Your start value was larger than the ammount of files in the archive. Please try again")
+            quit()
+        else: 
+            i = 0
+
+        if args.LOAD_NOVELTY_MAX > -1 and args.LOAD_NOVELTY_MAX<len_files:
+            end = args.LOAD_NOVELTY_MAX
+        elif(args.LOAD_NOVELTY_MAX>len_files):
+            print("Your end value was larger than the ammount of files in the archive. The rest of the files in the archive will be generated")
+            end = len_files
+        else: 
+            end = len_files
+        print("Loading {} saved structures from {}/{}{}/archive".format(end-i,args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
         # for i in range(len(novel_shapes)):
         #     with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
         #         genome_from_pickle = pickle.load(handle)
         #     novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
-        i = 0
-        len_files = len(novel_shapes)
-        while i <len_files:
+        
+        while i <end:
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
             i+=1
+
         # The shapes in the list are generated, returned for clearing
         loaded_blocks = mc.eval_fitness(novel_genomes, config)
         print("All shapes from the archive were generated!")
