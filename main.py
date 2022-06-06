@@ -119,6 +119,10 @@ def main(argv):
                         help='Whether or not to save archive in noevlty search')
     parser.add_argument('--LOAD_NOVELTY', type=boolean_string, default=False, metavar='',
                         help='Whether or not to load archive in noevlty search')
+    parser.add_argument('--LOAD_NOVELTY_MIN', type=int, default=-1, metavar='',
+                        help='Number to start loading generations from')
+    parser.add_argument('--LOAD_NOVELTY_MAX', type=int, default=-1, metavar='',
+                        help='Number to dtop loading generations from')
     parser.add_argument('--ONLY_SHOW_PLACED', type=boolean_string, default=True, metavar='',
                         help='Shows only the blocks that were placed in the shape in front of the shape')
     parser.add_argument('--PREVENT_DUPLICATE_BLOCK_TYPES', type=boolean_string, default=True, metavar='',
