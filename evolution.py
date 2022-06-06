@@ -67,8 +67,7 @@ def run(args):
         file_path = "C:/schrum2MM-NEAT/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # File path for loop below
         # Finds all shapes in the archive folder and makes them into a list. The length of this list is how long the next loop runs for
         novel_shapes = [f for f in listdir(file_path) if isfile(join(file_path, f))]
-        # Clear space for shapes
-        minecraft_structures.clear_area(mc.client, mc.position_information, len(novel_shapes)*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
+        
         # Loops through all files in archive and adds them, with their key, to a new list
 
         if(args.LOAD_NOVELTY_MIN>args.LOAD_NOVELTY_MAX):
@@ -91,6 +90,10 @@ def run(args):
         else: 
             end = len_files
         print("Loading {} saved structures from {}/{}{}/archive".format(end-i,args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
+
+        # Clear space for shapes
+        minecraft_structures.clear_area(mc.client, mc.position_information, end-i*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
+
         # for i in range(len(novel_shapes)):
         #     with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
         #         genome_from_pickle = pickle.load(handle)
