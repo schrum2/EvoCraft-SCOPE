@@ -72,6 +72,10 @@ def run(args):
         if(args.LOAD_NOVELTY_MIN>args.LOAD_NOVELTY_MAX):
             print("Invalid range. The start is bigger than the end. Try again")
             quit()
+        elif(args.LOAD_NOVELTY_MAX-args.LOAD_NOVELTY_MIN>1000):
+            user_ch=input("WARNING: Printing over 1000 shapes at a time could crash the server. Press \"c\" to continue, or any other key to quit: ")
+            if(user_ch!='c'):
+                quit()
         len_files = len(novel_shapes)
         if args.LOAD_NOVELTY_MIN > -1 and args.LOAD_NOVELTY_MIN<len_files:
             i = args.LOAD_NOVELTY_MIN
