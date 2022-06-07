@@ -64,7 +64,7 @@ def run(args):
     # If loading generated novelty structures
     if args.LOAD_NOVELTY and not args.SAVE_NOVELTY:  
         novel_genomes = [] 
-        file_path = "C:/evocraft/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # File path for loop below
+        file_path = "C:/schrum2MM-NEAT/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # File path for loop below
         # Finds all shapes in the archive folder and makes them into a list. The length of this list is how long the next loop runs for
         novel_shapes = [f for f in listdir(file_path) if isfile(join(file_path, f))]
 
