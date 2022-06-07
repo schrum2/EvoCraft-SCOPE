@@ -97,7 +97,7 @@ def run(args):
 
         # Clear space for shapes
         minecraft_structures.clear_area(mc.client, mc.position_information, end-i*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
-
+        print("cleared area")
         # Loops through from start to end, generating all shapes
         while i <end:
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
