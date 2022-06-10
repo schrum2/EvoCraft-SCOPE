@@ -195,7 +195,6 @@ def main(argv):
         except: print('{}/{}{}/ is not a valid fitness function name.'.format(args.FITNESS_FUNCTION))
 
     random.seed(args.RANDOM_SEED)
-    
     #if not args.FITNESS_FUNCTION in dir(ff): 
      #   print('The fitness function name you have given does not exist.')
     
@@ -211,8 +210,10 @@ def main(argv):
     
     # if the file of parameters already exists in the specified location, then load it
     load_path = '{}/{}{}'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED)
+    
     if exists('{}/parameters.txt'.format(load_path)):
-        with open('{}/parameters.txt'.format(load_path)) as f:
+        path = load_path
+        with open('{}/parameters.txt'.format(path)) as f:
             # read all of the lines
             lines = f.readlines()
             # split all of the lines to get the value
@@ -222,31 +223,16 @@ def main(argv):
                 new_line = rhs[0:len(rhs)-1]
                         
                 k = line.split(':')[0] # command line parameter name
-                print('this is k: {}'.format(k))
-                changeable_params = ['LOAD_SAVED_POPULATION', 'LOAD_SAVED_SEED', 'LOAD_GENERATION', 'SAVE_PARAMETERS', 'SAVE_FITNESS_LOG'] # these command line parameters are ok to change
-                if str(args.__dict__[k]) != new_line: # check if 
-                    if not changeable_params.__contains__(k): # check if parameter is allowed to be changed
-                        raise Exception("The value you have chosen for {} does not match the value loaded from the already existing parameters file. \nProposed Value: {} \nPreexisting Value: {}".format(k, tryeval(new_line), args.__dict__[k]))
-                        
-                else: setattr(args, k, tryeval(new_line)) # no changes to command line params, keep loading
-                print(args)
-        
+                changeable_params = ['LOAD_SAVED_POPULATION', 'LOAD_SAVED_SEED', 'LOAD_GENERATION'] # these command line parameters are ok to change
+
+                if k not in changeable_params: # check if parameter is allowed to be changed
+                    setattr(args, k, tryeval(new_line))
+
     # save the parameters if SAVE_PARAMETERS is true.      
     if args.SAVE_PARAMETERS:    
-        print('save parameters is true')
-        #try:
-        # does not already exist, make new file and save args
         with open('{}/parameters.txt'.format(path), 'w') as f:
-            print('the file has been opened.')
             for arg in args.__dict__:
                 f.write('{}:{}\n'.format(arg,args.__dict__[arg]))      
-        #except FileExistsError:
-            # already exists, not overriding the data in a preexisting file
-            # letting this exception pass since it will be loaded anyways by the code above.
-         #   pass
-    
-    # check if loaded value differs from attempted saved value and crash with message similar to 'The proposed command line parameter differs from the existing command line parameter.'
-
 
     evolution.run(args)
 
