@@ -222,22 +222,37 @@ def main(argv):
                 new_line = rhs[0:len(rhs)-1]
                         
                 k = line.split(':')[0]
+                print('this is k: {}'.format(k))
+                changeable_params = []
+                changeable_params.append('LOAD_SAVED_POPULATION')
+                changeable_params.append('LOAD_SAVED_SEED')
+                changeable_params.append('LOAD_GENERATION')
+                changeable_params.append('SAVE_PARAMETERS')
+                changeable_params.append('SAVE_FITNESS_LOG')
+
+
                 if str(args.__dict__[k]) != new_line:
-                    raise Exception("The value you have chosen for {} does not match the value loaded from the already existing parameters file. \nProposed Value: {} \nPreexisting Value: {}".format(k, tryeval(new_line), args.__dict__[k]))
-               
-                setattr(args, k, tryeval(new_line))
+                    print(k)
+                    print(type(k))
+                    if not changeable_params.__contains__(k):
+                        raise Exception("The value you have chosen for {} does not match the value loaded from the already existing parameters file. \nProposed Value: {} \nPreexisting Value: {}".format(k, tryeval(new_line), args.__dict__[k]))
+                  
+                else: setattr(args, k, tryeval(new_line)) # no changes to command line params, keep loading
+                print(args)
     
     # save the parameters if SAVE_PARAMETERS is true.      
     if args.SAVE_PARAMETERS:    
-        try:
+        print('save parameters is true')
+        #try:
         # does not already exist, make new file and save args
-          with open('{}/parameters.txt'.format(path), 'x') as f:
-                for arg in args.__dict__:
-                    f.write('{}:{}\n'.format(arg,args.__dict__[arg]))      
-        except FileExistsError:
+        with open('{}/parameters.txt'.format(path), 'w') as f:
+            print('the file has been opened.')
+            for arg in args.__dict__:
+                f.write('{}:{}\n'.format(arg,args.__dict__[arg]))      
+        #except FileExistsError:
             # already exists, not overriding the data in a preexisting file
             # letting this exception pass since it will be loaded anyways by the code above.
-            pass
+         #   pass
     
     # check if loaded value differs from attempted saved value and crash with message similar to 'The proposed command line parameter differs from the existing command line parameter.'
 
