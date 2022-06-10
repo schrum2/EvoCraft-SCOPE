@@ -160,7 +160,6 @@ def main(argv):
     parser.add_argument('--MAINTAIN_EVOLUTIONARY_HISTORY', type=boolean_string, default=False, metavar='',
                         help='Whether or not to keep all generated shapes')
 
-
     args = parser.parse_args()
    
     if args.BLOCK_CHANGE_PROBABILITY < 0.0 or args.BLOCK_CHANGE_PROBABILITY > 1.0:
@@ -211,8 +210,9 @@ def main(argv):
         os.mkdir(path)
     
     # if the file of parameters already exists in the specified location, then load it
-    if exists('{}/parameters.txt'.format(path)):
-        with open('{}/parameters.txt'.format(path)) as f:
+    load_path = '{}/{}{}'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED)
+    if exists('{}/parameters.txt'.format(load_path)):
+        with open('{}/parameters.txt'.format(load_path)) as f:
             # read all of the lines
             lines = f.readlines()
             # split all of the lines to get the value
@@ -221,25 +221,16 @@ def main(argv):
                 # get rid of the \n that was being saved with it
                 new_line = rhs[0:len(rhs)-1]
                         
-                k = line.split(':')[0]
+                k = line.split(':')[0] # command line parameter name
                 print('this is k: {}'.format(k))
-                changeable_params = []
-                changeable_params.append('LOAD_SAVED_POPULATION')
-                changeable_params.append('LOAD_SAVED_SEED')
-                changeable_params.append('LOAD_GENERATION')
-                changeable_params.append('SAVE_PARAMETERS')
-                changeable_params.append('SAVE_FITNESS_LOG')
-
-
-                if str(args.__dict__[k]) != new_line:
-                    print(k)
-                    print(type(k))
-                    if not changeable_params.__contains__(k):
+                changeable_params = ['LOAD_SAVED_POPULATION', 'LOAD_SAVED_SEED', 'LOAD_GENERATION', 'SAVE_PARAMETERS', 'SAVE_FITNESS_LOG'] # these command line parameters are ok to change
+                if str(args.__dict__[k]) != new_line: # check if 
+                    if not changeable_params.__contains__(k): # check if parameter is allowed to be changed
                         raise Exception("The value you have chosen for {} does not match the value loaded from the already existing parameters file. \nProposed Value: {} \nPreexisting Value: {}".format(k, tryeval(new_line), args.__dict__[k]))
-                  
+                        
                 else: setattr(args, k, tryeval(new_line)) # no changes to command line params, keep loading
                 print(args)
-    
+        
     # save the parameters if SAVE_PARAMETERS is true.      
     if args.SAVE_PARAMETERS:    
         print('save parameters is true')
