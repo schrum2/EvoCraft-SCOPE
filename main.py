@@ -227,6 +227,9 @@ def main(argv):
 
                 if k not in changeable_params: # check if parameter is allowed to be changed
                     setattr(args, k, tryeval(new_line))
+                else:
+                    if args.__dict__[k] == None:
+                        setattr(args, k, tryeval(new_line)) # do not let default values overwrite these values (if they already have a value)
 
     # save the parameters if SAVE_PARAMETERS is true.      
     if args.SAVE_PARAMETERS:    
