@@ -5,7 +5,7 @@
 # EvoCraft-SCOPE  
  
 <!--- MIGHT NEED SOME EDITING. DON'T THINK THIS IS COMPLETE --> 
- This project focuses on using artificial neural networks and other machine learning methods to create different structures in Minecraft. Mainly, there has been an attempt to generate structures that have only been accomplished by humans, such as a flying machine. This repository was made in the summer of 2022 as a part of undergraduate research at Southwestern University.
+ This project focuses on using Compositional Pattern Producing Networks (a form of neural network) and NeuroEvolution of Augmenting Topologies (a form of evolutionary computation) to create different structures in Minecraft. Shapes can be evolved interactively, with a fitness function, or using Novelty Search. This repository was made in the summer of 2022 as a part of undergraduate research at Southwestern University.
 <!--- DO NOT FORGET TO SITE THE TWO SOURCES -->  
 <!--- IS THIS WHERE THE SOURCES NEED TO BE SITED? OR SHOULD IT BE SOMEWHERE ELSE? -->
 <!--- RIGHT NOW JUST THE LINKS ARE HERE. NEEDS TO CITED IT BETTER. -->  
@@ -18,7 +18,7 @@
 
 NOTE: This code only works with Python 3.7 and 3.8!
 
-1. Install Java 8 (or 1.8). You can check what version you currently have with `java -version`
+1. Install Java 8 (a.k.a. 1.8). You can check what version you currently have with `java -version`
     - Unix: `sudo apt-get install openjdk-8-jre`
     - OSX:
         - brew tap AdoptOpenJDK/openjdk
@@ -26,20 +26,22 @@ NOTE: This code only works with Python 3.7 and 3.8!
         - If you have trouble installing, look at [**How to install Java JDK on macOS**](https://mkyong.com/java/how-to-install-java-on-mac-osx/)
     - Windows: [**Java for Windows 8**](https://www.oracle.com/java/technologies/downloads/#java8)
 
-2. Clone repo and install grpc:
-    - `git clone https://github.com/real-itu/Evocraft-p`
-    - `pip install grpcio`
+2. Clone repo:
+    - `git clone https://github.com/schrum2/EvoCraft-SCOPE.git`
 
-3. Run the batch file `SetUpServer.bat`. By doing this, it will:
+3. Run the batch file `SetUpServer.bat` (Windows only). By doing this, it will:
     - pip install the requirements.txt file
-    - Create a copy of the EvoCraft-py-Backup directory
+    - Create a copy of the `EvoCraft-py-Backup` directory under the name `EvoCraft-py` (different command needed on Mac/Linux/Unix)
 
-4. Change the eula = true in the eula.txt file located in the EvoCraft-py copy
+4. Run the batch file `LaunchServer.bat` in the root project directory (launches the `spongevanilla-1.12.2-7.3.0.jar` file in `EvoCraft-py`)
+    - Will setup some extra files associated with the server, but the server cannot run properly until the next step is completed.
+
+5. Change the `eula=true` in the `eula.txt` file located in the `EvoCraft-py` copy
 
 You can now connect to the server by launching minecraft!
 
 To connect to the server from within the game:
-1. Make sure the batch file `LaunchServer.bat` is running and the eula is set to true.
+1. Make sure the batch file `LaunchServer.bat` is running and the `eula` is set to `true`.
 2. Open up the minecraft launcher, and play the java edition 1.12.2
 3. Select the gamemode Multiplayer.
 4. Select Direct Connect, and in the server address box, type 'localhost'.
@@ -76,7 +78,7 @@ Currently, you can select from three types of batch files:
 - [**Evocraft-py**](https://github.com/real-itu/Evocraft-py)
 
 #### Contributors
-- Jacob Schrum
+- Dr. Jacob Schrum
 - Melanie Richey
 - Mark Mueller
 - Alejandro Medina

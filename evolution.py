@@ -67,14 +67,44 @@ def run(args):
         file_path = "C:/schrum2MM-NEAT/EvoCraft-SCOPE/{}/{}{}/archive".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # File path for loop below
         # Finds all shapes in the archive folder and makes them into a list. The length of this list is how long the next loop runs for
         novel_shapes = [f for f in listdir(file_path) if isfile(join(file_path, f))]
-        print("Loading {} saved structures from {}/{}{}/archive".format(len(novel_shapes),args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
+
+        # Gets the start point based on the command line param
+        if(args.LOAD_NOVELTY_MIN>args.LOAD_NOVELTY_MAX):
+            print("Invalid range. The start is bigger than the end. Try again")
+            quit()
+        elif(args.LOAD_NOVELTY_MAX-args.LOAD_NOVELTY_MIN>1000):
+            user_ch=input("WARNING: Printing over 1000 shapes at a time could crash the server. Press \"c\" to continue, or any other key to quit: ")
+            if(user_ch!='c'):
+                quit()
+        len_files = len(novel_shapes)
+        if args.LOAD_NOVELTY_MIN > -1 and args.LOAD_NOVELTY_MIN<len_files:
+            i = args.LOAD_NOVELTY_MIN
+        elif(args.LOAD_NOVELTY_MIN>len_files):
+            print("Your start value was larger than the ammount of files in the archive. Please try again")
+            quit()
+        else: 
+            i = 0
+
+        # Gets the end point based on the command line param
+        if args.LOAD_NOVELTY_MAX > -1 and args.LOAD_NOVELTY_MAX<len_files:
+            end = args.LOAD_NOVELTY_MAX
+        elif(args.LOAD_NOVELTY_MAX>len_files):
+            print("Your end value was larger than the ammount of files in the archive. The rest of the files in the archive will be generated")
+            end = len_files
+        else: 
+            end = len_files
+        print("Loading {} saved structures from {}/{}{}/archive".format(end-i,args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED))
+
         # Clear space for shapes
-        minecraft_structures.clear_area(mc.client, mc.position_information, len(novel_shapes)*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
-        # Loops through all files in archive and adds them, with their key, to a new list
-        for i in range(len(novel_shapes)):
+        minecraft_structures.clear_area(mc.client, mc.position_information, (end-i)*2, mc.args.SPACE_BETWEEN, mc.args.MAX_SNAKE_LENGTH)
+        print("cleared area")
+        # Loops through from start to end, generating all shapes
+        while i <end:
             with open( "{}/{}{}/archive/shape{}".format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED,i),'rb') as handle:
                 genome_from_pickle = pickle.load(handle)
             novel_genomes.append( (genome_from_pickle.key , genome_from_pickle) )
+            i+=1
+
         # The shapes in the list are generated, returned for clearing
         loaded_blocks = mc.eval_fitness(novel_genomes, config)
         print("All shapes from the archive were generated!")
@@ -160,6 +190,12 @@ def run(args):
             if not args.SAVE_FITNESS_LOG and args.LOAD_SAVED_POPULATION:
                 pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
             
+            if args.LOAD_PARAMETERS and args.LOAD_SAVED_POPULATION: # restore checkpoint when loading saved command line parameters.
+                print('in progress')
+                pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
+                # TODO: it looks like there is now a problem with the finally block
+
+
             pop.run(mc.eval_fitness, generations)
 
     finally:
