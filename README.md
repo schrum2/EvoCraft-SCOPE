@@ -78,7 +78,7 @@ Currently, you can select from three types of batch files:
 - [**Evocraft-py**](https://github.com/real-itu/Evocraft-py)
 
 #### Contributors
-- Jacob Schrum
+- Dr. Jacob Schrum
 - Melanie Richey
 - Mark Mueller
 - Alejandro Medina
