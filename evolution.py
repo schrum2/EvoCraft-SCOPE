@@ -190,6 +190,12 @@ def run(args):
             if not args.SAVE_FITNESS_LOG and args.LOAD_SAVED_POPULATION:
                 pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
             
+            if args.LOAD_PARAMETERS and args.LOAD_SAVED_POPULATION: # restore checkpoint when loading saved command line parameters.
+                print('in progress')
+                pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
+                # TODO: it looks like there is now a problem with the finally block
+
+
             pop.run(mc.eval_fitness, generations)
 
     finally:

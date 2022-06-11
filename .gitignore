@@ -5,11 +5,14 @@ __pycache__/
 .vscode/
 *.pyc
 *.csv
+
 weights/
 snake/
 test/
 fill/
 
+/interactive/
 /EvoCraft-py/
 None
 novelty/
+Python3.8.bat
