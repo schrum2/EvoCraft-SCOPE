@@ -159,7 +159,8 @@ def main(argv):
                         help='How big the step size is for the snake continuation.')
     parser.add_argument('--MAINTAIN_EVOLUTIONARY_HISTORY', type=boolean_string, default=False, metavar='',
                         help='Whether or not to keep all generated shapes')
-
+    parser.add_argument('--LOAD_PARAMETERS', type=boolean_string, default=None, metavar='',
+                        help='Whether or not to load previously saved command line parameters.')
 
     args = parser.parse_args()
    
@@ -196,7 +197,6 @@ def main(argv):
         except: print('{}/{}{}/ is not a valid fitness function name.'.format(args.FITNESS_FUNCTION))
 
     random.seed(args.RANDOM_SEED)
-    
     #if not args.FITNESS_FUNCTION in dir(ff): 
      #   print('The fitness function name you have given does not exist.')
     
@@ -211,8 +211,13 @@ def main(argv):
         os.mkdir(path)
     
     # if the file of parameters already exists in the specified location, then load it
-    if exists('{}/parameters.txt'.format(path)):
+    load_path = '{}/{}{}'.format(args.BASE_DIR,args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED)
+    
+    if exists('{}/parameters.txt'.format(load_path)):
+        path = load_path
+        setattr(args, 'LOAD_PARAMETERS', tryeval(True))
         with open('{}/parameters.txt'.format(path)) as f:
+            print('You are loading previously saved command line parameters.') # TODO: find a way to throw an exception without getting caught up by default values
             # read all of the lines
             lines = f.readlines()
             # split all of the lines to get the value
@@ -221,26 +226,36 @@ def main(argv):
                 # get rid of the \n that was being saved with it
                 new_line = rhs[0:len(rhs)-1]
                         
-                k = line.split(':')[0]
-                if str(args.__dict__[k]) != new_line:
-                    raise Exception("The value you have chosen for {} does not match the value loaded from the already existing parameters file. \nProposed Value: {} \nPreexisting Value: {}".format(k, tryeval(new_line), args.__dict__[k]))
-               
-                setattr(args, k, tryeval(new_line))
-    
+                k = line.split(':')[0] # command line parameter name
+                changeable_params = ['LOAD_SAVED_POPULATION', 'LOAD_SAVED_SEED', 'LOAD_GENERATION', 'LOAD_PARAMETERS'] # these command line parameters are ok to change
+        
+                if k not in changeable_params: # check if parameter is allowed to be changed
+                    setattr(args, k, tryeval(new_line))
+                    
+                else:
+                    if args.__dict__[k] == None:
+                        setattr(args, k, tryeval(new_line)) # do not let default values overwrite these values (if they already have a value)
+
+
+    # make sure to find the most recently saved generation to load
+    if args.LOAD_PARAMETERS:
+        directory = '{}/{}{}/gen'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX,args.LOAD_SAVED_SEED) # directory to look in
+        generation_number = 0 # default start on 0
+        for filename in os.scandir(directory): # look through all files in directory for highest saved generation number
+            if filename.is_file():
+                fname = str(filename)
+                rhs = fname.split('gen')[1] # get the right side (contains the number)
+                possible_gen_number = int(rhs.split('\'')[0]) # gen number of the file
+                if possible_gen_number > generation_number: 
+                    generation_number = possible_gen_number # get largest gen number from saved file in directory
+        setattr(args, 'LOAD_GENERATION', generation_number) # change args.LOAD_GENERATION to the highest saved and existing gen number
+
+
     # save the parameters if SAVE_PARAMETERS is true.      
     if args.SAVE_PARAMETERS:    
-        try:
-        # does not already exist, make new file and save args
-          with open('{}/parameters.txt'.format(path), 'x') as f:
-                for arg in args.__dict__:
-                    f.write('{}:{}\n'.format(arg,args.__dict__[arg]))      
-        except FileExistsError:
-            # already exists, not overriding the data in a preexisting file
-            # letting this exception pass since it will be loaded anyways by the code above.
-            pass
-    
-    # check if loaded value differs from attempted saved value and crash with message similar to 'The proposed command line parameter differs from the existing command line parameter.'
-
+        with open('{}/parameters.txt'.format(path), 'w') as f:
+            for arg in args.__dict__:
+                f.write('{}:{}\n'.format(arg,args.__dict__[arg]))      
 
     evolution.run(args)
 
