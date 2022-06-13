@@ -189,19 +189,30 @@ def run(args):
             
             if not args.SAVE_FITNESS_LOG and args.LOAD_SAVED_POPULATION:
                 pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
-            
-            if args.LOAD_PARAMETERS and args.LOAD_SAVED_POPULATION: # restore checkpoint when loading saved command line parameters.
-                print('in progress')
+                print("Evaluate 1 Generation")
+                pop.run(mc.eval_fitness, 1)
+                # When loading, the most recently saved generation is loaded, but no further evolution happens and the program crashes. 
+
+            elif args.LOAD_PARAMETERS and args.LOAD_SAVED_POPULATION: # restore checkpoint when loading saved command line parameters.
+                print('Load from: {}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
+                # Equivalent?
+                #pop = neat.checkpoint.Checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
                 pop = checkpointer.restore_checkpoint('{}/{}{}/gen/gen{}'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.LOAD_SAVED_SEED, args.LOAD_GENERATION))
-                # TODO: it looks like there is now a problem with the finally block
+                print("Evaluate 1 Generation")
+                pop.run(mc.eval_fitness, 1)
+                # When loading, the most recently saved generation is loaded, but no further evolution happens and the program crashes.
 
-
-            pop.run(mc.eval_fitness, generations)
+            else:
+                print("Start evolving")
+                pop.run(mc.eval_fitness, generations)
 
     finally:
         # only save to csv for fitness based evolution
+        print('outside the nested loops')
         if not args.INTERACTIVE_EVOLUTION:
+            print('inside the inner loop of nested loops')
             if not args.LOAD_SAVED_POPULATION and args.SAVE_FITNESS_LOG and not invalid_dir_names:
+                print('inside nested else statement')
                 checkpointer.save_checkpoint(config, pop.population, neat.DefaultSpeciesSet ,pop.generation)
                 stats.save()
                 # cross_validation has to be false, true produces an error, also the git thing said
@@ -235,8 +246,7 @@ def run(args):
                         xi+=1
             
                 visualize.draw_net(config, stats.best_genome(), view=True, filename='{}/{}{}/champion_neural_network.gv'.format(args.BASE_DIR, args.EXPERIMENT_PREFIX, args.RANDOM_SEED), node_names=node_names)
-
-
+            
         # Clear and reset lots of extra space on exit/crash unless KEEP_WORLD_ON_EXIT is true. Population size doubled to clear more space
         if not args.KEEP_WORLD_ON_EXIT:
             minecraft_structures.restore_ground(mc.client, mc.position_information, mc.args.POPULATION_SIZE*2, mc.args.SPACE_BETWEEN)
