@@ -65,11 +65,16 @@ You can run a batch file by:
 3. Include a space followed by any digit within the range of 0-100. This value will be the random seed for the world and is required for the batch files to run.
 
 Here's an example of what it would look like for a fitness function:
-![command prompt for batch](/images/command-prompt-batch.PNG)
+```
+.\FitnessFillSpaceSnakes.bat 0
+```
 
 Currently, you can select from three types of batch files:
 - Fitness functions: This set runs different tests that  attempt to maximize the space with certain blocks by generating snakes or cubes.
-- Interactive evolution: This set allows you as the player to choose what kind of structures (snakes or cubes) should continue to generate either through the console or through in-game input. You can select any of the structures by right clicking the levers that are before each structure. Then when you are finished selecting your favorites, you can press any of the buttons that are on the switches nearest to you to start the next generation. In `InteractiveInGameCube.bat`, you are also able to change the blocks that are present in each structure. Simply destroy any of the blocks that are behind the switches and replace it with any block you like.
+- Interactive evolution: This set allows you as the player to choose what kind of structures (snakes or cubes) should continue to generate either through the console or through in-game input. You can select any of the structures by right clicking the levers that are before each structure. Then when you are finished selecting your favorites, you can press any of the buttons that are on the switches nearest to you to start the next generation. In `InteractiveInGameCube.bat`, you are also able to change the blocks that are present in each structure. Simply destroy any of the blocks that are behind the switches and replace it with any block you like. Run this command to try it:
+```
+.\InteractiveInGameCubes.bat 0
+```
 ![interactive instructions](/images/Instructions-Interactive-Evolution.png)
 - Novelty search: This set runs a type of exploration algorithm that tests many different aspects of snake or cubic generation
 <!--- CHECK AGAIN IF THE RANGE OF RANDOM SEEDS IS 0-100 AND IF THAT IS INCLUSIVE/EXCLUSIVE --> 
