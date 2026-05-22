@@ -4,5 +4,16 @@ __pycache__/
 .pyc
 .vscode/
 *.pyc
+*.csv
+
 weights/
-/EvoCraft-py
+snake/
+test/
+fill/
+
+/novelty/
+/interactive/
+/EvoCraft-py/
+None
+novelty/
+Python3.8.bat
