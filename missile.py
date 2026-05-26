@@ -15,29 +15,26 @@ client.fillCube(FillCubeRequest(  # Clear a 20x10x20 working area
 ))
 
 client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=6, z=0), type=TNT, orientation=WEST),
+    Block(position=Point(x=1, y=6, z=0), type=REDSTONE_LAMP, orientation=WEST),
+    Block(position=Point(x=2, y=6, z=0), type=OBSERVER, orientation=SOUTH),
+    Block(position=Point(x=3, y=6, z=0), type=SLIME, orientation=WEST),
+    Block(position=Point(x=4, y=6, z=0), type=SLIME, orientation=WEST),
+    Block(position=Point(x=0, y=5, z=0), type=SLIME, orientation=WEST),
+    Block(position=Point(x=1, y=5, z=0), type=SLIME, orientation=WEST),
+    Block(position=Point(x=2, y=5, z=0), type=STICKY_PISTON, orientation=EAST),
+    Block(position=Point(x=4, y=5, z=0), type=SLIME, orientation=WEST),
 
-    # CORE PISTON LINE
-    Block(position=Point(x=0, y=5, z=0), type=STICKY_PISTON, orientation=WEST),
-    Block(position=Point(x=1, y=5, z=0), type=PISTON, orientation=EAST),
-    Block(position=Point(x=-1, y=5, z=0), type=SLIME, orientation=NORTH),
-    Block(position=Point(x=-2, y=5, z=0), type=PISTON, orientation=EAST),
-
-    # SLIME EXTENSION
-    Block(position=Point(x=2, y=5, z=0), type=SLIME, orientation=NORTH),
-    Block(position=Point(x=3, y=5, z=0), type=SLIME, orientation=NORTH),
-
-    # REDSTONE TRIGGERS
-    Block(position=Point(x=-1, y=6, z=0), type=REDSTONE_BLOCK, orientation=NORTH),
-    Block(position=Point(x=2, y=6, z=0), type=REDSTONE_BLOCK, orientation=NORTH),
-
-    # TNT PAYLOAD
-    Block(position=Point(x=3, y=4, z=0), type=TNT, orientation=NORTH),
-    Block(position=Point(x=3, y=5, z=-1), type=TNT, orientation=NORTH),
-    Block(position=Point(x=3, y=5, z=1), type=TNT, orientation=NORTH),
-    Block(position=Point(x=4, y=5, z=0), type=TNT, orientation=NORTH),
-
-    Block(position=Point(x=-2, y=4, z=0), type=SLIME, orientation=WEST),
-
+    Block(position=Point(x=0, y=6, z=1), type=SLIME, orientation=WEST),
+    Block(position=Point(x=1, y=6, z=1), type=SLIME, orientation=WEST),
+    Block(position=Point(x=2, y=6, z=1), type=STICKY_PISTON, orientation=WEST),
+    Block(position=Point(x=3, y=6, z=1), type=STICKY_PISTON, orientation=UP),
+    Block(position=Point(x=4, y=6, z=1), type=SLIME, orientation=WEST),
+    Block(position=Point(x=0, y=5, z=1), type=SLIME, orientation=WEST),
+    Block(position=Point(x=2, y=5, z=1), type=OBSERVER, orientation=UP),
+    Block(position=Point(x=3, y=5, z=1), type=SLIME, orientation=WEST),
+    Block(position=Point(x=4, y=5, z=1), type=STICKY_PISTON, orientation=EAST),
+    Block(position=Point(x=4, y=7, z=1), type=FIRE, orientation=EAST),
 ]))
 
 
