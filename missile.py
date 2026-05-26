@@ -9,11 +9,15 @@ client = minecraft_pb2_grpc.MinecraftServiceStub(channel)
 
 client.fillCube(FillCubeRequest(  # Clear a 20x10x20 working area
     cube=Cube(
-        min=Point(x=-5, y=5, z=5),
-        max=Point(x=7, y=15, z=-3)
+        min=Point(x=-2, y=1, z=1),
+        max=Point(x=3, y=11, z=11)
     ),
     type=AIR
 ))
+
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=10, z=5), type=TNT, orientation=SOUTH),
+]))
 
 client.spawnBlocks(Blocks(blocks=[
     # Origin slime block
@@ -75,11 +79,9 @@ client.spawnBlocks(Blocks(blocks=[
     # Front-facing observer to the left of TNT
     Block(position=Point(x=0, y=10, z=4), type=OBSERVER, orientation=SOUTH),
 ]))
-blocks = client.readCube(Cube(
-    min=Point(x=1, y=5, z=-4),
-    max=Point(x=1, y=6, z=1)
-))
-# time.sleep(0.1)
-client.spawnBlocks(Blocks(blocks=[
-    Block(position=Point(x=0, y=10, z=5), type=TNT, orientation=SOUTH),
-]))
+#blocks = client.readCube(Cube(
+#    min=Point(x=1, y=5, z=-4),
+#    max=Point(x=1, y=6, z=1)
+#))
+#time.sleep(0.1)
+#time.sleep(2.0)
