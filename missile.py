@@ -20,63 +20,107 @@ client.spawnBlocks(Blocks(blocks=[
 ]))
 
 client.spawnBlocks(Blocks(blocks=[
-    # Origin slime block
     Block(position=Point(x=0, y=10, z=0), type=SLIME, orientation=SOUTH),
+]))
 
-    # Front-facing observers left/right/up/down of origin slime
-    Block(position=Point(x=-1, y=10, z=0), type=OBSERVER, orientation=NORTH),  # left
-    Block(position=Point(x=1,  y=10, z=0), type=OBSERVER, orientation=NORTH),  # right
-    Block(position=Point(x=0,  y=11, z=0), type=OBSERVER, orientation=NORTH),  # up
-    Block(position=Point(x=0,  y=9,  z=0), type=OBSERVER, orientation=NORTH),  # down
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=-1, y=10, z=0), type=OBSERVER, orientation=NORTH),
+]))
 
-    # Slime block in front of origin slime
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=1, y=10, z=0), type=OBSERVER, orientation=NORTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=11, z=0), type=OBSERVER, orientation=NORTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=9, z=0), type=OBSERVER, orientation=NORTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=10, z=1), type=SLIME, orientation=SOUTH),
+]))
 
-    # Front-facing pistons left/right/up/down of origin slime
-    Block(position=Point(x=-1, y=10, z=1), type=PISTON, orientation=SOUTH),  # left
-    Block(position=Point(x=1,  y=10, z=1), type=PISTON, orientation=SOUTH),  # right
-    Block(position=Point(x=0,  y=11, z=1), type=PISTON, orientation=SOUTH),  # up
-    Block(position=Point(x=0,  y=9,  z=1), type=PISTON, orientation=SOUTH),  # down
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=-1, y=10, z=1), type=PISTON, orientation=SOUTH),
+]))
 
-    # Air, slime, TNT in front of LEFT piston
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=1, y=10, z=1), type=PISTON, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=11, z=1), type=PISTON, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=9, z=1), type=PISTON, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=-1, y=10, z=2), type=AIR, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=-1, y=10, z=3), type=SLIME, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=-1, y=10, z=4), type=TNT, orientation=SOUTH),
+]))
 
-    # Back-facing sticky piston behind observer
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=10, z=3), type=STICKY_PISTON, orientation=NORTH),
+]))
 
-    # TNT to the left of sticky piston
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=1, y=10, z=3), type=TNT, orientation=SOUTH),
+]))
 
-    # TNT to the left of observer
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=1, y=10, z=4), type=TNT, orientation=SOUTH),
+]))
 
-    # TNT above sticky piston
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=11, z=3), type=TNT, orientation=SOUTH),
+]))
 
-    # TNT above observer
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=11, z=4), type=TNT, orientation=SOUTH),
+]))
 
-    # TNT below sticky piston
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=9, z=3), type=TNT, orientation=WEST),
+]))
 
-    # TNT below observer
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=9, z=4), type=TNT, orientation=SOUTH),
+]))
 
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=-1, y=10, z=5), type=TNT, orientation=SOUTH),
-    Block(position=Point(x=1, y=10, z=5), type=TNT, orientation=SOUTH),
-    Block(position=Point(x=0, y=11, z=5), type=TNT, orientation=SOUTH),
-    #Block(position=Point(x=0, y=9, z=5), type=TNT, orientation=SOUTH),
+]))
 
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=1, y=10, z=5), type=TNT, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=11, z=5), type=TNT, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=10, z=8), type=REDSTONE_BLOCK, orientation=SOUTH),
+]))
+
+client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=10, z=7), type=QUARTZ_BLOCK, orientation=SOUTH),
-    # Front-facing observer to the left of TNT
 ]))
 
 client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=10, z=5), type=SAND, orientation=SOUTH),
-    #Block(position=Point(x=0, y=9, z=5), type=AIR, orientation=WEST),
 ]))
 
 # client.spawnBlocks(Blocks(blocks=[
