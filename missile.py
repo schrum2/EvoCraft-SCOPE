@@ -16,7 +16,7 @@ client.fillCube(FillCubeRequest(  # Clear a 20x10x20 working area
 ))
 
 client.spawnBlocks(Blocks(blocks=[
-    Block(position=Point(x=0, y=10, z=5), type=TNT, orientation=SOUTH),
+    Block(position=Point(x=0, y=10, z=4), type=OBSERVER, orientation=SOUTH),
 ]))
 
 client.spawnBlocks(Blocks(blocks=[
@@ -59,7 +59,7 @@ client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=0, y=11, z=4), type=TNT, orientation=SOUTH),
 
     # TNT below sticky piston
-    Block(position=Point(x=0, y=9, z=3), type=TNT, orientation=SOUTH),
+    Block(position=Point(x=0, y=9, z=3), type=TNT, orientation=WEST),
 
     # TNT below observer
     Block(position=Point(x=0, y=9, z=4), type=TNT, orientation=SOUTH),
@@ -67,18 +67,22 @@ client.spawnBlocks(Blocks(blocks=[
     Block(position=Point(x=-1, y=10, z=5), type=TNT, orientation=SOUTH),
     Block(position=Point(x=1, y=10, z=5), type=TNT, orientation=SOUTH),
     Block(position=Point(x=0, y=11, z=5), type=TNT, orientation=SOUTH),
-    Block(position=Point(x=0, y=9, z=5), type=TNT, orientation=SOUTH),
+    #Block(position=Point(x=0, y=9, z=5), type=TNT, orientation=SOUTH),
 
-    Block(position=Point(x=-1, y=10, z=6), type=TNT, orientation=SOUTH),
-    Block(position=Point(x=1, y=10, z=6), type=TNT, orientation=SOUTH),
-    Block(position=Point(x=0, y=11, z=6), type=TNT, orientation=SOUTH),
-    Block(position=Point(x=0, y=9, z=6), type=TNT, orientation=SOUTH),
-
-    Block(position=Point(x=0, y=10, z=7), type=REDSTONE_BLOCK, orientation=SOUTH),
-    Block(position=Point(x=0, y=10, z=6), type=QUARTZ_BLOCK, orientation=SOUTH),
+    Block(position=Point(x=0, y=10, z=8), type=REDSTONE_BLOCK, orientation=SOUTH),
+    Block(position=Point(x=0, y=10, z=7), type=QUARTZ_BLOCK, orientation=SOUTH),
     # Front-facing observer to the left of TNT
-    Block(position=Point(x=0, y=10, z=4), type=OBSERVER, orientation=SOUTH),
 ]))
+
+client.spawnBlocks(Blocks(blocks=[
+    Block(position=Point(x=0, y=10, z=5), type=SAND, orientation=SOUTH),
+    #Block(position=Point(x=0, y=9, z=5), type=AIR, orientation=WEST),
+]))
+
+# client.spawnBlocks(Blocks(blocks=[
+#     Block(position=Point(x=0, y=10, z=4), type=OBSERVER, orientation=SOUTH),
+# ]))
+
 #blocks = client.readCube(Cube(
 #    min=Point(x=1, y=5, z=-4),
 #    max=Point(x=1, y=6, z=1)
